@@ -9,6 +9,8 @@ bool config_optional_int_key(const char *json, const char *key, int *value);
 bool config_optional_bool_key(const char *json, const char *key, bool *value);
 bool config_optional_string_key(const char *json, const char *key,
                                 char *out, size_t out_len);
+bool config_optional_clamped_int_key(const char *json, const char *key,
+                                     int *value, int min, int max);
 bool config_required_int_key(const char *json, const char *key, int *value);
 bool config_required_string_key(const char *json, const char *key,
                                 char *out, size_t out_len);
