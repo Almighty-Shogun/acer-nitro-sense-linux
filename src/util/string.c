@@ -22,6 +22,28 @@ bool string_contains_case(const char *haystack, const char *needle)
     return false;
 }
 
+bool string_copy(char *out, const size_t out_len, const char *text)
+{
+    const size_t len = text ? strlen(text) : 0;
+
+    if (out_len == 0)
+        return false;
+
+    if (!text) {
+        out[0] = '\0';
+        return true;
+    }
+
+    if (len >= out_len) {
+        memcpy(out, text, out_len - 1);
+        out[out_len - 1] = '\0';
+        return false;
+    }
+
+    memcpy(out, text, len + 1);
+    return true;
+}
+
 void trim_ascii(char *s)
 {
     const char *start = s;

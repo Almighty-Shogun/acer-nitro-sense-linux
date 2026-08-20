@@ -1,11 +1,11 @@
 #include "ec/backend.h"
 
 #include "util/number.h"
+#include "util/string.h"
 
 #include <fcntl.h>
 #include <errno.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <unistd.h>
 
 int ec_open_file_backend(const char *path, const enum ec_backend backend,
@@ -16,7 +16,7 @@ int ec_open_file_backend(const char *path, const enum ec_backend backend,
         return -1;
 
     ec->backend = backend;
-    snprintf(ec->name, sizeof(ec->name), "%s", name);
+    string_copy(ec->name, sizeof(ec->name), name);
     return 0;
 }
 

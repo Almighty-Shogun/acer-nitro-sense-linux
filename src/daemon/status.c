@@ -7,6 +7,7 @@
 #include "platform/power_source.h"
 #include "util/file.h"
 #include "util/format.h"
+#include "util/string.h"
 
 #include <stdio.h>
 #include <time.h>
@@ -103,7 +104,7 @@ void write_status(const struct ans_config *cfg, struct ec_device *ec,
         char active_percent[16];
 
         if (firmware_mode && !states[i].safety_active)
-            snprintf(active_percent, sizeof(active_percent), "null");
+            string_copy(active_percent, sizeof(active_percent), "null");
         else
             snprintf(active_percent, sizeof(active_percent), "%d", states[i].percent);
 

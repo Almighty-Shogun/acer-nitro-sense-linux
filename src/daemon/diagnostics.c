@@ -6,6 +6,7 @@
 #include "platform/power_source.h"
 #include "sensors/sensors.h"
 #include "util/file.h"
+#include "util/string.h"
 
 #include <errno.h>
 #include <stdio.h>
@@ -108,14 +109,14 @@ void validate_model(struct ec_device *ec, const struct ans_config *cfg,
             snprintf(temperature_register, sizeof(temperature_register), "0x%02x",
                      fan->temperature_register);
         else
-            snprintf(temperature_register, sizeof(temperature_register), "none");
+            string_copy(temperature_register, sizeof(temperature_register), "none");
         if (fan->control_temperature_register >= 0)
             snprintf(control_temperature_register,
                      sizeof(control_temperature_register), "0x%02x",
                      fan->control_temperature_register);
         else
-            snprintf(control_temperature_register,
-                     sizeof(control_temperature_register), "none");
+            string_copy(control_temperature_register,
+                        sizeof(control_temperature_register), "none");
 
         printf("fan=%s name=\"%s\" sensor_group=%s control_sensor_group=%s rpm=%d temp=%d control_temp=%d read_register=0x%02x write_register=0x%02x temperature_register=%s control_temperature_register=%s reset_speed=%d missing_temperature_speed_percent=%d curve_points=%d keep_awake=%s sensor_power_control=%s\n",
                fan->id, fan->name, fan->sensor_group,

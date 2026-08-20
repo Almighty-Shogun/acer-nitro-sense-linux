@@ -49,7 +49,7 @@ static int find_power_control_path(const char *base, char *out,
     char path[PATH_MAX];
 
     if (!realpath(base, path))
-        snprintf(path, sizeof(path), "%s", base);
+        string_copy(path, sizeof(path), base);
 
     while (strcmp(path, "/") != 0) {
         const char *name = strrchr(path, '/');
@@ -65,7 +65,7 @@ static int find_power_control_path(const char *base, char *out,
                     free(candidate);
                     return -1;
                 }
-                snprintf(out, out_len, "%s", candidate);
+                string_copy(out, out_len, candidate);
                 free(candidate);
                 return 0;
             }
@@ -100,12 +100,11 @@ static int read_power_control(const char *path, char *out, const size_t out_len)
         return -1;
 
     trim_ascii(text);
-    if (strlen(text) >= out_len) {
+    if (!string_copy(out, out_len, text)) {
         free(text);
         return -1;
     }
 
-    snprintf(out, out_len, "%s", text);
     free(text);
     return 0;
 }

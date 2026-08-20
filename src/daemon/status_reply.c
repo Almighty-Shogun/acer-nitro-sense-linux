@@ -6,6 +6,7 @@
 #include "fan/control.h"
 #include "platform/control.h"
 #include "platform/power_source.h"
+#include "util/string.h"
 
 #include <stdio.h>
 
@@ -29,7 +30,7 @@ void reply_status(const int client, const struct ans_config *cfg,
         char active_percent[16];
 
         if (firmware_mode && !states[i].safety_active)
-            snprintf(active_percent, sizeof(active_percent), "firmware");
+            string_copy(active_percent, sizeof(active_percent), "firmware");
         else
             snprintf(active_percent, sizeof(active_percent), "%d", states[i].percent);
 

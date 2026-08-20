@@ -6,6 +6,7 @@
 #include "util/file.h"
 #include "util/format.h"
 #include "util/json.h"
+#include "util/string.h"
 
 #include <errno.h>
 #include <stdio.h>
@@ -113,11 +114,11 @@ bool restore_control_state_from_json(struct ec_device *ec,
             cfg->keyboard_backlight.timeout_seconds;
     }
 
-    snprintf(preset, preset_len, "auto");
+    string_copy(preset, preset_len, "auto");
     json_string_key(json, "preset", preset, preset_len);
 
     if (*auto_mode) {
-        snprintf(preset, preset_len, "auto");
+        string_copy(preset, preset_len, "auto");
         apply_daemon_control_fan_mode(ec, cfg);
 
         for (int i = 0; i < cfg->fan_len; i++) {
@@ -128,7 +129,7 @@ bool restore_control_state_from_json(struct ec_device *ec,
                             global_safety_reason(cfg, states));
         }
     } else if (strcmp(preset, FIRMWARE_AUTO_PRESET) == 0) {
-        snprintf(preset, preset_len, "%s", FIRMWARE_AUTO_PRESET);
+        string_copy(preset, preset_len, FIRMWARE_AUTO_PRESET);
 
         for (int i = 0; i < cfg->fan_len; i++) {
             const int percent = json_saved_percent_for_fan(
@@ -139,13 +140,13 @@ bool restore_control_state_from_json(struct ec_device *ec,
         }
 
         if (!apply_firmware_auto_fan_mode(ec, cfg))
-            snprintf(preset, preset_len, "manual");
+            string_copy(preset, preset_len, "manual");
     } else if (strcmp(preset, "manual") != 0 &&
                config_find_preset(cfg, preset)) {
         apply_daemon_control_fan_mode(ec, cfg);
         apply_preset(ec, cfg, states, preset);
     } else {
-        snprintf(preset, preset_len, "manual");
+        string_copy(preset, preset_len, "manual");
         apply_daemon_control_fan_mode(ec, cfg);
 
         for (int i = 0; i < cfg->fan_len; i++) {

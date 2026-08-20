@@ -2,6 +2,7 @@
 
 #include "ec/ec.h"
 #include "util/number.h"
+#include "util/string.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -33,8 +34,8 @@ void fan_update_safety_state(const struct fan_config *fan, fan_state *state,
     }
 
     state->safety_active = active;
-    snprintf(state->safety_reason, sizeof(state->safety_reason), "%s",
-             active ? reason : "");
+    string_copy(state->safety_reason, sizeof(state->safety_reason),
+                active ? reason : "");
 }
 
 int fan_safety_adjust_percent(const struct ans_config *cfg,

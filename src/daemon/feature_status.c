@@ -7,6 +7,7 @@
 #include "platform/control.h"
 #include "platform/power_source.h"
 #include "sensors/sensors.h"
+#include "util/string.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -140,7 +141,7 @@ void reply_keyboard_backlight_status(const int client, struct ec_device *ec,
     if (keyboard_backlight.reg >= 0)
         snprintf(reg_text, sizeof(reg_text), "0x%02x", keyboard_backlight.reg);
     else
-        snprintf(reg_text, sizeof(reg_text), "unavailable");
+        string_copy(reg_text, sizeof(reg_text), "unavailable");
 
     control_reply(client,
             "keyboard_backlight=%s timeout=%s timeout_seconds=%d timeout_backend=%s timed_off=%s restore_percent=%d name=%s brightness=%d max_brightness=%d percent=%d backend=%s register=%s reason=%s\n",

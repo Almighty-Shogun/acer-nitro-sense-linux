@@ -44,7 +44,7 @@ static bool read_trimmed_file(const char *path, char *out, const size_t out_len)
         return false;
 
     trim_ascii(text);
-    snprintf(out, out_len, "%s", text);
+    string_copy(out, out_len, text);
     free(text);
     return true;
 }

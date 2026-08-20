@@ -13,7 +13,7 @@
 static void init_status(struct keyboard_backlight_status *status)
 {
     memset(status, 0, sizeof(*status));
-    snprintf(status->backend, sizeof(status->backend), "none");
+    string_copy(status->backend, sizeof(status->backend), "none");
     status->reg = -1;
     status->brightness = -1;
     status->max_brightness = -1;
@@ -52,7 +52,7 @@ bool keyboard_backlight_read(struct keyboard_backlight_status *status)
     struct dirent *entry;
 
     init_status(status);
-    snprintf(status->backend, sizeof(status->backend), "sysfs");
+    string_copy(status->backend, sizeof(status->backend), "sysfs");
 
     dir = opendir("/sys/class/leds");
     if (!dir)
@@ -98,8 +98,8 @@ static bool keyboard_backlight_read_ec(struct ec_device *ec,
     int value;
 
     init_status(status);
-    snprintf(status->backend, sizeof(status->backend), "ec");
-    snprintf(status->name, sizeof(status->name), "acer-ec");
+    string_copy(status->backend, sizeof(status->backend), "ec");
+    string_copy(status->name, sizeof(status->name), "acer-ec");
     status->reg = cfg->keyboard_backlight.reg;
     status->max_brightness = cfg->keyboard_backlight.max_value;
 

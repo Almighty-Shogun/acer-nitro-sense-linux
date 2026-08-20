@@ -6,6 +6,7 @@
 #include "daemon/state.h"
 #include "fan/control.h"
 #include "platform/control.h"
+#include "util/string.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -57,7 +58,7 @@ static bool handle_set_command(const int client, struct ec_device *ec,
         return true;
 
     *auto_mode = false;
-    snprintf(preset, preset_len, "manual");
+    string_copy(preset, preset_len, "manual");
     if (!daemon_quiet_logs)
         fprintf(stderr, "mode_change mode=manual fan=%s requested=%d\n", fan, percent);
 
@@ -105,7 +106,7 @@ static bool handle_preset_command(const int client, struct ec_device *ec,
         return true;
 
     *auto_mode = false;
-    snprintf(preset, preset_len, "%s", p->id);
+    string_copy(preset, preset_len, p->id);
     if (!daemon_quiet_logs)
         fprintf(stderr, "mode_change mode=preset preset=%s cpu=%d gpu=%d\n",
                 p->id, p->cpu, p->gpu);
@@ -134,7 +135,7 @@ static bool handle_auto_command(const int client, struct ec_device *ec,
         return true;
 
     *auto_mode = true;
-    snprintf(preset, preset_len, "auto");
+    string_copy(preset, preset_len, "auto");
     if (!daemon_quiet_logs)
         fprintf(stderr, "mode_change mode=auto preset=auto\n");
 
@@ -174,7 +175,7 @@ static bool handle_firmware_auto_command(const int client, struct ec_device *ec,
 
     *auto_mode = false;
     *coolboost_enabled = false;
-    snprintf(preset, preset_len, "%s", FIRMWARE_AUTO_PRESET);
+    string_copy(preset, preset_len, FIRMWARE_AUTO_PRESET);
     write_control_state(cfg, states, *auto_mode, preset, *coolboost_enabled,
                         runtime);
     if (!daemon_quiet_logs)
