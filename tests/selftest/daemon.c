@@ -3,6 +3,7 @@
 #include "daemon/types.h"
 #include "ec/ec.h"
 #include "selftest/commands.h"
+#include "selftest/daemon_args.h"
 #include "selftest/fan_control.h"
 #include "selftest/parser.h"
 #include "selftest/state.h"
@@ -15,6 +16,9 @@ int run_self_tests(void)
     daemon_quiet_logs = true;
     daemon_persist_control_state = false;
     int failures = selftest_run_parser();
+
+    failures += selftest_run_daemon_args();
+
     struct ans_config cfg;
     struct ec_device ec = {.backend = EC_BACKEND_NONE};
     fan_state states[ANS_MAX_FANS];
