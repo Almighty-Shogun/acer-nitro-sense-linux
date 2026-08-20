@@ -1,12 +1,12 @@
 #include "commands/platform_handlers.h"
 
+#include "control/protocol.h"
 #include "commands/parser.h"
 #include "daemon/state.h"
 #include "platform/control.h"
 
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 
 bool handle_coolboost_command(const int client, struct ec_device *ec,
                               const struct ans_config *cfg,
@@ -23,12 +23,12 @@ bool handle_coolboost_command(const int client, struct ec_device *ec,
 
     if (!parse_coolboost_command(cmd, action, sizeof(action)) ||
         (strcmp(action, "on") != 0 && strcmp(action, "off") != 0)) {
-        dprintf(client, "error usage: coolboost on|off|status\n");
+        control_reply(client, "error usage: coolboost on|off|status\n");
         return true;
     }
 
     if (!cfg->fan_modes.available) {
-        dprintf(client, "error coolboost unavailable for this model\n");
+        control_reply(client, "error coolboost unavailable for this model\n");
         return true;
     }
 
@@ -39,7 +39,7 @@ bool handle_coolboost_command(const int client, struct ec_device *ec,
             apply_coolboost(ec, cfg, states, false));
 
     if (!applied) {
-        dprintf(client, "error coolboost write failed\n");
+        control_reply(client, "error coolboost write failed\n");
         return true;
     }
 
@@ -49,6 +49,6 @@ bool handle_coolboost_command(const int client, struct ec_device *ec,
     if (!daemon_quiet_logs)
         fprintf(stderr, "coolboost_change enabled=%d backend=fan-mode-turbo\n",
                 enabled ? 1 : 0);
-    dprintf(client, "coolboost=%s\n", enabled ? "on" : "off");
+    control_reply(client, "coolboost=%s\n", enabled ? "on" : "off");
     return true;
 }

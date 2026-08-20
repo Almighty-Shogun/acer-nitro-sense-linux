@@ -22,6 +22,7 @@ add_project_arguments('-D_GNU_SOURCE', language: 'c')
 core_sources = [
   'src/commands/parser.c',
   'src/commands/tokens.c',
+  'src/control/protocol.c',
   'src/config/config.c',
   'src/config/fans.c',
   'src/config/lists.c',
@@ -54,9 +55,13 @@ core_sources = [
   'src/sensors/fake.c',
   'src/sensors/nvidia.c',
   'src/sensors/power.c',
-  'src/util/util.c',
+  'src/util/fd.c',
+  'src/util/file.c',
+  'src/util/format.c',
   'src/util/json.c',
   'src/util/json_scan.c',
+  'src/util/number.c',
+  'src/util/string.c',
 ]
 
 fan_sources = [
@@ -137,7 +142,10 @@ executable('acer-nitro-sense',
     'src/client/status.c',
     'src/client/transport.c',
     'src/client/usage.c',
-    'src/util/util.c',
+    'src/util/fd.c',
+    'src/util/file.c',
+    'src/util/number.c',
+    'src/util/string.c',
   ],
   include_directories: src_inc,
   install: true)

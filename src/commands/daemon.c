@@ -1,5 +1,6 @@
 #include "commands/daemon.h"
 #include "commands/parser.h"
+#include "control/protocol.h"
 #include "control/socket.h"
 #include "commands/ec.h"
 #include "commands/fan.h"
@@ -9,7 +10,6 @@
 #include "platform/control.h"
 
 #include <stdio.h>
-#include <unistd.h>
 
 void execute_command(const int client, struct ec_device *ec, const struct ans_config *cfg,
                      fan_state states[ANS_MAX_FANS], bool *auto_mode,
@@ -23,7 +23,7 @@ void execute_command(const int client, struct ec_device *ec, const struct ans_co
         return;
 
     if (!can_control) {
-        dprintf(client, "error permission denied: add your user to the %s group and log in again\n", ANS_CONTROL_GROUP);
+        control_reply(client, "error permission denied: add your user to the %s group and log in again\n", ANS_CONTROL_GROUP);
 
         return;
     }
@@ -48,19 +48,19 @@ void execute_command(const int client, struct ec_device *ec, const struct ans_co
             apply_current_control_state(ec, cfg, states);
         if (!daemon_quiet_logs)
             fprintf(stderr, "resume_reapply mode=%s preset=%s\n", control_mode(*auto_mode, preset), preset);
-        dprintf(client, "resume=ok mode=%s preset=%s\n", control_mode(*auto_mode, preset), preset);
+        control_reply(client, "resume=ok mode=%s preset=%s\n", control_mode(*auto_mode, preset), preset);
 
         return;
     }
 
     if (command_is_exact(cmd, "stop")) {
         daemon_running = 0;
-        dprintf(client, "stop=ok reset=firmware\n");
+        control_reply(client, "stop=ok reset=firmware\n");
 
         return;
     }
 
-    dprintf(client, "error unknown command\n");
+    control_reply(client, "error unknown command\n");
 }
 
 void handle_client(const int client, struct ec_device *ec, const struct ans_config *cfg,
@@ -70,12 +70,13 @@ void handle_client(const int client, struct ec_device *ec, const struct ans_conf
                    daemon_runtime_state *runtime)
 {
     char cmd[256];
-    const ssize_t n = read(client, cmd, sizeof(cmd) - 1);
+    const int read_result = control_read_command(client, cmd, sizeof(cmd));
 
-    if (n <= 0)
+    if (read_result < 0) {
+        control_reply(client, "error invalid command\n");
         return;
+    }
 
-    cmd[n] = '\0';
     execute_command(client, ec, cfg, states, auto_mode, preset, preset_len,
                     coolboost_enabled, runtime, cmd, client_can_control(client));
 }

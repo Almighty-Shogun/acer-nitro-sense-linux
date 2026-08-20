@@ -2,6 +2,7 @@
 
 #include "fan/control.h"
 #include "platform/control.h"
+#include "util/format.h"
 #include "util/json.h"
 
 #include <errno.h>
@@ -32,7 +33,7 @@ void write_control_state(const struct ans_config *cfg,
                          const daemon_runtime_state *runtime)
 {
     char buf[1024];
-    int off = 0;
+    text_buffer out;
     const time_t now = time(NULL);
 
     (void)coolboost_enabled;
@@ -46,30 +47,39 @@ void write_control_state(const struct ans_config *cfg,
         return;
     }
 
-    off += snprintf(buf + off, sizeof(buf) - (size_t)off,
-                    "{\n  \"schema\": 1,\n  \"mode\": \"%s\",\n"
-                    "  \"auto\": %s,\n  \"preset\": \"%s\",\n"
-                    "  \"coolboost\": false,\n"
-                    "  \"power_source_auto_apply\": %s,\n"
-                    "  \"keyboard_backlight_timeout_enabled\": %s,\n"
-                    "  \"timestamp\": %ld,\n  \"fans\": [\n",
-                    control_mode(auto_mode, preset), auto_mode ? "true" : "false",
-                    preset, runtime && runtime->power_source_auto_apply ? "true" : "false",
-                    runtime && runtime->keyboard_backlight_timeout_enabled ?
-                        "true" : "false",
-                    (long)now);
+    text_buffer_init(&out, buf, sizeof(buf));
+    text_buffer_append(&out,
+                       "{\n  \"schema\": 1,\n  \"mode\": \"%s\",\n"
+                       "  \"auto\": %s,\n  \"preset\": \"%s\",\n"
+                       "  \"coolboost\": false,\n"
+                       "  \"power_source_auto_apply\": %s,\n"
+                       "  \"keyboard_backlight_timeout_enabled\": %s,\n"
+                       "  \"timestamp\": %ld,\n  \"fans\": [\n",
+                       control_mode(auto_mode, preset),
+                       auto_mode ? "true" : "false",
+                       preset,
+                       runtime && runtime->power_source_auto_apply ?
+                           "true" : "false",
+                       runtime && runtime->keyboard_backlight_timeout_enabled ?
+                           "true" : "false",
+                       (long)now);
 
     for (int i = 0; i < cfg->fan_len; i++) {
         const int percent = states[i].requested_percent > 0 ?
             states[i].requested_percent : states[i].percent;
 
-        off += snprintf(buf + off, sizeof(buf) - (size_t)off,
-                        "    { \"id\": \"%s\", \"percent\": %d }%s\n",
-                        cfg->fans[i].id, percent,
-                        i == cfg->fan_len - 1 ? "" : ",");
+        text_buffer_append(&out,
+                           "    { \"id\": \"%s\", \"percent\": %d }%s\n",
+                           cfg->fans[i].id, percent,
+                           i == cfg->fan_len - 1 ? "" : ",");
     }
 
-    snprintf(buf + off, sizeof(buf) - (size_t)off, "  ]\n}\n");
+    text_buffer_append(&out, "  ]\n}\n");
+
+    if (!text_buffer_ok(&out)) {
+        fprintf(stderr, "warning: failed to save control state: buffer too small\n");
+        return;
+    }
 
     if (write_text_file_atomic(ANS_STATE_PATH, buf) < 0)
         fprintf(stderr, "warning: failed to save control state: %s\n",

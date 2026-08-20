@@ -2,12 +2,21 @@
 
 #include <dlfcn.h>
 #include <stddef.h>
+#include <string.h>
 
 typedef struct nvmlDevice_st *nvmlDevice_t;
 typedef int nvmlReturn_t;
 
 #define NVML_SUCCESS 0
 #define NVML_TEMPERATURE_GPU 0
+
+static void load_symbol(void *handle, const char *name, void *out, const size_t out_len)
+{
+    void *symbol = dlsym(handle, name);
+
+    memset(out, 0, out_len);
+    memcpy(out, &symbol, out_len < sizeof(symbol) ? out_len : sizeof(symbol));
+}
 
 int sensor_read_nvidia_ml_c(void)
 {
@@ -24,21 +33,21 @@ int sensor_read_nvidia_ml_c(void)
         if (!handle)
             return -1;
 
-        nvmlInit_fn = (nvmlReturn_t (*)(void))dlsym(handle, "nvmlInit_v2");
+        load_symbol(handle, "nvmlInit_v2", &nvmlInit_fn, sizeof(nvmlInit_fn));
         if (!nvmlInit_fn)
-            nvmlInit_fn = (nvmlReturn_t (*)(void))dlsym(handle, "nvmlInit");
+            load_symbol(handle, "nvmlInit", &nvmlInit_fn, sizeof(nvmlInit_fn));
 
-        nvmlDeviceGetHandleByIndex_fn =
-            (nvmlReturn_t (*)(unsigned int, nvmlDevice_t *))dlsym(handle,
-                                                                  "nvmlDeviceGetHandleByIndex_v2");
+        load_symbol(handle, "nvmlDeviceGetHandleByIndex_v2",
+                    &nvmlDeviceGetHandleByIndex_fn,
+                    sizeof(nvmlDeviceGetHandleByIndex_fn));
         if (!nvmlDeviceGetHandleByIndex_fn)
-            nvmlDeviceGetHandleByIndex_fn =
-                (nvmlReturn_t (*)(unsigned int, nvmlDevice_t *))dlsym(handle,
-                                                                      "nvmlDeviceGetHandleByIndex");
+            load_symbol(handle, "nvmlDeviceGetHandleByIndex",
+                        &nvmlDeviceGetHandleByIndex_fn,
+                        sizeof(nvmlDeviceGetHandleByIndex_fn));
 
-        nvmlDeviceGetTemperature_fn =
-            (nvmlReturn_t (*)(nvmlDevice_t, unsigned int, unsigned int *))dlsym(
-                handle, "nvmlDeviceGetTemperature");
+        load_symbol(handle, "nvmlDeviceGetTemperature",
+                    &nvmlDeviceGetTemperature_fn,
+                    sizeof(nvmlDeviceGetTemperature_fn));
 
         if (!nvmlInit_fn || !nvmlDeviceGetHandleByIndex_fn || !nvmlDeviceGetTemperature_fn ||
             nvmlInit_fn() != NVML_SUCCESS ||

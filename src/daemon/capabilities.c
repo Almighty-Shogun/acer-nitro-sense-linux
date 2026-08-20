@@ -1,5 +1,6 @@
 #include "daemon/capabilities.h"
 
+#include "control/protocol.h"
 #include "ans.h"
 #include "keyboard/backlight.h"
 #include "platform/power_source.h"
@@ -67,17 +68,17 @@ void reply_capabilities(const int client, const struct ans_config *cfg,
     gpu_temperature_source(cfg, gpu_temp_source, sizeof(gpu_temp_source));
     keyboard_backlight_read(&keyboard_backlight);
 
-    dprintf(client, "fan_control=available modes=manual,preset,auto,firmware-auto\n");
-    dprintf(client, "coolboost=%s backend=%s\n",
+    control_reply(client, "fan_control=available modes=manual,preset,auto,firmware-auto\n");
+    control_reply(client, "coolboost=%s backend=%s\n",
             cfg->fan_modes.available ? "available" : "unavailable",
             cfg->fan_modes.available ? "fan-mode-turbo" : "unavailable");
-    dprintf(client, "fan_mode=%s modes=%s\n",
+    control_reply(client, "fan_mode=%s modes=%s\n",
             cfg->fan_modes.available ? "available" : "unavailable",
             cfg->fan_modes.available ? "auto,manual,turbo" : "unavailable");
-    dprintf(client, "platform_profile=%s profiles=%s\n",
+    control_reply(client, "platform_profile=%s profiles=%s\n",
             cfg->platform_profiles.available ? "available" : "unavailable",
             profiles);
-    dprintf(client,
+    control_reply(client,
             "power_source_profile=%s auto_apply=%s ac_profile=%s battery_profile=%s\n",
             power_source_profile_policy_available(cfg) ? "available" : "unavailable",
             runtime && runtime->power_source_auto_apply ? "on" : "off",
@@ -85,14 +86,14 @@ void reply_capabilities(const int client, const struct ans_config *cfg,
                 cfg->power_source_profiles.ac_profile : "unavailable",
             cfg->power_source_profiles.battery_profile[0] ?
                 cfg->power_source_profiles.battery_profile : "unavailable");
-    dprintf(client,
+    control_reply(client,
             "gpu_temperature=%s source=%s live_policy=%s current_policy=%s\n",
             (gpu_power_control_available ||
              strcmp(gpu_temp_source, "hwmon") != 0) ? "available" : "cached-only",
             gpu_temp_source,
             gpu_power_control_available ? "auto,live" : "unavailable",
             gpu_power_control_available ? gpu_power_control : "unavailable");
-    dprintf(client,
+    control_reply(client,
             "keyboard_backlight=%s control=%s timeout=%s timeout_backend=%s reason=%s\n",
             (cfg->keyboard_backlight.available ||
              keyboard_backlight.available) ? "available" : "unavailable",
