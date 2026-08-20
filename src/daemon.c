@@ -12,6 +12,7 @@
 #include "keyboard/backlight_timeout.h"
 #include "platform/control.h"
 #include "util/file.h"
+#include "util/string.h"
 
 #include <signal.h>
 #include <stdio.h>
@@ -159,14 +160,14 @@ int main(const int argc, char** argv)
     {
         auto_mode = true;
 
-        snprintf(preset, sizeof(preset), "auto");
+        string_copy(preset, sizeof(preset), "auto");
         apply_daemon_control_fan_mode(&ec, &cfg);
         write_control_state(&cfg, states, auto_mode, preset, coolboost_enabled, &runtime);
     }
     else if (strcmp(cfg.default_preset, FIRMWARE_AUTO_PRESET) == 0 && apply_firmware_auto_fan_mode(&ec, &cfg))
     {
         auto_mode = false;
-        snprintf(preset, sizeof(preset), "%s", FIRMWARE_AUTO_PRESET);
+        string_copy(preset, sizeof(preset), FIRMWARE_AUTO_PRESET);
         write_control_state(&cfg, states, auto_mode, preset, coolboost_enabled,
                             &runtime);
     }
@@ -174,7 +175,7 @@ int main(const int argc, char** argv)
     {
         auto_mode = false;
 
-        snprintf(preset, sizeof(preset), "%s", cfg.default_preset);
+        string_copy(preset, sizeof(preset), cfg.default_preset);
         write_control_state(&cfg, states, auto_mode, preset, coolboost_enabled, &runtime);
     }
 

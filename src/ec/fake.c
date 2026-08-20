@@ -1,11 +1,11 @@
 #include "ec/backend.h"
 
 #include "util/number.h"
+#include "util/string.h"
 
 #include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -37,7 +37,7 @@ int ec_open_fake(struct ec_device *ec)
 {
     ec->backend = EC_BACKEND_FAKE;
     ec->fd = -1;
-    snprintf(ec->name, sizeof(ec->name), "fake");
+    string_copy(ec->name, sizeof(ec->name), "fake");
 
     fake_set_word(ec, 0x13, 3000);
     fake_set_word(ec, 0x15, 2600);

@@ -1,10 +1,10 @@
 #include "ec/backend.h"
 
 #include "util/number.h"
+#include "util/string.h"
 
 #include <errno.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <sys/io.h>
 #include <unistd.h>
 
@@ -80,7 +80,7 @@ int ec_open_io_ports(struct ec_device *ec)
 
     ec->backend = EC_BACKEND_IO_PORTS;
     ec->fd = -1;
-    snprintf(ec->name, sizeof(ec->name), "io-ports");
+    string_copy(ec->name, sizeof(ec->name), "io-ports");
     return 0;
 #else
     (void)ec;

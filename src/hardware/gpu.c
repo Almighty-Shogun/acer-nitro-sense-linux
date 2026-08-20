@@ -102,7 +102,7 @@ void load_gpu_name(char *out, const size_t out_len)
     char fallback[160] = "GPU";
     char line[512];
 
-    snprintf(out, out_len, "GPU");
+    string_copy(out, out_len, "GPU");
 
     if (!lspci)
         return;
@@ -129,10 +129,10 @@ void load_gpu_name(char *out, const size_t out_len)
         const bool is_nvidia = string_contains_case(vendor, "nvidia");
 
         if (strcmp(fallback, "GPU") == 0)
-            snprintf(fallback, sizeof(fallback), "%s", name);
+            string_copy(fallback, sizeof(fallback), name);
 
         if (is_nvidia) {
-            snprintf(out, out_len, "%s", name);
+            string_copy(out, out_len, name);
             pclose(lspci);
 
             return;
@@ -140,5 +140,5 @@ void load_gpu_name(char *out, const size_t out_len)
     }
 
     pclose(lspci);
-    snprintf(out, out_len, "%s", fallback);
+    string_copy(out, out_len, fallback);
 }

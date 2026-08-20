@@ -5,6 +5,7 @@
 #include "daemon/state.h"
 #include "fan/control.h"
 #include "platform/control.h"
+#include "util/string.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -44,10 +45,10 @@ bool handle_fan_mode_command(const int client, struct ec_device *ec,
     *coolboost_enabled = strcmp(action, "turbo") == 0;
     if (strcmp(action, "auto") == 0) {
         *auto_mode = false;
-        snprintf(preset, preset_len, "%s", FIRMWARE_AUTO_PRESET);
+        string_copy(preset, preset_len, FIRMWARE_AUTO_PRESET);
     } else if (strcmp(action, "manual") == 0) {
         *auto_mode = false;
-        snprintf(preset, preset_len, "manual");
+        string_copy(preset, preset_len, "manual");
         apply_current_control_state(ec, cfg, states);
     }
     write_control_state(cfg, states, *auto_mode, preset, *coolboost_enabled,
