@@ -9,7 +9,6 @@
 
 int client_handle_ec_command(const int argc, char **argv)
 {
-    char cmd[128];
     int start;
     int end;
 
@@ -25,9 +24,7 @@ int client_handle_ec_command(const int argc, char **argv)
             return 2;
         }
 
-        snprintf(cmd, sizeof(cmd), "ec-read %d\n", start);
-
-        return client_send_command(cmd, false);
+        return client_send_commandf(false, "ec-read %d\n", start);
     }
 
     if (strcmp(argv[2], "dump") == 0 && argc == 5) {
@@ -43,9 +40,7 @@ int client_handle_ec_command(const int argc, char **argv)
             return 2;
         }
 
-        snprintf(cmd, sizeof(cmd), "ec-dump %d %d\n", start, end);
-
-        return client_send_command(cmd, false);
+        return client_send_commandf(false, "ec-dump %d %d\n", start, end);
     }
 
     client_usage(stderr);
@@ -55,7 +50,6 @@ int client_handle_ec_command(const int argc, char **argv)
 
 int client_handle_set_command(const int argc, char **argv)
 {
-    char cmd[128];
     int percent;
 
     if (argc != 4) {
@@ -76,15 +70,11 @@ int client_handle_set_command(const int argc, char **argv)
         return 2;
     }
 
-    snprintf(cmd, sizeof(cmd), "set %s %d\n", argv[2], percent);
-
-    return client_send_command(cmd, false);
+    return client_send_commandf(false, "set %s %d\n", argv[2], percent);
 }
 
 int client_handle_preset_command(const int argc, char **argv)
 {
-    char cmd[128];
-
     if (argc != 3) {
         client_usage(stderr);
         return 2;
@@ -93,7 +83,5 @@ int client_handle_preset_command(const int argc, char **argv)
     if (strcmp(argv[2], "show") == 0)
         return client_send_command("preset-show\n", false);
 
-    snprintf(cmd, sizeof(cmd), "preset %s\n", argv[2]);
-
-    return client_send_command(cmd, false);
+    return client_send_commandf(false, "preset %s\n", argv[2]);
 }
