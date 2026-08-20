@@ -1,9 +1,12 @@
 #include "daemon/feature_status.h"
 
+#include "config/config.h"
 #include "control/protocol.h"
+#include "ec/ec.h"
 #include "keyboard/backlight.h"
 #include "platform/control.h"
 #include "platform/power_source.h"
+#include "sensors/sensors.h"
 
 #include <stdio.h>
 #include <string.h>

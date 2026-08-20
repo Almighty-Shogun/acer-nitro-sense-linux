@@ -1,8 +1,11 @@
 #ifndef ANS_DAEMON_TYPES_H
 #define ANS_DAEMON_TYPES_H
 
-#include "ans.h"
+#include "config/types.h"
+#include "core/constants.h"
+#include "ec/types.h"
 
+#include <stdbool.h>
 #include <signal.h>
 
 typedef struct {

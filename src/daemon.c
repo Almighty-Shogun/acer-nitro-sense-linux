@@ -1,14 +1,17 @@
-#include "ans.h"
+#include "commands/daemon.h"
+#include "config/config.h"
+#include "core/constants.h"
 #include "control/socket.h"
 #include "daemon/args.h"
-#include "commands/daemon.h"
 #include "daemon/diagnostics.h"
 #include "daemon/loop.h"
 #include "daemon/state.h"
+#include "ec/ec.h"
 #include "fan/control.h"
 #include "hardware/hardware.h"
 #include "keyboard/backlight_timeout.h"
 #include "platform/control.h"
+#include "util/file.h"
 
 #include <signal.h>
 #include <stdio.h>

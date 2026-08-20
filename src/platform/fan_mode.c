@@ -1,5 +1,6 @@
 #include "platform/control.h"
 
+#include "ec/ec.h"
 #include "fan/control.h"
 
 #include <string.h>

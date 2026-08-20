@@ -1,7 +1,10 @@
 #include "fan/control.h"
+
+#include "config/config.h"
 #include "fan/observation.h"
 #include "fan/safety.h"
 #include "platform/control.h"
+#include "util/number.h"
 
 #include <stdio.h>
 #include <string.h>

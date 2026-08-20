@@ -2,6 +2,7 @@
 
 #include "control/protocol.h"
 #include "daemon/status_format.h"
+#include "ec/ec.h"
 #include "fan/control.h"
 #include "platform/control.h"
 #include "platform/power_source.h"

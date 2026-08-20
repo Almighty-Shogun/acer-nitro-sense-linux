@@ -1,5 +1,6 @@
 #include "config/sections.h"
 
+#include "config/config.h"
 #include "config/parse.h"
 #include "util/json.h"
 

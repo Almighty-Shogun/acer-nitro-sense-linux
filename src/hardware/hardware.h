@@ -1,7 +1,10 @@
 #ifndef ANS_HARDWARE_H
 #define ANS_HARDWARE_H
 
-#include "ans.h"
+#include <stdbool.h>
+
+struct ans_config;
+struct fan_config;
 
 typedef struct {
     char cpu[160];

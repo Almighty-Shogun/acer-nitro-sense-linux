@@ -1,8 +1,8 @@
 #include "commands/platform_handlers.h"
 
-#include "control/protocol.h"
-#include "ans.h"
 #include "commands/parser.h"
+#include "control/protocol.h"
+#include "sensors/sensors.h"
 
 #include <stdio.h>
 #include <string.h>

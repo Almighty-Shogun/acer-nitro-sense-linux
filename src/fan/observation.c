@@ -1,6 +1,8 @@
 #include "fan/observation.h"
 
+#include "ec/ec.h"
 #include "fan/safety.h"
+#include "sensors/sensors.h"
 
 #include <stdio.h>
 #include <string.h>

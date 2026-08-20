@@ -1,4 +1,6 @@
 #include "hardware/hardware.h"
+
+#include "config/types.h"
 #include "hardware/names_internal.h"
 
 #include <string.h>
