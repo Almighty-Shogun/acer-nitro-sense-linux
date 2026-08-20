@@ -102,6 +102,7 @@ selftest_sources = [
   'tests/selftest/platform_power.c',
   'tests/selftest/platform_commands.c',
   'tests/selftest/platform_status.c',
+  'tests/selftest/daemon_args.c',
   'tests/selftest/state.c',
   'tests/selftest/daemon.c',
   'tests/selftest/fan_auto.c',
