@@ -1,5 +1,6 @@
 #include "selftest/command_cases.h"
 
+#include "ec/ec.h"
 #include "fan/control.h"
 #include "platform/control.h"
 #include "selftest/fixture.h"

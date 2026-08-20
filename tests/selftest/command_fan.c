@@ -1,5 +1,6 @@
 #include "selftest/command_cases.h"
 
+#include "ec/ec.h"
 #include "selftest/helpers.h"
 
 #include <stdio.h>

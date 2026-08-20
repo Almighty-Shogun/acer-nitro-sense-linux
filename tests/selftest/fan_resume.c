@@ -1,6 +1,7 @@
 #include "selftest/fan_cases.h"
 
 #include "daemon/status.h"
+#include "ec/ec.h"
 #include "fan/control.h"
 #include "selftest/fixture.h"
 #include "selftest/helpers.h"

@@ -1,11 +1,11 @@
 #include "selftest/daemon.h"
 
-#include "ans.h"
+#include "daemon/types.h"
+#include "ec/ec.h"
 #include "selftest/commands.h"
 #include "selftest/fan_control.h"
 #include "selftest/parser.h"
 #include "selftest/state.h"
-#include "daemon/types.h"
 #include "selftest/fixture.h"
 
 #include <stdio.h>
