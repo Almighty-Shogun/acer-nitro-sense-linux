@@ -6,12 +6,9 @@
 
 # Acer Nitro Sense Linux
 
-Small Linux daemon and CLI for Acer Nitro fan control.
+A lightweight Acer Nitro fan-control daemon and CLI for Linux.
 
-It controls supported Acer Nitro laptops through model-specific EC registers and
-keeps the public surface focused: fan control, fan telemetry, Nitro profiles,
-CoolBoost-style turbo cooling, GPU temperature policy, power-source profiles,
-and validated keyboard backlight controls.
+It controls supported Acer Nitro laptops through model-specific EC registers and keeps the public surface focused: fan control, fan telemetry, Nitro profiles, CoolBoost-style turbo cooling, GPU temperature policy, power-source profiles, and validated keyboard backlight controls.
 
 The first supported model is `Acer Nitro 5 AN517-51`.
 
@@ -27,7 +24,7 @@ The first supported model is `Acer Nitro 5 AN517-51`.
 - Controls keyboard backlight brightness and timeout on validated models.
 - Exposes local status for optional companion interfaces.
 
-> [NOTE]
+> [!NOTE]
 > Not every Acer Sense feature has a stable Linux control path. Desktop sticky
 keys, Windows/menu key locking, and TrueHarmony audio modes are intentionally
 not implemented.
@@ -41,7 +38,8 @@ not implemented.
   - `/dev/ec` from `acpi_ec`
   - direct EC I/O ports when the kernel allows it
 
-On Fedora with Secure Boot, the practical route is usually a signed `acpi_ec`
+> [!NOTE]
+> On Fedora with Secure Boot, the practical route is usually a signed `acpi_ec`
 module. See [EC access](docs/ec-access.md).
 
 ## 🚀 Installation
@@ -73,14 +71,19 @@ sudo ./acer-nitro-sense-linux-*.run --model acer-nitro-an517-51
 Log out and back in after installation so your user session picks up the
 `acer-nitro-sense` group.
 
-The GNOME Shell extension is optional and distributed separately. Install the
+The [GNOME Shell extension](https://github.com/Almighty-Shogun/acer-nitro-sense-linux-gnome-extension) is optional and distributed separately. Install the
 daemon first, then install the extension if you want panel status and controls.
 
 Uninstall:
 
 ```sh
+# Fedora
 sudo dnf remove acer-nitro-sense-linux
+
+# Debian/Ubuntu
 sudo apt remove acer-nitro-sense-linux
+
+# Generic
 sudo ./acer-nitro-sense-linux-*.run --uninstall
 ```
 
@@ -101,7 +104,7 @@ scripts/discover-keyboard-backlight.sh
 
 ## 💻 Usage
 
-`ans` is the short alias for `acer-nitro-sense`.
+Commands can either be invoked with `acer-nitro-sense` or the shorter alias `ans`.
 
 | Name | Arguments | Description |
 | --- | --- | --- |
@@ -116,7 +119,7 @@ scripts/discover-keyboard-backlight.sh
 | `coolboost` | `status`, `[on\|off]` | Toggle CoolBoost-style turbo cooling. |
 | `profile` | `status`, `[quiet\|balanced\|performance]` | Read or switch the Nitro profile. |
 | `power-source` | `status`, `apply`, `auto [on\|off]` | Configure AC/battery profile switching. |
-| `gpu-temp` | `status`, `[live\|auto]` | Configure GPU temperature wake policy. |
+| `gpu-temp` | `status`, `[live\|auto\` | Configure GPU temperature wake policy. |
 | `keyboard-backlight` | `status`, `set [0\|25\|50\|75\|100]`, `timeout [on\|off]` | Control keyboard backlight brightness and timeout. |
 | `start` | - | Start the daemon service. Requires `sudo`. |
 | `restart` | - | Restart the daemon service. Requires `sudo`. |
