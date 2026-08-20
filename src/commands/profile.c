@@ -1,7 +1,8 @@
 #include "commands/platform_handlers.h"
 
-#include "control/protocol.h"
 #include "commands/parser.h"
+#include "config/config.h"
+#include "control/protocol.h"
 #include "platform/control.h"
 
 #include <stdio.h>

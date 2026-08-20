@@ -1,7 +1,9 @@
 #include "daemon/state.h"
 
+#include "config/config.h"
 #include "fan/control.h"
 #include "platform/control.h"
+#include "util/file.h"
 #include "util/format.h"
 #include "util/json.h"
 

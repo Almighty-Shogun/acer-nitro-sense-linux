@@ -1,7 +1,7 @@
 #ifndef ANS_EC_BACKEND_H
 #define ANS_EC_BACKEND_H
 
-#include "ans.h"
+#include "ec/types.h"
 
 int ec_open_fake(struct ec_device *ec);
 int ec_fake_read_byte(struct ec_device *ec, int reg);

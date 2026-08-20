@@ -1,5 +1,9 @@
 #include "hardware/hardware.h"
 
+#include "config/types.h"
+#include "util/file.h"
+#include "util/string.h"
+
 #include <stdlib.h>
 #include <string.h>
 

@@ -5,6 +5,7 @@
 #include "keyboard/backlight.h"
 #include "platform/control.h"
 #include "platform/power_source.h"
+#include "util/file.h"
 #include "util/format.h"
 
 #include <stdio.h>

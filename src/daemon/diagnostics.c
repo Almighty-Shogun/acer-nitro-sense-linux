@@ -1,8 +1,11 @@
 #include "daemon/diagnostics.h"
 
+#include "ec/ec.h"
 #include "hardware/hardware.h"
 #include "platform/control.h"
 #include "platform/power_source.h"
+#include "sensors/sensors.h"
+#include "util/file.h"
 
 #include <errno.h>
 #include <stdio.h>

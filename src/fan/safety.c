@@ -1,5 +1,8 @@
 #include "fan/safety.h"
 
+#include "ec/ec.h"
+#include "util/number.h"
+
 #include <stdio.h>
 #include <string.h>
 

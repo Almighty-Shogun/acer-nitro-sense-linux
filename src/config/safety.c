@@ -2,6 +2,7 @@
 
 #include "config/parse.h"
 #include "util/json.h"
+#include "util/number.h"
 
 int config_parse_safety(const char *json, struct ans_config *cfg)
 {

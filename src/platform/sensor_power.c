@@ -1,5 +1,7 @@
 #include "platform/control.h"
 
+#include "sensors/sensors.h"
+
 #include <stdio.h>
 #include <string.h>
 

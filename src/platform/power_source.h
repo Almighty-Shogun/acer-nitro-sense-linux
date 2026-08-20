@@ -1,7 +1,10 @@
 #ifndef ANS_POWER_SOURCE_H
 #define ANS_POWER_SOURCE_H
 
-#include "ans.h"
+#include <stdbool.h>
+
+struct ans_config;
+struct ec_device;
 
 enum power_source_state {
     POWER_SOURCE_UNKNOWN = 0,

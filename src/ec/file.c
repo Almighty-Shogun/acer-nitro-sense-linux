@@ -1,5 +1,7 @@
 #include "ec/backend.h"
 
+#include "util/number.h"
+
 #include <fcntl.h>
 #include <errno.h>
 #include <stdint.h>

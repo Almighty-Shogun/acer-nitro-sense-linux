@@ -1,9 +1,10 @@
 #include "daemon/capabilities.h"
 
+#include "config/config.h"
 #include "control/protocol.h"
-#include "ans.h"
 #include "keyboard/backlight.h"
 #include "platform/power_source.h"
+#include "sensors/sensors.h"
 
 #include <stdio.h>
 #include <string.h>

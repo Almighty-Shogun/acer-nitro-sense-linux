@@ -1,6 +1,8 @@
 #include "platform/power_source.h"
 
 #include "platform/control.h"
+#include "util/file.h"
+#include "util/string.h"
 
 #include <dirent.h>
 #include <stdio.h>

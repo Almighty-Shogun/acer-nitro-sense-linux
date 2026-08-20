@@ -1,5 +1,8 @@
 #include "platform/control.h"
 
+#include "config/config.h"
+#include "ec/ec.h"
+
 bool apply_platform_profile(struct ec_device *ec, const struct ans_config *cfg,
                             const char *profile)
 {

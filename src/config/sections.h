@@ -1,7 +1,7 @@
 #ifndef ANS_CONFIG_SECTIONS_H
 #define ANS_CONFIG_SECTIONS_H
 
-#include "ans.h"
+#include "config/types.h"
 
 int config_parse_allowed_dmi(const char *json, struct ans_config *cfg);
 int config_parse_init_writes(const char *json, struct ans_config *cfg);

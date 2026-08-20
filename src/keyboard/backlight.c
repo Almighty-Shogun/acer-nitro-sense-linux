@@ -1,6 +1,9 @@
 #include "keyboard/backlight.h"
 
-#include "ans.h"
+#include "config/types.h"
+#include "ec/ec.h"
+#include "util/file.h"
+#include "util/string.h"
 
 #include <dirent.h>
 #include <stdio.h>

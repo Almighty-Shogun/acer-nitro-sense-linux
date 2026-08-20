@@ -1,7 +1,7 @@
 #ifndef ANS_DAEMON_ARGS_H
 #define ANS_DAEMON_ARGS_H
 
-#include "ans.h"
+#include <stdbool.h>
 
 struct daemon_args {
     const char *config_path;

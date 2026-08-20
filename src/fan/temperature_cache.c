@@ -1,5 +1,6 @@
 #include "fan/control.h"
 
+#include "util/file.h"
 #include "util/json.h"
 
 #include <stdio.h>
