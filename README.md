@@ -51,7 +51,9 @@ Install from a release artifact.
 Fedora:
 
 ```sh
-sudo dnf install ./acer-nitro-sense-linux-*.fc44.x86_64.rpm
+sudo dnf install dnf-plugins-core
+sudo dnf copr enable almighty-shogun/acer-nitro-sense-linux
+sudo dnf install acer-nitro-sense-linux
 ```
 
 Debian/Ubuntu:
