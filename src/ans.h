@@ -5,6 +5,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "util/file.h"
+#include "util/number.h"
+#include "util/string.h"
+
 #define ANS_MAX_FANS 2
 #define ANS_MAX_THRESHOLDS 32
 #define ANS_MAX_WRITES 8
@@ -173,12 +177,5 @@ int ec_read_word(struct ec_device *ec, int reg);
 int sensor_read_group_max_c(const char *group);
 int sensor_set_group_power_control(const char *group, const char *control);
 int sensor_read_group_power_control(const char *group, char *out, size_t out_len);
-
-int mkdir_p(const char *path);
-char *read_text_file(const char *path, size_t limit);
-int write_text_file_atomic(const char *path, const char *content);
-bool string_contains_case(const char *haystack, const char *needle);
-void trim_ascii(char *s);
-int clamp_int(int value, int min, int max);
 
 #endif

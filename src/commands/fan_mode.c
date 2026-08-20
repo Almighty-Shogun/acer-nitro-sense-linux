@@ -1,5 +1,6 @@
 #include "commands/platform_handlers.h"
 
+#include "control/protocol.h"
 #include "commands/parser.h"
 #include "daemon/state.h"
 #include "fan/control.h"
@@ -7,7 +8,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 
 bool handle_fan_mode_command(const int client, struct ec_device *ec,
                              const struct ans_config *cfg,
@@ -27,17 +27,17 @@ bool handle_fan_mode_command(const int client, struct ec_device *ec,
         (strcmp(action, "auto") != 0 &&
          strcmp(action, "manual") != 0 &&
          strcmp(action, "turbo") != 0)) {
-        dprintf(client, "error usage: fan-mode status|auto|manual|turbo\n");
+        control_reply(client, "error usage: fan-mode status|auto|manual|turbo\n");
         return true;
     }
 
     if (!cfg->fan_modes.available) {
-        dprintf(client, "error fan modes unavailable for this model\n");
+        control_reply(client, "error fan modes unavailable for this model\n");
         return true;
     }
 
     if (!apply_fan_mode(ec, cfg, action)) {
-        dprintf(client, "error fan-mode write failed\n");
+        control_reply(client, "error fan-mode write failed\n");
         return true;
     }
 
@@ -56,6 +56,6 @@ bool handle_fan_mode_command(const int client, struct ec_device *ec,
     if (!daemon_quiet_logs)
         fprintf(stderr, "fan_mode_change mode=%s cpu_register=0x%02x gpu_register=0x%02x\n",
                 action, cfg->fan_modes.cpu_reg, cfg->fan_modes.gpu_reg);
-    dprintf(client, "fan_mode=%s\n", action);
+    control_reply(client, "fan_mode=%s\n", action);
     return true;
 }

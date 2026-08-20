@@ -1,6 +1,7 @@
 #include "client/transport.h"
 
 #include "ans.h"
+#include "util/fd.h"
 
 #include <errno.h>
 #include <stdio.h>
@@ -30,7 +31,6 @@ int client_send_command_capture(const char *command, bool quiet, char *out,
     struct sockaddr_un addr;
     char buf[4096];
     size_t used = 0;
-    ssize_t n;
 
     if (out_len > 0)
         out[0] = '\0';
@@ -58,7 +58,7 @@ int client_send_command_capture(const char *command, bool quiet, char *out,
         return 1;
     }
 
-    if (write(fd, command, strlen(command)) != (ssize_t)strlen(command)) {
+    if (fd_write_string(fd, command) < 0) {
         if (!quiet)
             perror("write");
 
@@ -69,7 +69,21 @@ int client_send_command_capture(const char *command, bool quiet, char *out,
 
     shutdown(fd, SHUT_WR);
 
-    while ((n = read(fd, buf, sizeof(buf) - 1)) > 0) {
+    for (;;) {
+        const ssize_t n = fd_read_retry(fd, buf, sizeof(buf) - 1);
+
+        if (n < 0) {
+            if (!quiet)
+                perror("read");
+
+            close(fd);
+
+            return 1;
+        }
+
+        if (n == 0)
+            break;
+
         buf[n] = '\0';
         if (out && out_len > 0) {
             size_t available = out_len - used - 1;

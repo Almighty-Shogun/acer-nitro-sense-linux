@@ -1,5 +1,6 @@
 #include "commands/fan.h"
 
+#include "control/protocol.h"
 #include "commands/parser.h"
 #include "daemon/state.h"
 #include "fan/control.h"
@@ -26,7 +27,7 @@ static bool switch_to_daemon_control(const int client, struct ec_device *ec,
     if (apply_daemon_control_fan_mode(ec, cfg))
         return true;
 
-    dprintf(client, "error fan-mode write failed\n");
+    control_reply(client, "error fan-mode write failed\n");
     return false;
 }
 
@@ -46,7 +47,7 @@ static bool handle_set_command(const int client, struct ec_device *ec,
         return false;
 
     if (!parse_set_command(cmd, fan, sizeof(fan), &percent)) {
-        dprintf(client, "error usage: set cpu|gpu|all 1-100\n");
+        control_reply(client, "error usage: set cpu|gpu|all 1-100\n");
         return true;
     }
 
@@ -62,13 +63,13 @@ static bool handle_set_command(const int client, struct ec_device *ec,
     const int changed = set_one(ec, cfg, states, fan, percent);
 
     if (changed == 0) {
-        dprintf(client, "error unknown fan: %s\n", fan);
+        control_reply(client, "error unknown fan: %s\n", fan);
         return true;
     }
 
     write_control_state(cfg, states, *auto_mode, preset, *coolboost_enabled,
                         runtime);
-    dprintf(client, "mode=manual fan=%s requested=%d\n", fan, percent);
+    control_reply(client, "mode=manual fan=%s requested=%d\n", fan, percent);
     return true;
 }
 
@@ -87,14 +88,14 @@ static bool handle_preset_command(const int client, struct ec_device *ec,
         return false;
 
     if (!parse_preset_command(cmd, preset_name, sizeof(preset_name))) {
-        dprintf(client, "error usage: preset NAME\n");
+        control_reply(client, "error usage: preset NAME\n");
         return true;
     }
 
     const struct preset_config *p = config_find_preset(cfg, preset_name);
 
     if (!p) {
-        dprintf(client, "error unknown preset\n");
+        control_reply(client, "error unknown preset\n");
         return true;
     }
 
@@ -111,7 +112,7 @@ static bool handle_preset_command(const int client, struct ec_device *ec,
     apply_preset(ec, cfg, states, p->id);
     write_control_state(cfg, states, *auto_mode, preset, *coolboost_enabled,
                         runtime);
-    dprintf(client, "mode=preset preset=%s cpu=%d gpu=%d\n", p->id, p->cpu, p->gpu);
+    control_reply(client, "mode=preset preset=%s cpu=%d gpu=%d\n", p->id, p->cpu, p->gpu);
     return true;
 }
 
@@ -144,7 +145,7 @@ static bool handle_auto_command(const int client, struct ec_device *ec,
 
     write_control_state(cfg, states, *auto_mode, preset, *coolboost_enabled,
                         runtime);
-    dprintf(client, "mode=auto preset=auto\n");
+    control_reply(client, "mode=auto preset=auto\n");
     return true;
 }
 
@@ -161,12 +162,12 @@ static bool handle_firmware_auto_command(const int client, struct ec_device *ec,
         return false;
 
     if (!cfg->fan_modes.available) {
-        dprintf(client, "error firmware-auto unavailable for this model\n");
+        control_reply(client, "error firmware-auto unavailable for this model\n");
         return true;
     }
 
     if (!apply_firmware_auto_fan_mode(ec, cfg)) {
-        dprintf(client, "error fan-mode write failed\n");
+        control_reply(client, "error fan-mode write failed\n");
         return true;
     }
 
@@ -178,7 +179,7 @@ static bool handle_firmware_auto_command(const int client, struct ec_device *ec,
     if (!daemon_quiet_logs)
         fprintf(stderr, "mode_change mode=%s preset=%s\n", FIRMWARE_AUTO_PRESET,
                 FIRMWARE_AUTO_PRESET);
-    dprintf(client, "mode=%s preset=%s\n", FIRMWARE_AUTO_PRESET, FIRMWARE_AUTO_PRESET);
+    control_reply(client, "mode=%s preset=%s\n", FIRMWARE_AUTO_PRESET, FIRMWARE_AUTO_PRESET);
     return true;
 }
 

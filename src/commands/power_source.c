@@ -1,5 +1,6 @@
 #include "commands/platform_handlers.h"
 
+#include "control/protocol.h"
 #include "commands/parser.h"
 #include "daemon/state.h"
 #include "platform/control.h"
@@ -7,7 +8,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 
 bool handle_power_source_command(const int client, struct ec_device *ec,
                                  const struct ans_config *cfg,
@@ -27,7 +27,7 @@ bool handle_power_source_command(const int client, struct ec_device *ec,
 
     if (parse_power_source_auto_command(cmd, auto_value, sizeof(auto_value))) {
         if (!power_source_profile_policy_available(cfg)) {
-            dprintf(client, "error power-source profile policy unavailable source=%s\n",
+            control_reply(client, "error power-source profile policy unavailable source=%s\n",
                     power_source_name(source));
             return true;
         }
@@ -35,13 +35,13 @@ bool handle_power_source_command(const int client, struct ec_device *ec,
         if (strcmp(auto_value, "on") == 0) {
             runtime->power_source_auto_apply = true;
             if (target_profile && !apply_power_source_profile(ec, cfg, source)) {
-                dprintf(client, "error power-source profile write failed\n");
+                control_reply(client, "error power-source profile write failed\n");
                 return true;
             }
         } else if (strcmp(auto_value, "off") == 0) {
             runtime->power_source_auto_apply = false;
         } else {
-            dprintf(client, "error usage: power-source status|apply|auto on|off\n");
+            control_reply(client, "error usage: power-source status|apply|auto on|off\n");
             return true;
         }
 
@@ -52,7 +52,7 @@ bool handle_power_source_command(const int client, struct ec_device *ec,
                     runtime->power_source_auto_apply ? 1 : 0,
                     power_source_name(source),
                     target_profile ? target_profile : "unavailable");
-        dprintf(client, "power_source=%s auto_apply=%s profile=%s\n",
+        control_reply(client, "power_source=%s auto_apply=%s profile=%s\n",
                 power_source_name(source),
                 runtime->power_source_auto_apply ? "on" : "off",
                 target_profile ? target_profile : "unavailable");
@@ -61,25 +61,25 @@ bool handle_power_source_command(const int client, struct ec_device *ec,
 
     if (!parse_power_source_command(cmd, action, sizeof(action)) ||
         strcmp(action, "apply") != 0) {
-        dprintf(client, "error usage: power-source status|apply|auto on|off\n");
+        control_reply(client, "error usage: power-source status|apply|auto on|off\n");
         return true;
     }
 
     if (!target_profile) {
-        dprintf(client, "error power-source profile policy unavailable source=%s\n",
+        control_reply(client, "error power-source profile policy unavailable source=%s\n",
                 power_source_name(source));
         return true;
     }
 
     if (!apply_power_source_profile(ec, cfg, source)) {
-        dprintf(client, "error power-source profile write failed\n");
+        control_reply(client, "error power-source profile write failed\n");
         return true;
     }
 
     if (!daemon_quiet_logs)
         fprintf(stderr, "power_source_profile_apply source=%s profile=%s\n",
                 power_source_name(source), target_profile);
-    dprintf(client, "power_source=%s profile=%s\n",
+    control_reply(client, "power_source=%s profile=%s\n",
             power_source_name(source), target_profile);
     return true;
 }

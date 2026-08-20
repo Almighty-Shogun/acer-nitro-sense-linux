@@ -1,5 +1,6 @@
 #include "daemon/feature_status.h"
 
+#include "control/protocol.h"
 #include "keyboard/backlight.h"
 #include "platform/control.h"
 #include "platform/power_source.h"
@@ -10,7 +11,7 @@
 void reply_coolboost_status(const int client, const struct ans_config *cfg,
                             const bool coolboost_enabled)
 {
-    dprintf(client, "coolboost=%s\n",
+    control_reply(client, "coolboost=%s\n",
             cfg->fan_modes.available ?
                 (coolboost_enabled ? "on" : "off") :
                 "unavailable");
@@ -23,7 +24,7 @@ void reply_fan_mode_status(const int client, struct ec_device *ec,
     int gpu_value = -1;
 
     if (!read_fan_mode(ec, cfg, &cpu_value, &gpu_value)) {
-        dprintf(client, "fan_mode=unavailable\n");
+        control_reply(client, "fan_mode=unavailable\n");
         return;
     }
 
@@ -31,7 +32,7 @@ void reply_fan_mode_status(const int client, struct ec_device *ec,
     const char *gpu_mode = fan_mode_value_name(&cfg->fan_modes, false, gpu_value);
     const char *mode = strcmp(cpu_mode, gpu_mode) == 0 ? cpu_mode : "mixed";
 
-    dprintf(client,
+    control_reply(client,
             "fan_mode=%s cpu=%s cpu_value=0x%02x gpu=%s gpu_value=0x%02x\n",
             mode, cpu_mode, cpu_value, gpu_mode, gpu_value);
 }
@@ -42,11 +43,11 @@ void reply_profile_status(const int client, struct ec_device *ec,
     int value = -1;
 
     if (!read_platform_profile(ec, cfg, &value)) {
-        dprintf(client, "profile=unavailable\n");
+        control_reply(client, "profile=unavailable\n");
         return;
     }
 
-    dprintf(client, "profile=%s value=0x%02x\n",
+    control_reply(client, "profile=%s value=0x%02x\n",
             platform_profile_value_name(cfg, value), value);
 }
 
@@ -58,7 +59,7 @@ void reply_power_source_status(const int client, struct ec_device *ec,
     int value = -1;
 
     read_platform_profile(ec, cfg, &value);
-    dprintf(client,
+    control_reply(client,
             "power_source=%s policy=%s auto_apply=%s ac_profile=%s battery_profile=%s current_profile=%s target_profile=%s\n",
             power_source_name(source),
             power_source_profile_policy_available(cfg) ? "available" : "unavailable",
@@ -101,7 +102,7 @@ void reply_gpu_temp_status(const int client, struct ec_device *ec,
         temp_c = sensor_read_group_max_c("gpu");
 
     if (temp_c >= 0) {
-        dprintf(client,
+        control_reply(client,
                 "gpu_temp=available policy=%s live=%s temp=%dC readable=1 source=%s reason=ok\n",
                 has_power_control ? control : "unavailable",
                 has_power_control ?
@@ -112,12 +113,12 @@ void reply_gpu_temp_status(const int client, struct ec_device *ec,
     }
 
     if (!has_power_control) {
-        dprintf(client,
+        control_reply(client,
                 "gpu_temp=available policy=unknown live=unknown temp=-- readable=0 reason=no-power-control\n");
         return;
     }
 
-    dprintf(client,
+    control_reply(client,
             "gpu_temp=available policy=%s live=%s temp=-- readable=0 reason=sensor-unreadable\n",
             control, strcmp(control, "on") == 0 ? "on" : "auto");
 }
@@ -138,7 +139,7 @@ void reply_keyboard_backlight_status(const int client, struct ec_device *ec,
     else
         snprintf(reg_text, sizeof(reg_text), "unavailable");
 
-    dprintf(client,
+    control_reply(client,
             "keyboard_backlight=%s timeout=%s timeout_seconds=%d timeout_backend=%s timed_off=%s restore_percent=%d name=%s brightness=%d max_brightness=%d percent=%d backend=%s register=%s reason=%s\n",
             keyboard_backlight.available ? "available" : "unavailable",
             timeout_supported ? (timeout_enabled ? "on" : "off") : "unsupported",

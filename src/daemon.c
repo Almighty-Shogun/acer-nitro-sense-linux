@@ -101,6 +101,7 @@ int main(const int argc, char** argv)
 
     signal(SIGINT, on_signal);
     signal(SIGTERM, on_signal);
+    signal(SIGPIPE, SIG_IGN);
 
     if (mkdir_p(ANS_RUN_DIR) < 0)
     {
