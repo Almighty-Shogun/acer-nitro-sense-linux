@@ -1,0 +1,81 @@
+#include "commands/parser_internal.h"
+
+#include <errno.h>
+#include <stdlib.h>
+#include <string.h>
+
+const char *command_skip_space(const char *p)
+{
+    while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n')
+        p++;
+    return p;
+}
+
+bool command_read_token(const char **cursor, char *out, const size_t out_len)
+{
+    const char *p = command_skip_space(*cursor);
+    size_t len = 0;
+
+    if (*p == '\0')
+        return false;
+
+    while (p[len] && p[len] != ' ' && p[len] != '\t' &&
+           p[len] != '\r' && p[len] != '\n')
+        len++;
+
+    if (len == 0 || len >= out_len)
+        return false;
+
+    memcpy(out, p, len);
+    out[len] = '\0';
+    *cursor = p + len;
+    return true;
+}
+
+bool command_has_only_trailing_space(const char *p)
+{
+    return *command_skip_space(p) == '\0';
+}
+
+bool command_parse_percent_token(const char *text, int *percent)
+{
+    char *end;
+
+    errno = 0;
+    const long value = strtol(text, &end, 10);
+    if (errno != 0 || end == text || *end != '\0' || value < 1 || value > 100)
+        return false;
+
+    *percent = (int)value;
+    return true;
+}
+
+bool command_parse_int_token(const char *text, const int min_value,
+                             const int max_value, int *value)
+{
+    char *end;
+
+    errno = 0;
+    const long parsed = strtol(text, &end, 0);
+    if (errno != 0 || end == text || *end != '\0' ||
+        parsed < min_value || parsed > max_value)
+        return false;
+
+    *value = (int)parsed;
+    return true;
+}
+
+bool command_parse_action(const char *cmd, const char *expected_command,
+                          char *action, const size_t action_len)
+{
+    const char *cursor = cmd;
+    char command[32];
+
+    if (!command_read_token(&cursor, command, sizeof(command)) ||
+        strcmp(command, expected_command) != 0)
+        return false;
+    if (!command_read_token(&cursor, action, action_len))
+        return false;
+
+    return command_has_only_trailing_space(cursor);
+}

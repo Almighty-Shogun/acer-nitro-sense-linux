@@ -1,0 +1,121 @@
+<a href="https://shogun.ms" target="_blank" rel="noopener">
+	<img src="https://cdn.shogun.ms/assets/branding/app-icon-256.svg" alt="Shogun app-icon" height="62"/>
+</a>
+
+---
+
+# Acer Nitro Sense Linux
+
+Small Linux daemon and CLI for Acer Nitro fan control.
+
+It controls supported Acer Nitro laptops through model-specific EC registers and
+keeps the public surface focused: fan control, fan telemetry, Nitro profiles,
+CoolBoost-style turbo cooling, GPU temperature policy, power-source profiles,
+and validated keyboard backlight controls.
+
+The first supported model is `Acer Nitro 5 AN517-51`.
+
+## ✨ Features
+
+- Reads CPU/GPU fan RPM and temperatures.
+- Sets CPU, GPU, or all fan speeds from `1-100%`.
+- Applies JSON presets.
+- Switches fan mode between `auto`, `manual`, and `turbo`.
+- Provides a CoolBoost-style turbo cooldown command.
+- Switches Nitro profile between `quiet`, `balanced`, and `performance`.
+- Optionally maps AC/battery state to Nitro profiles.
+- Controls keyboard backlight brightness and timeout on validated models.
+- Exposes local status for optional companion interfaces.
+
+> [NOTE]
+> Not every Acer Sense feature has a stable Linux control path. Desktop sticky
+keys, Windows/menu key locking, and TrueHarmony audio modes are intentionally
+not implemented.
+
+## 📦 Requirements
+
+- Linux with systemd
+- A supported Acer Nitro model profile
+- EC access through one of:
+  - `ec_sys`
+  - `/dev/ec` from `acpi_ec`
+  - direct EC I/O ports when the kernel allows it
+
+On Fedora with Secure Boot, the practical route is usually a signed `acpi_ec`
+module. See [EC access](docs/ec-access.md).
+
+## 🚀 Installation
+
+Install from a release artifact.
+
+Fedora:
+
+```sh
+sudo dnf install ./acer-nitro-sense-linux-*.fc44.x86_64.rpm
+```
+
+Debian/Ubuntu:
+
+```sh
+sudo apt install ./acer-nitro-sense-linux_*.deb
+```
+
+Generic installer:
+
+```sh
+chmod +x acer-nitro-sense-linux-*.run
+./acer-nitro-sense-linux-*.run --list-models
+sudo ./acer-nitro-sense-linux-*.run --model acer-nitro-an517-51
+```
+
+Log out and back in after installation so your user session picks up the
+`acer-nitro-sense` group.
+
+The GNOME Shell extension is optional and distributed separately. Install the
+daemon first, then install the extension if you want panel status and controls.
+
+Uninstall:
+
+```sh
+sudo dnf remove acer-nitro-sense-linux
+sudo apt remove acer-nitro-sense-linux
+sudo ./acer-nitro-sense-linux-*.run --uninstall
+```
+
+## 🛠️ Building
+
+```sh
+meson setup build --prefix=/usr --sysconfdir=/etc
+meson compile -C build
+meson test -C build
+```
+
+Hardware validation tools live in `scripts/`:
+
+```sh
+scripts/validate-hardware.sh
+scripts/discover-keyboard-backlight.sh
+```
+
+## 💻 Usage
+
+`ans` is the short alias for `acer-nitro-sense`.
+
+| Name | Arguments | Description |
+| --- | --- | --- |
+| `status` | `--json`, `--fahrenheit` | Show current model, mode, RPM, temperatures, fan targets, and safety state. |
+| `capabilities` | - | Show which features are available on the current machine. |
+| `doctor` | - | Collect system, EC, sensor, and feature diagnostics. |
+| `firmware-auto` | - | Let Acer firmware own live fan speed while the daemon keeps reporting status. |
+| `auto` | - | Enable the daemon fan curve. |
+| `set` | `[cpu\|gpu\|all] [1-100]` | Set manual fan speed percentages. |
+| `preset` | `[quiet\|balanced\|performance]` | Apply a configured fan preset. |
+| `fan-mode` | `status`, `[auto\|manual\|turbo]` | Read or switch the Acer firmware fan mode. |
+| `coolboost` | `status`, `[on\|off]` | Toggle CoolBoost-style turbo cooling. |
+| `profile` | `status`, `[quiet\|balanced\|performance]` | Read or switch the Nitro profile. |
+| `power-source` | `status`, `apply`, `auto [on\|off]` | Configure AC/battery profile switching. |
+| `gpu-temp` | `status`, `[live\|auto]` | Configure GPU temperature wake policy. |
+| `keyboard-backlight` | `status`, `set [0\|25\|50\|75\|100]`, `timeout [on\|off]` | Control keyboard backlight brightness and timeout. |
+| `start` | - | Start the daemon service. Requires `sudo`. |
+| `restart` | - | Restart the daemon service. Requires `sudo`. |
+| `stop` | - | Ask the daemon to stop. |

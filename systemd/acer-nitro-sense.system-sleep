@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+set -eu
+
+case "${1:-}/${2:-}" in
+    post/*)
+        /usr/bin/acer-nitro-sense resume >/dev/null 2>&1 || true
+        ;;
+esac

@@ -1,0 +1,63 @@
+Name:           acer-nitro-sense-linux
+Version:        @VERSION@
+Release:        @RPM_RELEASE@%{?dist}
+Summary:        Acer Nitro fan control daemon and CLI
+License:        MIT
+URL:            https://github.com/@GITHUB_REPOSITORY@
+Source0:        %{name}-%{version}.tar.gz
+
+BuildRequires:  gcc
+BuildRequires:  meson
+BuildRequires:  ninja-build
+BuildRequires:  pkgconfig
+BuildRequires:  systemd-devel
+BuildRequires:  systemd-rpm-macros
+Requires:       kmod
+Requires:       systemd
+
+%description
+Minimal Linux daemon and CLI for supported Acer Nitro laptops.
+
+%prep
+%autosetup
+
+%build
+%meson --buildtype=release
+%meson_build
+
+%install
+%meson_install
+mkdir -p %{buildroot}%{_sysconfdir}/acer-nitro-sense
+ln -sfn ../../usr/share/acer-nitro-sense/models/@DEFAULT_MODEL@.json %{buildroot}%{_sysconfdir}/acer-nitro-sense/model.json
+
+%pre
+getent group acer-nitro-sense >/dev/null || groupadd -r acer-nitro-sense || :
+
+%post
+%systemd_post acer-nitro-sense.service
+if [ "$1" -eq 1 ]; then
+    systemctl enable --now acer-nitro-sense.service >/dev/null 2>&1 || :
+fi
+
+%preun
+%systemd_preun acer-nitro-sense.service
+
+%postun
+%systemd_postun_with_restart acer-nitro-sense.service
+
+%files
+%license LICENSE
+%doc README.md docs
+%{_bindir}/acer-nitro-sense
+%{_bindir}/acer-nitro-sensed
+%{_bindir}/ans
+%{_datadir}/acer-nitro-sense
+%{_unitdir}/acer-nitro-sense.service
+%{_sysusersdir}/acer-nitro-sense.conf
+%{_prefix}/lib/systemd/system-sleep/acer-nitro-sense
+%dir %{_sysconfdir}/acer-nitro-sense
+%config(noreplace) %{_sysconfdir}/acer-nitro-sense/model.json
+
+%changelog
+* @RPM_CHANGELOG_DATE@ Almighty Shogun <contact@shogun.ms> - @VERSION@-@RPM_RELEASE@
+- Build release package
