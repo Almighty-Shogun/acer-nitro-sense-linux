@@ -2,7 +2,6 @@
 
 #include "config/parse.h"
 #include "util/json.h"
-#include "util/number.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -137,8 +136,9 @@ int config_parse_fans(const char *json, struct ans_config *cfg)
             !config_optional_int_key(buf, "write_min", &fan->write_min) ||
             !config_optional_int_key(buf, "write_max", &fan->write_max) ||
             !config_optional_int_key(buf, "reset_speed", &fan->reset_speed) ||
-            !config_optional_int_key(buf, "missing_temperature_speed_percent",
-                                     &fan->missing_temperature_speed_percent))
+            !config_optional_clamped_int_key(
+                buf, "missing_temperature_speed_percent",
+                &fan->missing_temperature_speed_percent, 0, 100))
             return config_invalid("fan numeric limits are invalid");
 
         if (fan->read_min < 0 || fan->read_max <= fan->read_min ||
@@ -147,9 +147,6 @@ int config_parse_fans(const char *json, struct ans_config *cfg)
             fan->reset_speed < fan->write_min ||
             fan->reset_speed > fan->write_max)
             return config_invalid("fan numeric ranges are invalid");
-
-        fan->missing_temperature_speed_percent =
-            clamp_int(fan->missing_temperature_speed_percent, 0, 100);
 
         if (parse_curve(buf, fan) < 0)
             return -1;

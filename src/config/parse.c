@@ -1,6 +1,7 @@
 #include "config/parse.h"
 
 #include "util/json.h"
+#include "util/number.h"
 
 #include <stdio.h>
 
@@ -33,6 +34,16 @@ bool config_optional_string_key(const char *json, const char *key,
         return true;
 
     return json_string_key_checked(json, key, out, out_len);
+}
+
+bool config_optional_clamped_int_key(const char *json, const char *key,
+                                     int *value, const int min, const int max)
+{
+    if (!config_optional_int_key(json, key, value))
+        return false;
+
+    *value = clamp_int(*value, min, max);
+    return true;
 }
 
 bool config_required_int_key(const char *json, const char *key, int *value)
