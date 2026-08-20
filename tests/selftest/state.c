@@ -1,6 +1,7 @@
 #include "selftest/state.h"
 
 #include "daemon/state.h"
+#include "ec/ec.h"
 #include "platform/control.h"
 #include "selftest/fixture.h"
 

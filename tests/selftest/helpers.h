@@ -1,7 +1,6 @@
 #ifndef ANS_SELFTEST_HELPERS_H
 #define ANS_SELFTEST_HELPERS_H
 
-#include "ans.h"
 #include "daemon/types.h"
 
 #include <stddef.h>

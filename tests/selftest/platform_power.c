@@ -1,5 +1,6 @@
 #include "selftest/platform_cases.h"
 
+#include "ec/ec.h"
 #include "selftest/helpers.h"
 
 #include <stdio.h>
