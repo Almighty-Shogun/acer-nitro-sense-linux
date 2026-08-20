@@ -10,8 +10,6 @@
 
 int client_handle_coolboost_command(const int argc, char **argv)
 {
-    char cmd[128];
-
     if (argc != 3) {
         client_usage(stderr);
         return 2;
@@ -27,15 +25,11 @@ int client_handle_coolboost_command(const int argc, char **argv)
     if (strcmp(argv[2], "status") == 0)
         return client_print_coolboost_status();
 
-    snprintf(cmd, sizeof(cmd), "coolboost %s\n", argv[2]);
-
-    return client_send_command(cmd, false);
+    return client_send_commandf(false, "coolboost %s\n", argv[2]);
 }
 
 int client_handle_fan_mode_command(const int argc, char **argv)
 {
-    char cmd[128];
-
     if (argc != 3) {
         client_usage(stderr);
         return 2;
@@ -48,29 +42,21 @@ int client_handle_fan_mode_command(const int argc, char **argv)
         return 2;
     }
 
-    snprintf(cmd, sizeof(cmd), "fan-mode %s\n", argv[2]);
-
-    return client_send_command(cmd, false);
+    return client_send_commandf(false, "fan-mode %s\n", argv[2]);
 }
 
 int client_handle_profile_command(const int argc, char **argv)
 {
-    char cmd[128];
-
     if (argc != 3) {
         client_usage(stderr);
         return 2;
     }
 
-    snprintf(cmd, sizeof(cmd), "profile %s\n", argv[2]);
-
-    return client_send_command(cmd, false);
+    return client_send_commandf(false, "profile %s\n", argv[2]);
 }
 
 int client_handle_gpu_temp_command(const int argc, char **argv)
 {
-    char cmd[128];
-
     if (argc != 3) {
         client_usage(stderr);
         return 2;
@@ -83,15 +69,11 @@ int client_handle_gpu_temp_command(const int argc, char **argv)
         return 2;
     }
 
-    snprintf(cmd, sizeof(cmd), "gpu-temp %s\n", argv[2]);
-
-    return client_send_command(cmd, false);
+    return client_send_commandf(false, "gpu-temp %s\n", argv[2]);
 }
 
 int client_handle_power_source_command(const int argc, char **argv)
 {
-    char cmd[128];
-
     if (argc != 3 && argc != 4) {
         client_usage(stderr);
         return 2;
@@ -104,8 +86,7 @@ int client_handle_power_source_command(const int argc, char **argv)
             return 2;
         }
 
-        snprintf(cmd, sizeof(cmd), "power-source auto %s\n", argv[3]);
-        return client_send_command(cmd, false);
+        return client_send_commandf(false, "power-source auto %s\n", argv[3]);
     }
 
     if (argc != 3 ||
@@ -115,14 +96,11 @@ int client_handle_power_source_command(const int argc, char **argv)
         return 2;
     }
 
-    snprintf(cmd, sizeof(cmd), "power-source %s\n", argv[2]);
-
-    return client_send_command(cmd, false);
+    return client_send_commandf(false, "power-source %s\n", argv[2]);
 }
 
 int client_handle_keyboard_backlight_command(const int argc, char **argv)
 {
-    char cmd[128];
     char *end;
     long percent;
 
@@ -141,8 +119,7 @@ int client_handle_keyboard_backlight_command(const int argc, char **argv)
             return 2;
         }
 
-        snprintf(cmd, sizeof(cmd), "keyboard-backlight timeout %s\n", argv[3]);
-        return client_send_command(cmd, false);
+        return client_send_commandf(false, "keyboard-backlight timeout %s\n", argv[3]);
     }
 
     if (argc != 4 || strcmp(argv[2], "set") != 0) {
@@ -157,6 +134,5 @@ int client_handle_keyboard_backlight_command(const int argc, char **argv)
         return 2;
     }
 
-    snprintf(cmd, sizeof(cmd), "keyboard-backlight set %ld\n", percent);
-    return client_send_command(cmd, false);
+    return client_send_commandf(false, "keyboard-backlight set %ld\n", percent);
 }

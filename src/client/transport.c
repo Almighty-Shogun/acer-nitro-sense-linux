@@ -5,6 +5,7 @@
 #include "util/file.h"
 
 #include <errno.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -111,4 +112,23 @@ int client_send_command_capture(const char *command, bool quiet, char *out,
 int client_send_command(const char *command, bool quiet)
 {
     return client_send_command_capture(command, quiet, NULL, 0);
+}
+
+int client_send_commandf(const bool quiet, const char *format, ...)
+{
+    char command[256];
+    va_list args;
+
+    va_start(args, format);
+    const int written = vsnprintf(command, sizeof(command), format, args);
+    va_end(args);
+
+    if (written < 0 || (size_t)written >= sizeof(command)) {
+        if (!quiet)
+            fprintf(stderr, "command too long\n");
+
+        return 2;
+    }
+
+    return client_send_command(command, quiet);
 }
