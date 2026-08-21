@@ -74,6 +74,54 @@ static void restore_saved_fan_targets(const struct ans_config *cfg,
     }
 }
 
+static void restore_auto_control_state(struct ec_device *ec,
+                                       const struct ans_config *cfg,
+                                       fan_state states[ANS_MAX_FANS],
+                                       char *preset,
+                                       const size_t preset_len,
+                                       const char *json)
+{
+    string_copy(preset, preset_len, "auto");
+    apply_daemon_control_fan_mode(ec, cfg);
+    apply_saved_fan_percentages(ec, cfg, states, json);
+}
+
+static void restore_firmware_auto_control_state(
+    struct ec_device *ec, const struct ans_config *cfg,
+    fan_state states[ANS_MAX_FANS], char *preset, const size_t preset_len,
+    const char *json)
+{
+    string_copy(preset, preset_len, FIRMWARE_AUTO_PRESET);
+    restore_saved_fan_targets(cfg, states, json);
+
+    if (!apply_firmware_auto_fan_mode(ec, cfg))
+        string_copy(preset, preset_len, "manual");
+}
+
+static bool restore_named_preset_control_state(
+    struct ec_device *ec, const struct ans_config *cfg,
+    fan_state states[ANS_MAX_FANS], const char *preset)
+{
+    if (strcmp(preset, "manual") == 0 || !config_find_preset(cfg, preset))
+        return false;
+
+    apply_daemon_control_fan_mode(ec, cfg);
+    apply_preset(ec, cfg, states, preset);
+    return true;
+}
+
+static void restore_manual_control_state(struct ec_device *ec,
+                                         const struct ans_config *cfg,
+                                         fan_state states[ANS_MAX_FANS],
+                                         char *preset,
+                                         const size_t preset_len,
+                                         const char *json)
+{
+    string_copy(preset, preset_len, "manual");
+    apply_daemon_control_fan_mode(ec, cfg);
+    apply_saved_fan_percentages(ec, cfg, states, json);
+}
+
 void write_control_state(const struct ans_config *cfg,
                          const fan_state states[ANS_MAX_FANS],
                          const bool auto_mode, const char *preset,
@@ -152,23 +200,12 @@ bool restore_control_state_from_json(struct ec_device *ec,
     json_string_key(json, "preset", preset, preset_len);
 
     if (*auto_mode) {
-        string_copy(preset, preset_len, "auto");
-        apply_daemon_control_fan_mode(ec, cfg);
-        apply_saved_fan_percentages(ec, cfg, states, json);
+        restore_auto_control_state(ec, cfg, states, preset, preset_len, json);
     } else if (strcmp(preset, FIRMWARE_AUTO_PRESET) == 0) {
-        string_copy(preset, preset_len, FIRMWARE_AUTO_PRESET);
-        restore_saved_fan_targets(cfg, states, json);
-
-        if (!apply_firmware_auto_fan_mode(ec, cfg))
-            string_copy(preset, preset_len, "manual");
-    } else if (strcmp(preset, "manual") != 0 &&
-               config_find_preset(cfg, preset)) {
-        apply_daemon_control_fan_mode(ec, cfg);
-        apply_preset(ec, cfg, states, preset);
-    } else {
-        string_copy(preset, preset_len, "manual");
-        apply_daemon_control_fan_mode(ec, cfg);
-        apply_saved_fan_percentages(ec, cfg, states, json);
+        restore_firmware_auto_control_state(ec, cfg, states, preset,
+                                            preset_len, json);
+    } else if (!restore_named_preset_control_state(ec, cfg, states, preset)) {
+        restore_manual_control_state(ec, cfg, states, preset, preset_len, json);
     }
 
     if (cfg->fan_modes.available && !firmware_auto_mode(*auto_mode, preset))
