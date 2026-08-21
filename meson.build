@@ -103,30 +103,30 @@ platform_sources = [
   'src/platform/sensor_power.c',
 ]
 
-selftest_sources = [
-  'tests/selftest/command_ec.c',
-  'tests/selftest/command_fan.c',
-  'tests/selftest/command_firmware.c',
-  'tests/selftest/command_invalid.c',
-  'tests/selftest/commands.c',
-  'tests/selftest/platform_fan_mode.c',
-  'tests/selftest/platform_keyboard_backlight.c',
-  'tests/selftest/platform_power.c',
-  'tests/selftest/platform_commands.c',
-  'tests/selftest/platform_status.c',
-  'tests/selftest/daemon_args.c',
-  'tests/selftest/state.c',
-  'tests/selftest/daemon.c',
-  'tests/selftest/fan_auto.c',
-  'tests/selftest/fan_control.c',
-  'tests/selftest/fan_ec.c',
-  'tests/selftest/fan_resume.c',
-  'tests/selftest/fan_safety.c',
-  'tests/selftest/fan_temperature.c',
-  'tests/selftest/parser.c',
-  'tests/selftest/helpers.c',
-  'tests/selftest/fixture.c',
-  'tests/selftest/utility.c',
+unit_sources = [
+  'tests/unit/command_ec.c',
+  'tests/unit/command_fan.c',
+  'tests/unit/command_firmware.c',
+  'tests/unit/command_invalid.c',
+  'tests/unit/commands.c',
+  'tests/unit/platform_fan_mode.c',
+  'tests/unit/platform_keyboard_backlight.c',
+  'tests/unit/platform_power.c',
+  'tests/unit/platform_commands.c',
+  'tests/unit/platform_status.c',
+  'tests/unit/daemon_args.c',
+  'tests/unit/state.c',
+  'tests/unit/daemon.c',
+  'tests/unit/fan_auto.c',
+  'tests/unit/fan_control.c',
+  'tests/unit/fan_ec.c',
+  'tests/unit/fan_resume.c',
+  'tests/unit/fan_safety.c',
+  'tests/unit/fan_temperature.c',
+  'tests/unit/parser.c',
+  'tests/unit/helpers.c',
+  'tests/unit/fixture.c',
+  'tests/unit/utility.c',
 ]
 
 daemon_sources = core_sources + fan_sources + platform_sources
@@ -137,8 +137,8 @@ executable('acer-nitro-sensed',
   dependencies: dl,
   install: true)
 
-selftest = executable('acer-nitro-sense-selftest',
-  ['tests/selftest/main.c'] + daemon_sources + selftest_sources,
+unit = executable('acer-nitro-sense-unit-test',
+  ['tests/unit/main.c'] + daemon_sources + unit_sources,
   include_directories: [src_inc, tests_inc],
   dependencies: dl,
   install: false)
@@ -184,8 +184,8 @@ install_data(
   install_mode: 'rwxr-xr-x',
   install_dir: systemd_system_sleep_dir)
 
-test('daemon-self-test',
-  selftest)
+test('daemon-unit-test',
+  unit)
 
 test('config-real-model',
   find_program('sh'),
