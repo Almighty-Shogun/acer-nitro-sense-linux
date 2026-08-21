@@ -109,6 +109,43 @@ static int read_power_control(const char *path, char *out, const size_t out_len)
     return 0;
 }
 
+static bool hwmon_entry_power_control_path(const struct dirent *entry,
+                                           const char *group, char *out,
+                                           const size_t out_len)
+{
+    char *base;
+    char *name_path;
+    char *name;
+    bool found = false;
+
+    if (entry->d_name[0] == '.')
+        return false;
+
+    base = sensor_path_join("/sys/class/hwmon", entry->d_name);
+    if (!base)
+        return false;
+
+    name_path = sensor_path_join(base, "name");
+    if (!name_path) {
+        free(base);
+        return false;
+    }
+
+    name = read_text_file(name_path, 128);
+    free(name_path);
+    if (!name) {
+        free(base);
+        return false;
+    }
+
+    if (sensor_group_matches(group, name))
+        found = find_power_control_path(base, out, out_len) == 0;
+
+    free(name);
+    free(base);
+    return found;
+}
+
 int sensor_set_group_power_control(const char *group, const char *control)
 {
     DIR *hwmon = opendir("/sys/class/hwmon");
@@ -119,40 +156,12 @@ int sensor_set_group_power_control(const char *group, const char *control)
         return -1;
 
     while ((entry = readdir(hwmon))) {
-        char *base;
-        char *name_path;
         char power_path[PATH_MAX];
-        char *name;
 
-        if (entry->d_name[0] == '.')
-            continue;
-
-        base = sensor_path_join("/sys/class/hwmon", entry->d_name);
-        if (!base)
-            continue;
-        name_path = sensor_path_join(base, "name");
-        if (!name_path) {
-            free(base);
-            continue;
-        }
-        name = read_text_file(name_path, 128);
-        free(name_path);
-        if (!name) {
-            free(base);
-            continue;
-        }
-
-        if (!sensor_group_matches(group, name)) {
-            free(name);
-            free(base);
-            continue;
-        }
-        free(name);
-
-        if (find_power_control_path(base, power_path, sizeof(power_path)) == 0 &&
+        if (hwmon_entry_power_control_path(entry, group, power_path,
+                                           sizeof(power_path)) &&
             write_power_control(power_path, control) == 0)
             changed++;
-        free(base);
     }
 
     closedir(hwmon);
@@ -169,43 +178,14 @@ int sensor_read_group_power_control(const char *group, char *out,
         return -1;
 
     while ((entry = readdir(hwmon))) {
-        char *base;
-        char *name_path;
         char power_path[PATH_MAX];
-        char *name;
 
-        if (entry->d_name[0] == '.')
-            continue;
-
-        base = sensor_path_join("/sys/class/hwmon", entry->d_name);
-        if (!base)
-            continue;
-        name_path = sensor_path_join(base, "name");
-        if (!name_path) {
-            free(base);
-            continue;
-        }
-        name = read_text_file(name_path, 128);
-        free(name_path);
-        if (!name) {
-            free(base);
-            continue;
-        }
-
-        if (!sensor_group_matches(group, name)) {
-            free(name);
-            free(base);
-            continue;
-        }
-        free(name);
-
-        if (find_power_control_path(base, power_path, sizeof(power_path)) == 0 &&
+        if (hwmon_entry_power_control_path(entry, group, power_path,
+                                           sizeof(power_path)) &&
             read_power_control(power_path, out, out_len) == 0) {
-            free(base);
             closedir(hwmon);
             return 0;
         }
-        free(base);
     }
 
     closedir(hwmon);
