@@ -44,6 +44,29 @@ bool string_copy(char *out, const size_t out_len, const char *text)
     return true;
 }
 
+bool string_copy_span(char *out, const size_t out_len, const char *start,
+                      size_t len)
+{
+    if (out_len == 0)
+        return false;
+
+    if (!start) {
+        out[0] = '\0';
+        return true;
+    }
+
+    if (len >= out_len) {
+        len = out_len - 1;
+        memcpy(out, start, len);
+        out[len] = '\0';
+        return false;
+    }
+
+    memcpy(out, start, len);
+    out[len] = '\0';
+    return true;
+}
+
 void trim_ascii(char *s)
 {
     const char *start = s;

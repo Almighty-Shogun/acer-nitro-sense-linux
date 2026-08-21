@@ -30,13 +30,7 @@ void load_cpu_name(char *out, const size_t out_len)
             if (!end)
                 end = value + strlen(value);
 
-            size_t len = (size_t)(end - value);
-
-            if (len >= out_len)
-                len = out_len - 1;
-
-            memcpy(out, value, len);
-            out[len] = '\0';
+            string_copy_span(out, out_len, value, (size_t)(end - value));
             trim_ascii(out);
         }
     }

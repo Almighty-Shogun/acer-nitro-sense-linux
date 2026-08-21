@@ -6,6 +6,7 @@
 
 bool string_contains_case(const char *haystack, const char *needle);
 bool string_copy(char *out, size_t out_len, const char *text);
+bool string_copy_span(char *out, size_t out_len, const char *start, size_t len);
 void trim_ascii(char *s);
 
 #endif
