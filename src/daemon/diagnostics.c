@@ -28,6 +28,61 @@ void probe_ec(struct ec_device *ec, const struct ans_config *cfg)
     }
 }
 
+static void format_optional_register(char *out, const size_t out_len,
+                                     const int reg)
+{
+    if (reg >= 0)
+        snprintf(out, out_len, "0x%02x", reg);
+    else
+        string_copy(out, out_len, "none");
+}
+
+static int fan_ec_temperature(struct ec_device *ec, const int reg)
+{
+    const int temp = reg >= 0 ? ec_read_byte(ec, reg) : -1;
+
+    return temp > 0 && temp <= 130 ? temp : -1;
+}
+
+static void validate_fan(struct ec_device *ec, const struct ans_config *cfg,
+                         const struct fan_config *fan)
+{
+    const int raw = cfg->read_words ? ec_read_word(ec, fan->read_register) :
+                                      ec_read_byte(ec, fan->read_register);
+    const int ec_temp = fan_ec_temperature(ec, fan->temperature_register);
+    const int ec_control_temp =
+        fan_ec_temperature(ec, fan->control_temperature_register);
+    char temperature_register[16];
+    char control_temperature_register[16];
+    const int temp = ec_temp >= 0 ? ec_temp :
+        sensor_read_group_max_c(fan->sensor_group);
+    const int control_temp = ec_control_temp >= 0 ? ec_control_temp :
+        fan->control_sensor_group[0] ?
+        sensor_read_group_max_c(fan->control_sensor_group) : temp;
+
+    format_optional_register(temperature_register, sizeof(temperature_register),
+                             fan->temperature_register);
+    format_optional_register(control_temperature_register,
+                             sizeof(control_temperature_register),
+                             fan->control_temperature_register);
+
+    printf("fan=%s name=\"%s\" sensor_group=%s control_sensor_group=%s rpm=%d temp=%d control_temp=%d read_register=0x%02x write_register=0x%02x temperature_register=%s control_temperature_register=%s reset_speed=%d missing_temperature_speed_percent=%d curve_points=%d keep_awake=%s sensor_power_control=%s\n",
+           fan->id, fan->name, fan->sensor_group,
+           fan->control_sensor_group[0] ? fan->control_sensor_group :
+               fan->sensor_group,
+           raw, temp, control_temp, fan->read_register,
+           fan->write_register, temperature_register,
+           control_temperature_register,
+           fan->reset_speed,
+           fan->missing_temperature_speed_percent > 0 ?
+               fan->missing_temperature_speed_percent :
+               cfg->safety.missing_temperature_speed_percent,
+           fan->curve_len,
+           fan->keep_awake ? "true" : "false",
+           fan->sensor_power_control[0] ? fan->sensor_power_control :
+               "default");
+}
+
 void validate_model(struct ec_device *ec, const struct ans_config *cfg,
                     const char *config_path, const bool force_model)
 {
@@ -91,48 +146,7 @@ void validate_model(struct ec_device *ec, const struct ans_config *cfg,
 
     for (int i = 0; i < cfg->fan_len; i++) {
         const struct fan_config *fan = &cfg->fans[i];
-        const int raw = cfg->read_words ? ec_read_word(ec, fan->read_register) :
-                                          ec_read_byte(ec, fan->read_register);
-        const int ec_temp = fan->temperature_register >= 0 ?
-            ec_read_byte(ec, fan->temperature_register) : -1;
-        const int ec_control_temp = fan->control_temperature_register >= 0 ?
-            ec_read_byte(ec, fan->control_temperature_register) : -1;
-        char temperature_register[16];
-        char control_temperature_register[16];
-        const int temp = ec_temp > 0 && ec_temp <= 130 ? ec_temp :
-            sensor_read_group_max_c(fan->sensor_group);
-        const int control_temp = ec_control_temp > 0 && ec_control_temp <= 130 ?
-            ec_control_temp : fan->control_sensor_group[0] ?
-            sensor_read_group_max_c(fan->control_sensor_group) : temp;
-
-        if (fan->temperature_register >= 0)
-            snprintf(temperature_register, sizeof(temperature_register), "0x%02x",
-                     fan->temperature_register);
-        else
-            string_copy(temperature_register, sizeof(temperature_register), "none");
-        if (fan->control_temperature_register >= 0)
-            snprintf(control_temperature_register,
-                     sizeof(control_temperature_register), "0x%02x",
-                     fan->control_temperature_register);
-        else
-            string_copy(control_temperature_register,
-                        sizeof(control_temperature_register), "none");
-
-        printf("fan=%s name=\"%s\" sensor_group=%s control_sensor_group=%s rpm=%d temp=%d control_temp=%d read_register=0x%02x write_register=0x%02x temperature_register=%s control_temperature_register=%s reset_speed=%d missing_temperature_speed_percent=%d curve_points=%d keep_awake=%s sensor_power_control=%s\n",
-               fan->id, fan->name, fan->sensor_group,
-               fan->control_sensor_group[0] ? fan->control_sensor_group :
-                   fan->sensor_group,
-               raw, temp, control_temp, fan->read_register,
-               fan->write_register, temperature_register,
-               control_temperature_register,
-               fan->reset_speed,
-               fan->missing_temperature_speed_percent > 0 ?
-                   fan->missing_temperature_speed_percent :
-                   cfg->safety.missing_temperature_speed_percent,
-               fan->curve_len,
-               fan->keep_awake ? "true" : "false",
-               fan->sensor_power_control[0] ? fan->sensor_power_control :
-                   "default");
+        validate_fan(ec, cfg, fan);
     }
 }
 
