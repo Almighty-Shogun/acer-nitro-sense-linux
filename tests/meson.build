@@ -11,6 +11,7 @@ unit_sources = files(
   'unit/platform_status.c',
   'unit/daemon_args.c',
   'unit/state.c',
+  'unit/status_json.c',
   'unit/daemon.c',
   'unit/fan_auto.c',
   'unit/fan_control.c',
