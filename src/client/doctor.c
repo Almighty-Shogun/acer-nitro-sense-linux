@@ -6,6 +6,21 @@
 
 #include <stdio.h>
 
+static void doctor_run_daemon_command(const char *label, const char *display,
+                                      const char *command)
+{
+    char response[4096];
+
+    printf("$ acer-nitro-sense %s\n", display);
+
+    if (client_send_command_capture(command, true, response, sizeof(response)) == 0) {
+        fputs(response, stdout);
+        return;
+    }
+
+    printf("%s=unavailable reason=daemon-command-failed\n", label);
+}
+
 int client_doctor(void)
 {
     char status_response[4096];
@@ -28,10 +43,10 @@ int client_doctor(void)
     else
         client_print_status_file();
 
-    doctor_run_command("coolboost", "acer-nitro-sense coolboost status 2>&1");
-    doctor_run_command("fan_mode", "acer-nitro-sense fan-mode status 2>&1");
-    doctor_run_command("profile", "acer-nitro-sense profile status 2>&1");
-    doctor_run_command("gpu_temp", "acer-nitro-sense gpu-temp status 2>&1");
+    doctor_run_daemon_command("coolboost", "coolboost status", "coolboost status\n");
+    doctor_run_daemon_command("fan_mode", "fan-mode status", "fan-mode status\n");
+    doctor_run_daemon_command("profile", "profile status", "profile status\n");
+    doctor_run_daemon_command("gpu_temp", "gpu-temp status", "gpu-temp status\n");
 
     doctor_print_section("Install And Permissions");
     doctor_run_command("which", DOCTOR_PROBE_INSTALL_PATHS);
@@ -63,7 +78,8 @@ int client_doctor(void)
     doctor_run_command("power_supply", DOCTOR_PROBE_POWER_SUPPLY);
 
     doctor_print_section("Keyboard Backlight");
-    doctor_run_command("keyboard_backlight", "acer-nitro-sense keyboard-backlight status 2>&1");
+    doctor_run_daemon_command("keyboard_backlight", "keyboard-backlight status",
+                              "keyboard-backlight status\n");
     doctor_run_command("leds", DOCTOR_PROBE_LED_LIST);
     doctor_run_command("led_details", DOCTOR_PROBE_LED_DETAILS);
 
