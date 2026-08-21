@@ -1,5 +1,5 @@
-#include "commands/parser.h"
-#include "commands/parser_internal.h"
+#include "commands/parser/parser.h"
+#include "commands/parser/internal.h"
 
 #include <string.h>
 

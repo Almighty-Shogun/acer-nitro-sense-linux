@@ -1,6 +1,6 @@
 #include "selftest/parser.h"
 
-#include "commands/parser.h"
+#include "commands/parser/parser.h"
 
 #include <stdio.h>
 #include <string.h>

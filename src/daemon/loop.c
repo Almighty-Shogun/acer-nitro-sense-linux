@@ -1,6 +1,6 @@
 #include "daemon/loop.h"
 
-#include "commands/daemon.h"
+#include "commands/daemon/daemon.h"
 #include "daemon/state.h"
 #include "daemon/status.h"
 #include "fan/control.h"

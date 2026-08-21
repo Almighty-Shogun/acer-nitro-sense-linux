@@ -1,6 +1,6 @@
-#include "commands/platform.h"
+#include "commands/daemon/platform.h"
 
-#include "commands/platform_handlers.h"
+#include "commands/daemon/platform_handlers.h"
 
 bool handle_platform_command(const int client, struct ec_device *ec,
                              const struct ans_config *cfg,

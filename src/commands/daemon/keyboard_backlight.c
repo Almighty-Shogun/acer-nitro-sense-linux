@@ -1,7 +1,7 @@
-#include "commands/platform_handlers.h"
+#include "commands/daemon/platform_handlers.h"
 
 #include "control/protocol.h"
-#include "commands/parser.h"
+#include "commands/parser/parser.h"
 #include "daemon/state.h"
 #include "keyboard/backlight.h"
 #include "keyboard/backlight_timeout.h"

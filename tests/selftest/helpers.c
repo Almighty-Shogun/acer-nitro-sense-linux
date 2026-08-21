@@ -1,6 +1,6 @@
 #include "selftest/helpers.h"
 
-#include "commands/daemon.h"
+#include "commands/daemon/daemon.h"
 
 #include <string.h>
 #include <unistd.h>
