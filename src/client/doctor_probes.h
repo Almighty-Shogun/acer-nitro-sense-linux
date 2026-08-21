@@ -2,8 +2,6 @@
 #define ANS_CLIENT_DOCTOR_PROBES_H
 
 extern const char *DOCTOR_PROBE_DATE;
-extern const char *DOCTOR_PROBE_INSTALL_PATHS;
-extern const char *DOCTOR_PROBE_MODEL_CONFIG;
 extern const char *DOCTOR_PROBE_SERVICE_STATUS;
 extern const char *DOCTOR_PROBE_CURRENT_DAEMON_JOURNAL;
 extern const char *DOCTOR_PROBE_RECENT_DAEMON_JOURNAL;
