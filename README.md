@@ -98,8 +98,8 @@ meson test -C build
 Hardware validation tools live in `scripts/`:
 
 ```sh
-scripts/validate-hardware.sh
-scripts/discover-keyboard-backlight.sh
+scripts/hardware/validate-hardware.sh
+scripts/hardware/discover-keyboard-backlight.sh
 ```
 
 ## 💻 Usage

@@ -64,20 +64,20 @@ values. Do not continue to fan writes until read registers look plausible.
 Install the profile locally, then run hardware validation:
 
 ```sh
-scripts/validate-hardware.sh
+scripts/hardware/validate-hardware.sh
 ```
 
 For fan percentage calibration:
 
 ```sh
-CALIBRATE_FANS=1 scripts/validate-hardware.sh
+CALIBRATE_FANS=1 scripts/hardware/validate-hardware.sh
 ```
 
 Useful calibration options:
 
 ```sh
-CALIBRATE_FANS=1 CALIBRATION_SPEEDS='10 20 30 40 50 60 70 80 90 100' scripts/validate-hardware.sh
-CALIBRATE_FANS=1 EC_DUMP=1 scripts/validate-hardware.sh
+CALIBRATE_FANS=1 CALIBRATION_SPEEDS='10 20 30 40 50 60 70 80 90 100' scripts/hardware/validate-hardware.sh
+CALIBRATE_FANS=1 EC_DUMP=1 scripts/hardware/validate-hardware.sh
 ```
 
 Calibration should confirm:
@@ -114,7 +114,7 @@ ls /sys/class/leds
 If no usable LED exists, use the discovery helper:
 
 ```sh
-sudo scripts/discover-keyboard-backlight.sh
+sudo scripts/hardware/discover-keyboard-backlight.sh
 ```
 
 Only add EC keyboard backlight registers after confirming visible brightness
@@ -126,7 +126,7 @@ Do not tune presets from another model's fan curve. Use the calibration table
 and daily observation runs:
 
 ```sh
-DAILY_MODE=1 SAMPLES=120 INTERVAL=5 scripts/validate-hardware.sh
+DAILY_MODE=1 SAMPLES=120 INTERVAL=5 scripts/hardware/validate-hardware.sh
 ```
 
 A good profile should:
