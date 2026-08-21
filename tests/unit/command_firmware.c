@@ -22,6 +22,8 @@ int unit_run_firmware_auto_commands(struct ec_device *ec,
 
     ec_write_byte(ec, cfg->fans[0].write_register, 31);
     ec_write_byte(ec, cfg->fans[1].write_register, 41);
+    setenv("ANS_FAKE_CPU_TEMP_C", "45", 1);
+    setenv("ANS_FAKE_GPU_TEMP_C", "45", 1);
     if (unit_execute_command("firmware-auto\n", ec, cfg, states,
                                  auto_mode, preset, preset_len,
                                  coolboost_enabled, true, reply,
@@ -49,6 +51,8 @@ int unit_run_firmware_auto_commands(struct ec_device *ec,
         fprintf(stderr, "unit-test failed: firmware-auto status clarity\n");
         failures++;
     }
+    unsetenv("ANS_FAKE_CPU_TEMP_C");
+    unsetenv("ANS_FAKE_GPU_TEMP_C");
 
     reset_unit_test_states(cfg, states);
     *auto_mode = false;

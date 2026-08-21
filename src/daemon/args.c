@@ -20,7 +20,7 @@ void daemon_args_init(struct daemon_args *args)
     args->validate = false;
 }
 
-int daemon_args_parse(const int argc, char **argv, struct daemon_args *args)
+int daemon_args_parse(const int argc, char *const argv[], struct daemon_args *args)
 {
     daemon_args_init(args);
 

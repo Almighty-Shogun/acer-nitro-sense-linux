@@ -1,4 +1,5 @@
 #include "sensors/internal.h"
+#include "sensors/sensors.h"
 #include "util/file.h"
 #include "util/string.h"
 
