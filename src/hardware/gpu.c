@@ -36,34 +36,10 @@ static bool extract_lspci_field(const char *line, const int index, char *out,
 static void format_name_pair(char *out, const size_t out_len, const char *left,
                              const char *right)
 {
-    size_t used = 0;
-
     if (out_len == 0)
         return;
 
-    out[0] = '\0';
-    size_t left_len = strlen(left);
-
-    if (left_len >= out_len)
-        left_len = out_len - 1;
-
-    memcpy(out, left, left_len);
-    used = left_len;
-    out[used] = '\0';
-
-    if (used + 1 < out_len) {
-        out[used++] = ' ';
-        out[used] = '\0';
-    }
-
-    size_t right_len = strlen(right);
-
-    if (right_len >= out_len - used)
-        right_len = out_len - used - 1;
-
-    memcpy(out + used, right, right_len);
-    used += right_len;
-    out[used] = '\0';
+    snprintf(out, out_len, "%s %s", left, right);
 }
 
 static void simplify_gpu_name(const char *vendor, const char *device, char *out,
