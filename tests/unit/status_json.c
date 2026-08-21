@@ -1,6 +1,6 @@
 #include "unit/status_json.h"
 
-#include "daemon/status.h"
+#include "daemon/status_json.h"
 #include "ec/ec.h"
 #include "hardware/hardware.h"
 

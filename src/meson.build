@@ -19,6 +19,7 @@ core_sources = files(
   'commands/daemon/readonly.c',
   'daemon/state.c',
   'daemon/status.c',
+  'daemon/status_json.c',
   'daemon/status_reply.c',
   'ec/ec.c',
   'ec/fake.c',
