@@ -3,9 +3,11 @@
 #include "config/parse.h"
 #include "daemon/status_format.h"
 #include "util/number.h"
+#include "util/process.h"
 
 #include <stdio.h>
 #include <string.h>
+#include <sys/wait.h>
 
 static int expect_int(const char *label, const int actual, const int expected)
 {
@@ -76,6 +78,35 @@ static int unit_run_config_helpers(void)
     return failures;
 }
 
+static int unit_run_process_helpers(void)
+{
+    char command[] = "printf";
+    char text[] = "fan";
+    char *const argv[] = {command, text, NULL};
+    char buf[16];
+    pid_t pid;
+    int failures = 0;
+    FILE *stream = process_open_stdout("printf", argv, &pid);
+
+    if (!stream) {
+        fprintf(stderr, "unit-test failed: process stdout open\n");
+        return 1;
+    }
+
+    if (!fgets(buf, sizeof(buf), stream) || strcmp(buf, "fan") != 0) {
+        fprintf(stderr, "unit-test failed: process stdout read\n");
+        failures++;
+    }
+
+    const int status = process_close_stdout(stream, pid);
+    if (status < 0 || !WIFEXITED(status) || WEXITSTATUS(status) != 0) {
+        fprintf(stderr, "unit-test failed: process stdout close\n");
+        failures++;
+    }
+
+    return failures;
+}
+
 static int unit_run_status_helpers(void)
 {
     fan_state state = {.percent = 40, .requested_percent = 0};
@@ -126,6 +157,7 @@ int unit_run_utility_helpers(void)
 
     failures += unit_run_number_helpers();
     failures += unit_run_config_helpers();
+    failures += unit_run_process_helpers();
     failures += unit_run_status_helpers();
 
     return failures;
