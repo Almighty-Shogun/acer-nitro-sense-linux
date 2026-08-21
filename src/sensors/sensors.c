@@ -5,6 +5,7 @@
 
 #include <dirent.h>
 #include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -30,20 +31,17 @@ bool sensor_group_matches(const char *group, const char *name)
 
 char *sensor_path_join(const char *left, const char *right)
 {
-    size_t left_len = strlen(left);
-    size_t right_len = strlen(right);
-    bool needs_slash = left_len > 0 && left[left_len - 1] != '/';
+    const size_t left_len = strlen(left);
+    const size_t right_len = strlen(right);
+    const bool needs_slash = left_len > 0 && left[left_len - 1] != '/';
+    const size_t path_len = left_len + (needs_slash ? 1 : 0) + right_len + 1;
     char *path;
 
-    path = malloc(left_len + (needs_slash ? 1 : 0) + right_len + 1);
+    path = malloc(path_len);
     if (!path)
         return NULL;
 
-    memcpy(path, left, left_len);
-    if (needs_slash)
-        path[left_len++] = '/';
-    memcpy(path + left_len, right, right_len);
-    path[left_len + right_len] = '\0';
+    snprintf(path, path_len, needs_slash ? "%s/%s" : "%s%s", left, right);
     return path;
 }
 
