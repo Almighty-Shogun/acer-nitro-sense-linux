@@ -2,6 +2,7 @@
 
 #include "core/constants.h"
 #include "util/file.h"
+#include "util/process.h"
 #include "util/string.h"
 
 #include <errno.h>
@@ -99,12 +100,14 @@ void doctor_print_os_pretty_name(void)
 
 void doctor_run_command(const char *label, const char *command)
 {
+    const char *const argv[] = {"sh", "-c", command, NULL};
     char line[512];
+    pid_t pid;
     int status;
 
     printf("$ %s\n", command);
 
-    FILE *pipe = popen(command, "r");
+    FILE *pipe = process_open_output("sh", argv, true, &pid);
     if (!pipe) {
         printf("%s=failed error=%s\n", label, strerror(errno));
         return;
@@ -113,7 +116,7 @@ void doctor_run_command(const char *label, const char *command)
     while (fgets(line, sizeof(line), pipe))
         fputs(line, stdout);
 
-    status = pclose(pipe);
+    status = process_close_stdout(pipe, pid);
     print_command_status(label, status);
 }
 
