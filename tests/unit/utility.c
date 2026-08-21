@@ -2,6 +2,8 @@
 
 #include "config/parse.h"
 #include "daemon/status_format.h"
+#include "util/format.h"
+#include "util/json.h"
 #include "util/number.h"
 
 #include <stdio.h>
@@ -76,6 +78,28 @@ static int unit_run_config_helpers(void)
     return failures;
 }
 
+static int unit_run_json_helpers(void)
+{
+    char buf[128];
+    text_buffer out;
+    int failures = 0;
+
+    text_buffer_init(&out, buf, sizeof(buf));
+    if (json_append_string(&out, "Acer \"Nitro\"\\GPU\n\t") < 0 ||
+        strcmp(buf, "\"Acer \\\"Nitro\\\"\\\\GPU\\n\\t\"") != 0) {
+        fprintf(stderr, "unit-test failed: json string escaping\n");
+        failures++;
+    }
+
+    text_buffer_init(&out, buf, 8);
+    if (json_append_string(&out, "too long") == 0 || text_buffer_ok(&out)) {
+        fprintf(stderr, "unit-test failed: json string overflow tracking\n");
+        failures++;
+    }
+
+    return failures;
+}
+
 static int unit_run_status_helpers(void)
 {
     fan_state state = {.percent = 40, .requested_percent = 0};
@@ -126,6 +150,7 @@ int unit_run_utility_helpers(void)
 
     failures += unit_run_number_helpers();
     failures += unit_run_config_helpers();
+    failures += unit_run_json_helpers();
     failures += unit_run_status_helpers();
 
     return failures;
