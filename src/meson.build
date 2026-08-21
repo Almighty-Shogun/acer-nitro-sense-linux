@@ -49,6 +49,7 @@ fan_sources = files(
   'commands/daemon/coolboost.c',
   'commands/daemon/ec.c',
   'commands/daemon/fan.c',
+  'commands/daemon/fan_context.c',
   'commands/daemon/fan_mode.c',
   'commands/daemon/gpu_temp.c',
   'fan/control.c',
