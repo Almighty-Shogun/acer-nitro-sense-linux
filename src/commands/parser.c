@@ -51,22 +51,8 @@ bool parse_power_source_command(const char *cmd, char *action, size_t action_len
 bool parse_power_source_auto_command(const char *cmd, char *value,
                                      const size_t value_len)
 {
-    const char *cursor = cmd;
-    char command[32];
-    char action[16];
-
-    if (!command_read_token(&cursor, command, sizeof(command)) ||
-        strcmp(command, "power-source") != 0)
-        return false;
-    if (!command_read_token(&cursor, action, sizeof(action)) ||
-        strcmp(action, "auto") != 0)
-        return false;
-    if (!command_read_token(&cursor, value, value_len))
-        return false;
-    if (!command_has_only_trailing_space(cursor))
-        return false;
-
-    return true;
+    return command_parse_subaction(cmd, "power-source", "auto", value,
+                                   value_len);
 }
 
 bool parse_gpu_temp_command(const char *cmd, char *action, size_t action_len)
@@ -82,59 +68,20 @@ bool parse_keyboard_backlight_command(const char *cmd, char *action,
 
 bool parse_keyboard_backlight_set_command(const char *cmd, int *percent)
 {
-    const char *cursor = cmd;
-    char command[32];
-    char action[16];
-    char percent_text[16];
-
-    if (!command_read_token(&cursor, command, sizeof(command)) ||
-        strcmp(command, "keyboard-backlight") != 0)
-        return false;
-    if (!command_read_token(&cursor, action, sizeof(action)) ||
-        strcmp(action, "set") != 0)
-        return false;
-    if (!command_read_token(&cursor, percent_text, sizeof(percent_text)))
-        return false;
-    if (!command_has_only_trailing_space(cursor))
-        return false;
-
-    return command_parse_int_token(percent_text, 0, 100, percent);
+    return command_parse_int_subaction(cmd, "keyboard-backlight", "set", 0, 100,
+                                       percent);
 }
 
 bool parse_keyboard_backlight_timeout_command(const char *cmd, char *action,
                                               const size_t action_len)
 {
-    const char *cursor = cmd;
-    char command[32];
-    char subcommand[16];
-
-    if (!command_read_token(&cursor, command, sizeof(command)) ||
-        strcmp(command, "keyboard-backlight") != 0)
-        return false;
-    if (!command_read_token(&cursor, subcommand, sizeof(subcommand)) ||
-        strcmp(subcommand, "timeout") != 0)
-        return false;
-    if (!command_read_token(&cursor, action, action_len))
-        return false;
-
-    return command_has_only_trailing_space(cursor);
+    return command_parse_subaction(cmd, "keyboard-backlight", "timeout",
+                                   action, action_len);
 }
 
 bool parse_ec_read_command(const char *cmd, int *reg)
 {
-    const char *cursor = cmd;
-    char command[16];
-    char reg_text[16];
-
-    if (!command_read_token(&cursor, command, sizeof(command)) ||
-        strcmp(command, "ec-read") != 0)
-        return false;
-    if (!command_read_token(&cursor, reg_text, sizeof(reg_text)))
-        return false;
-    if (!command_has_only_trailing_space(cursor))
-        return false;
-
-    return command_parse_int_token(reg_text, 0, 255, reg);
+    return command_parse_int_action(cmd, "ec-read", 0, 255, reg);
 }
 
 bool parse_ec_dump_command(const char *cmd, int *start, int *end)
