@@ -1,7 +1,7 @@
 #include "commands/parser_internal.h"
 
-#include <errno.h>
-#include <stdlib.h>
+#include "util/number.h"
+
 #include <string.h>
 
 const char *command_skip_space(const char *p)
@@ -39,30 +39,13 @@ bool command_has_only_trailing_space(const char *p)
 
 bool command_parse_percent_token(const char *text, int *percent)
 {
-    char *end;
-
-    errno = 0;
-    const long value = strtol(text, &end, 10);
-    if (errno != 0 || end == text || *end != '\0' || value < 1 || value > 100)
-        return false;
-
-    *percent = (int)value;
-    return true;
+    return parse_int_range(text, 1, 100, 10, percent);
 }
 
 bool command_parse_int_token(const char *text, const int min_value,
                              const int max_value, int *value)
 {
-    char *end;
-
-    errno = 0;
-    const long parsed = strtol(text, &end, 0);
-    if (errno != 0 || end == text || *end != '\0' ||
-        parsed < min_value || parsed > max_value)
-        return false;
-
-    *value = (int)parsed;
-    return true;
+    return parse_int_range(text, min_value, max_value, 0, value);
 }
 
 bool command_parse_action(const char *cmd, const char *expected_command,
