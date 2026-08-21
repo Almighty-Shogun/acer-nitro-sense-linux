@@ -49,6 +49,23 @@ static bool read_trimmed_file(const char *path, char *out, const size_t out_len)
     return true;
 }
 
+static bool power_supply_type_is_mains(const char *type)
+{
+    return strcmp(type, "Mains") == 0 || strcmp(type, "USB") == 0 ||
+           strcmp(type, "USB-C") == 0 || strcmp(type, "USB_PD") == 0;
+}
+
+static bool power_supply_is_online(const char *path)
+{
+    char online_path[1024];
+    char online[16];
+
+    snprintf(online_path, sizeof(online_path), "%s/online", path);
+
+    return read_trimmed_file(online_path, online, sizeof(online)) &&
+           strcmp(online, "1") == 0;
+}
+
 enum power_source_state read_power_source(void)
 {
     enum power_source_state fake = fake_power_source();
@@ -67,9 +84,7 @@ enum power_source_state read_power_source(void)
     while ((entry = readdir(dir))) {
         char path[512];
         char type_path[1024];
-        char online_path[1024];
         char type[64];
-        char online[16];
 
         if (entry->d_name[0] == '.')
             continue;
@@ -84,14 +99,11 @@ enum power_source_state read_power_source(void)
             continue;
         }
 
-        if (strcmp(type, "Mains") != 0 && strcmp(type, "USB") != 0 &&
-            strcmp(type, "USB-C") != 0 && strcmp(type, "USB_PD") != 0)
+        if (!power_supply_type_is_mains(type))
             continue;
 
         has_mains = true;
-        snprintf(online_path, sizeof(online_path), "%s/online", path);
-        if (read_trimmed_file(online_path, online, sizeof(online)) &&
-            strcmp(online, "1") == 0) {
+        if (power_supply_is_online(path)) {
             closedir(dir);
             return POWER_SOURCE_AC;
         }
