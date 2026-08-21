@@ -2,13 +2,6 @@
 
 const char *DOCTOR_PROBE_DATE = "date --iso-8601=seconds 2>/dev/null || date";
 
-const char *DOCTOR_PROBE_INSTALL_PATHS =
-    "command -v acer-nitro-sense; command -v ans; command -v acer-nitro-sensed";
-
-const char *DOCTOR_PROBE_MODEL_CONFIG =
-    "ls -l /etc/acer-nitro-sense/model.json 2>&1; "
-    "readlink -f /etc/acer-nitro-sense/model.json 2>&1";
-
 const char *DOCTOR_PROBE_SERVICE_STATUS =
     "systemctl --no-pager --full status acer-nitro-sense.service 2>&1";
 

@@ -49,8 +49,8 @@ int client_doctor(void)
     doctor_run_daemon_command("gpu_temp", "gpu-temp status", "gpu-temp status\n");
 
     doctor_print_section("Install And Permissions");
-    doctor_run_command("which", DOCTOR_PROBE_INSTALL_PATHS);
-    doctor_run_command("config", DOCTOR_PROBE_MODEL_CONFIG);
+    doctor_print_command_paths();
+    doctor_print_model_config();
     doctor_print_socket_permissions();
     doctor_print_user_groups();
 
