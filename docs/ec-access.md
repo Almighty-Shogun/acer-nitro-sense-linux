@@ -54,11 +54,11 @@ ANS_FAKE_CPU_TEMP_C=55 ANS_FAKE_GPU_TEMP_C=50 \
 Daemon behavior tests are available through:
 
 ```sh
-build/acer-nitro-sense-selftest
+build/acer-nitro-sense-unit-test
 meson test -C build
 ```
 
-The self-test covers command parsing, command execution, authorization denial,
+The unit-test covers command parsing, command execution, authorization denial,
 safety clamps, global critical overrides, preset writes through fake EC,
 resume-style reapply, and status response format. Meson also checks valid model
 fixtures and rejects malformed profile fixtures.
