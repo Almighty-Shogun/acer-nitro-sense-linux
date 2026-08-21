@@ -47,3 +47,28 @@ bool text_buffer_ok(const text_buffer *buf)
 {
     return !buf->truncated;
 }
+
+const char *bool_text(const bool value)
+{
+    return value ? "true" : "false";
+}
+
+const char *availability_text(const bool available)
+{
+    return available ? "available" : "unavailable";
+}
+
+const char *on_off_text(const bool enabled)
+{
+    return enabled ? "on" : "off";
+}
+
+const char *supported_text(const bool supported)
+{
+    return supported ? "available" : "unsupported";
+}
+
+const char *fallback_text(const char *text, const char *fallback)
+{
+    return text && text[0] ? text : fallback;
+}

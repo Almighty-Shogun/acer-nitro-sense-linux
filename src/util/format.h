@@ -15,5 +15,10 @@ void text_buffer_init(text_buffer *buf, char *data, size_t cap);
 int text_buffer_append(text_buffer *buf, const char *fmt, ...)
     __attribute__((format(printf, 2, 3)));
 bool text_buffer_ok(const text_buffer *buf);
+const char *bool_text(bool value);
+const char *availability_text(bool available);
+const char *on_off_text(bool enabled);
+const char *supported_text(bool supported);
+const char *fallback_text(const char *text, const char *fallback);
 
 #endif

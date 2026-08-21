@@ -1,4 +1,4 @@
-#include "commands/daemon.h"
+#include "commands/daemon/daemon.h"
 #include "config/config.h"
 #include "core/constants.h"
 #include "control/socket.h"

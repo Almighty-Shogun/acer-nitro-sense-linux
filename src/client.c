@@ -1,4 +1,4 @@
-#include "commands/client_dispatch.h"
+#include "commands/client/dispatch.h"
 
 int main(const int argc, char **argv)
 {
