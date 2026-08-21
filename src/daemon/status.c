@@ -10,6 +10,55 @@
 
 #include <time.h>
 
+static void append_fan_status_json(text_buffer *out,
+                                   const struct ans_config *cfg,
+                                   const fan_state states[ANS_MAX_FANS],
+                                   const hardware_names *names,
+                                   const bool firmware_mode, const int index)
+{
+    const char *control = status_fan_control_source(
+        firmware_mode, states[index].safety_active);
+    char active_percent[16];
+
+    status_active_percent_text(active_percent, sizeof(active_percent),
+                               firmware_mode, states[index].safety_active,
+                               states[index].percent, "null");
+
+    text_buffer_append(
+        out,
+        "    { \"id\": \"%s\", \"name\": \"%s\", \"component_name\": \"%s\", \"rpm\": %d, "
+        "\"temp_c\": %d, \"sensor_temp_c\": %d, "
+        "\"control_temp_c\": %d, \"control_sensor_temp_c\": %d, "
+        "\"temp_available\": %s, \"control_temp_available\": %s, "
+        "\"control\": \"%s\", \"active_percent\": %s, "
+        "\"firmware_controlled\": %s, \"percent\": %d, "
+        "\"requested_percent\": %d, \"effective_percent\": %d, "
+        "\"write_value\": %d, "
+        "\"critical_temp_samples\": %d, "
+        "\"ec_read_failures\": %d, \"ec_write_failures\": %d, "
+        "\"safety_active\": %s, "
+        "\"safety_reason\": \"%s\" }%s\n",
+        cfg->fans[index].id, cfg->fans[index].name,
+        component_name_for_fan(names, &cfg->fans[index]), states[index].rpm,
+        states[index].temp_c, states[index].sensor_temp_c,
+        states[index].control_temp_c, states[index].control_sensor_temp_c,
+        states[index].temp_available ? "true" : "false",
+        states[index].control_temp_available ? "true" : "false",
+        control, active_percent,
+        status_fan_firmware_controlled(firmware_mode,
+                                       states[index].safety_active) ?
+            "true" : "false",
+        states[index].percent,
+        status_requested_percent(&states[index]),
+        states[index].percent,
+        states[index].write_value,
+        states[index].critical_temp_samples,
+        states[index].ec_read_failures, states[index].ec_write_failures,
+        states[index].safety_active ? "true" : "false",
+        states[index].safety_reason,
+        index == cfg->fan_len - 1 ? "" : ",");
+}
+
 void write_status(const struct ans_config *cfg, struct ec_device *ec,
                   const fan_state states[ANS_MAX_FANS], const bool auto_mode,
                   const char *preset, const bool coolboost_enabled,
@@ -96,48 +145,8 @@ void write_status(const struct ans_config *cfg, struct ec_device *ec,
         keyboard_backlight_reason(&keyboard_backlight),
         (long)now);
 
-    for (int i = 0; i < cfg->fan_len; i++) {
-        const char *control = status_fan_control_source(firmware_mode,
-                                                        states[i].safety_active);
-        char active_percent[16];
-
-        status_active_percent_text(active_percent, sizeof(active_percent),
-                                   firmware_mode, states[i].safety_active,
-                                   states[i].percent, "null");
-
-        text_buffer_append(
-            &out,
-            "    { \"id\": \"%s\", \"name\": \"%s\", \"component_name\": \"%s\", \"rpm\": %d, "
-            "\"temp_c\": %d, \"sensor_temp_c\": %d, "
-            "\"control_temp_c\": %d, \"control_sensor_temp_c\": %d, "
-            "\"temp_available\": %s, \"control_temp_available\": %s, "
-            "\"control\": \"%s\", \"active_percent\": %s, "
-            "\"firmware_controlled\": %s, \"percent\": %d, "
-            "\"requested_percent\": %d, \"effective_percent\": %d, "
-            "\"write_value\": %d, "
-            "\"critical_temp_samples\": %d, "
-            "\"ec_read_failures\": %d, \"ec_write_failures\": %d, "
-            "\"safety_active\": %s, "
-            "\"safety_reason\": \"%s\" }%s\n",
-            cfg->fans[i].id, cfg->fans[i].name,
-            component_name_for_fan(names, &cfg->fans[i]), states[i].rpm,
-            states[i].temp_c, states[i].sensor_temp_c,
-            states[i].control_temp_c, states[i].control_sensor_temp_c,
-            states[i].temp_available ? "true" : "false",
-            states[i].control_temp_available ? "true" : "false",
-            control, active_percent,
-            status_fan_firmware_controlled(firmware_mode, states[i].safety_active) ?
-                "true" : "false",
-            states[i].percent,
-            states[i].requested_percent > 0 ?
-                states[i].requested_percent : states[i].percent,
-            states[i].percent,
-            states[i].write_value,
-            states[i].critical_temp_samples,
-            states[i].ec_read_failures, states[i].ec_write_failures,
-            states[i].safety_active ? "true" : "false", states[i].safety_reason,
-            i == cfg->fan_len - 1 ? "" : ",");
-    }
+    for (int i = 0; i < cfg->fan_len; i++)
+        append_fan_status_json(&out, cfg, states, names, firmware_mode, i);
 
     text_buffer_append(&out, "  ]\n}\n");
     if (text_buffer_ok(&out))
