@@ -2,6 +2,7 @@
 
 #include "core/constants.h"
 #include "util/file.h"
+#include "util/string.h"
 
 #include <errno.h>
 #include <grp.h>
@@ -12,6 +13,48 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
+static bool os_release_pretty_name(const char *text, char *out,
+                                   const size_t out_len)
+{
+    const char *line = text;
+
+    while (*line) {
+        const char *line_end = strchr(line, '\n');
+        const char *value;
+        size_t len;
+
+        if (!line_end)
+            line_end = line + strlen(line);
+
+        if (strncmp(line, "PRETTY_NAME=", 12) != 0) {
+            line = *line_end == '\n' ? line_end + 1 : line_end;
+            continue;
+        }
+
+        value = line + 12;
+        len = (size_t)(line_end - value);
+        if (len >= 2 && value[0] == '"' && value[len - 1] == '"') {
+            value++;
+            len -= 2;
+        }
+
+        string_copy_span(out, out_len, value, len);
+        return true;
+    }
+
+    return false;
+}
+
+static void print_command_status(const char *label, const int status)
+{
+    if (status == -1)
+        printf("%s=failed error=%s\n", label, strerror(errno));
+    else if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+        printf("%s=exit-code-%d\n", label, WEXITSTATUS(status));
+    else if (!WIFEXITED(status))
+        printf("%s=not-exited\n", label);
+}
 
 void doctor_print_section(const char *title)
 {
@@ -38,7 +81,7 @@ void doctor_print_file_value(const char *label, const char *path)
 void doctor_print_os_pretty_name(void)
 {
     char *text = read_text_file("/etc/os-release", 64 * 1024);
-    char *line;
+    char pretty_name[256];
 
     if (!text) {
         printf("os_pretty_name=unavailable path=/etc/os-release error=%s\n",
@@ -46,25 +89,11 @@ void doctor_print_os_pretty_name(void)
         return;
     }
 
-    line = strtok(text, "\n");
-    while (line) {
-        if (strncmp(line, "PRETTY_NAME=", 12) == 0) {
-            char *value = line + 12;
+    if (os_release_pretty_name(text, pretty_name, sizeof(pretty_name)))
+        printf("os_pretty_name=%s\n", pretty_name);
+    else
+        printf("os_pretty_name=unknown\n");
 
-            if (*value == '"') {
-                value++;
-                char *quote = strrchr(value, '"');
-                if (quote)
-                    *quote = '\0';
-            }
-            printf("os_pretty_name=%s\n", value);
-            free(text);
-            return;
-        }
-        line = strtok(NULL, "\n");
-    }
-
-    printf("os_pretty_name=unknown\n");
     free(text);
 }
 
@@ -85,12 +114,7 @@ void doctor_run_command(const char *label, const char *command)
         fputs(line, stdout);
 
     status = pclose(pipe);
-    if (status == -1)
-        printf("%s=failed error=%s\n", label, strerror(errno));
-    else if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
-        printf("%s=exit-code-%d\n", label, WEXITSTATUS(status));
-    else if (!WIFEXITED(status))
-        printf("%s=not-exited\n", label);
+    print_command_status(label, status);
 }
 
 void doctor_print_socket_permissions(void)
