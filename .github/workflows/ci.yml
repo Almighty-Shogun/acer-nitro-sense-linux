@@ -36,6 +36,7 @@ jobs:
                     apt-get install -y --no-install-recommends \
                         ca-certificates \
                         gcc \
+                        libc6-dev \
                         libsystemd-dev \
                         meson \
                         ninja-build \
