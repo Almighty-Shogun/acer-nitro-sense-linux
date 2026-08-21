@@ -3,6 +3,7 @@
 #include "client/transport.h"
 #include "core/constants.h"
 #include "util/file.h"
+#include "util/string.h"
 
 #include <errno.h>
 #include <stdio.h>
@@ -46,6 +47,15 @@ static void print_status_token(const char *token, enum temp_unit unit)
     fputs(token, stdout);
 }
 
+static void print_status_token_span(const char *start, size_t len,
+                                    enum temp_unit unit)
+{
+    char part[128];
+
+    string_copy_span(part, sizeof(part), start, len);
+    print_status_token(part, unit);
+}
+
 static void print_status_human(const char *status, enum temp_unit unit)
 {
     const char *line = status;
@@ -66,15 +76,7 @@ static void print_status_human(const char *status, enum temp_unit unit)
             if (token > line)
                 putchar(' ');
 
-            char part[128];
-            size_t len = (size_t)(token_end - token);
-
-            if (len >= sizeof(part))
-                len = sizeof(part) - 1;
-
-            memcpy(part, token, len);
-            part[len] = '\0';
-            print_status_token(part, unit);
+            print_status_token_span(token, (size_t)(token_end - token), unit);
 
             token = token_end;
             while (token < line_end && (*token == ' ' || *token == '\t'))
