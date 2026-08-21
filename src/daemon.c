@@ -35,7 +35,7 @@ int main(const int argc, char** argv)
     struct ans_config cfg;
     struct daemon_args args;
 
-    hardware_names hardware_names;
+    hardware_names names;
     fan_state states[ANS_MAX_FANS] = {0};
 
     struct ec_device ec;
@@ -129,7 +129,7 @@ int main(const int argc, char** argv)
     }
 
     fprintf(stderr, "using EC backend: %s\n", ec.name);
-    load_hardware_names(&hardware_names);
+    load_hardware_names(&names);
 
     const int sock_fd = make_socket();
 
@@ -179,7 +179,7 @@ int main(const int argc, char** argv)
         write_control_state(&cfg, states, auto_mode, preset, coolboost_enabled, &runtime);
     }
 
-    run_daemon_loop(sock_fd, &ec, &cfg, states, &auto_mode, preset, sizeof(preset), &coolboost_enabled, &hardware_names, &runtime);
+    run_daemon_loop(sock_fd, &ec, &cfg, states, &auto_mode, preset, sizeof(preset), &coolboost_enabled, &names, &runtime);
 
     apply_reset_writes(&ec, &cfg);
     apply_sensor_power_control(&cfg, "auto");

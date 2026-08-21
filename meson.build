@@ -19,6 +19,18 @@ tests_inc = include_directories('tests')
 
 add_project_arguments('-D_GNU_SOURCE', language: 'c')
 
+if get_option('dev_checks')
+  add_project_arguments(
+    cc.get_supported_arguments([
+      '-Wformat=2',
+      '-Wundef',
+      '-Wshadow',
+      '-Wstrict-prototypes',
+      '-Wold-style-definition',
+    ]),
+    language: 'c')
+endif
+
 core_sources = [
   'src/commands/parser.c',
   'src/commands/tokens.c',
