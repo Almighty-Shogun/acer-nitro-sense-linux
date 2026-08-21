@@ -114,6 +114,7 @@ selftest_sources = [
   'tests/selftest/parser.c',
   'tests/selftest/helpers.c',
   'tests/selftest/fixture.c',
+  'tests/selftest/utility.c',
 ]
 
 daemon_sources = core_sources + fan_sources + platform_sources
