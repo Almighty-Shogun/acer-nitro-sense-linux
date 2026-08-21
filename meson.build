@@ -40,8 +40,8 @@ executable('acer-nitro-sensed',
   dependencies: dl,
   install: true)
 
-selftest = executable('acer-nitro-sense-selftest',
-  selftest_main + daemon_sources + selftest_sources,
+unit = executable('acer-nitro-sense-unit-test',
+  unit_main + daemon_sources + unit_sources,
   include_directories: [src_inc, tests_inc],
   dependencies: dl,
   install: false)
@@ -71,8 +71,8 @@ install_data(
   install_mode: 'rwxr-xr-x',
   install_dir: systemd_system_sleep_dir)
 
-test('daemon-self-test',
-  selftest)
+test('daemon-unit-test',
+  unit)
 
 test('config-real-model',
   find_program('sh'),

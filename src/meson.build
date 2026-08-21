@@ -1,6 +1,6 @@
 core_sources = files(
-  'commands/parser.c',
-  'commands/tokens.c',
+  'commands/parser/parser.c',
+  'commands/parser/tokens.c',
   'control/protocol.c',
   'config/config.c',
   'config/fans.c',
@@ -12,11 +12,11 @@ core_sources = files(
   'control/socket.c',
   'daemon/args.c',
   'daemon/capabilities.c',
-  'commands/daemon.c',
+  'commands/daemon/daemon.c',
   'daemon/diagnostics.c',
   'daemon/feature_status.c',
   'daemon/loop.c',
-  'commands/readonly.c',
+  'commands/daemon/readonly.c',
   'daemon/state.c',
   'daemon/status.c',
   'daemon/status_reply.c',
@@ -44,11 +44,11 @@ core_sources = files(
 )
 
 fan_sources = files(
-  'commands/coolboost.c',
-  'commands/ec.c',
-  'commands/fan.c',
-  'commands/fan_mode.c',
-  'commands/gpu_temp.c',
+  'commands/daemon/coolboost.c',
+  'commands/daemon/ec.c',
+  'commands/daemon/fan.c',
+  'commands/daemon/fan_mode.c',
+  'commands/daemon/gpu_temp.c',
   'fan/control.c',
   'fan/lifecycle.c',
   'fan/observation.c',
@@ -58,10 +58,10 @@ fan_sources = files(
 )
 
 platform_sources = files(
-  'commands/keyboard_backlight.c',
-  'commands/platform.c',
-  'commands/power_source.c',
-  'commands/profile.c',
+  'commands/daemon/keyboard_backlight.c',
+  'commands/daemon/platform.c',
+  'commands/daemon/power_source.c',
+  'commands/daemon/profile.c',
   'keyboard/backlight.c',
   'keyboard/backlight_timeout.c',
   'platform/control.c',
@@ -74,12 +74,12 @@ daemon_sources = core_sources + fan_sources + platform_sources
 
 client_sources = files(
   'client.c',
-  'commands/client_dispatch.c',
+  'commands/client/dispatch.c',
   'client/doctor.c',
   'client/doctor_util.c',
-  'commands/client_fan.c',
+  'commands/client/fan.c',
   'client/parse.c',
-  'commands/client_platform.c',
+  'commands/client/platform.c',
   'client/service.c',
   'client/status.c',
   'client/transport.c',
