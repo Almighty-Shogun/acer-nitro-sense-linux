@@ -8,6 +8,7 @@
 #include "selftest/parser.h"
 #include "selftest/state.h"
 #include "selftest/fixture.h"
+#include "selftest/utility.h"
 
 #include <stdio.h>
 
@@ -18,6 +19,7 @@ int run_self_tests(void)
     int failures = selftest_run_parser();
 
     failures += selftest_run_daemon_args();
+    failures += selftest_run_utility_helpers();
 
     struct ans_config cfg;
     struct ec_device ec = {.backend = EC_BACKEND_NONE};
