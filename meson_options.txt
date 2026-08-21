@@ -1,0 +1,4 @@
+option('dev_checks',
+  type: 'boolean',
+  value: false,
+  description: 'Enable extra compiler diagnostics for development checks')
