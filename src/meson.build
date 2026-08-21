@@ -76,6 +76,7 @@ client_sources = files(
   'client.c',
   'commands/client/dispatch.c',
   'client/doctor.c',
+  'client/doctor_probes.c',
   'client/doctor_util.c',
   'commands/client/fan.c',
   'client/parse.c',
