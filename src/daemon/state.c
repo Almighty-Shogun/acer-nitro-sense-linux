@@ -29,6 +29,51 @@ static int json_saved_percent_for_fan(const char *json, const char *id,
     return percent;
 }
 
+static void restore_runtime_state_from_json(const struct ans_config *cfg,
+                                            daemon_runtime_state *runtime,
+                                            const char *json)
+{
+    if (!runtime)
+        return;
+
+    runtime->power_source_auto_apply =
+        json_bool_key(json, "power_source_auto_apply",
+                      cfg->power_source_profiles.auto_apply);
+    runtime->keyboard_backlight_timeout_enabled =
+        cfg->keyboard_backlight.timeout_supported &&
+        json_bool_key(json, "keyboard_backlight_timeout_enabled",
+                      cfg->keyboard_backlight.timeout_default_enabled);
+    runtime->keyboard_backlight_timeout_seconds =
+        cfg->keyboard_backlight.timeout_seconds;
+}
+
+static void apply_saved_fan_percentages(struct ec_device *ec,
+                                        const struct ans_config *cfg,
+                                        fan_state states[ANS_MAX_FANS],
+                                        const char *json)
+{
+    for (int i = 0; i < cfg->fan_len; i++) {
+        const int percent = json_saved_percent_for_fan(
+            json, cfg->fans[i].id, cfg->fans[i].reset_speed);
+
+        set_fan_percent(ec, cfg, &cfg->fans[i], &states[i], percent,
+                        global_safety_reason(cfg, states));
+    }
+}
+
+static void restore_saved_fan_targets(const struct ans_config *cfg,
+                                      fan_state states[ANS_MAX_FANS],
+                                      const char *json)
+{
+    for (int i = 0; i < cfg->fan_len; i++) {
+        const int percent = json_saved_percent_for_fan(
+            json, cfg->fans[i].id, cfg->fans[i].reset_speed);
+
+        states[i].percent = percent;
+        states[i].requested_percent = percent;
+    }
+}
+
 void write_control_state(const struct ans_config *cfg,
                          const fan_state states[ANS_MAX_FANS],
                          const bool auto_mode, const char *preset,
@@ -101,18 +146,7 @@ bool restore_control_state_from_json(struct ec_device *ec,
     *auto_mode = json_bool_key(json, "auto", true);
     (void)json_bool_key(json, "coolboost", cfg->coolboost.default_enabled);
     *coolboost_enabled = false;
-    if (runtime)
-        runtime->power_source_auto_apply =
-            json_bool_key(json, "power_source_auto_apply",
-                          cfg->power_source_profiles.auto_apply);
-    if (runtime) {
-        runtime->keyboard_backlight_timeout_enabled =
-            cfg->keyboard_backlight.timeout_supported &&
-            json_bool_key(json, "keyboard_backlight_timeout_enabled",
-                          cfg->keyboard_backlight.timeout_default_enabled);
-        runtime->keyboard_backlight_timeout_seconds =
-            cfg->keyboard_backlight.timeout_seconds;
-    }
+    restore_runtime_state_from_json(cfg, runtime, json);
 
     string_copy(preset, preset_len, "auto");
     json_string_key(json, "preset", preset, preset_len);
@@ -120,24 +154,10 @@ bool restore_control_state_from_json(struct ec_device *ec,
     if (*auto_mode) {
         string_copy(preset, preset_len, "auto");
         apply_daemon_control_fan_mode(ec, cfg);
-
-        for (int i = 0; i < cfg->fan_len; i++) {
-            const int percent = json_saved_percent_for_fan(
-                json, cfg->fans[i].id, cfg->fans[i].reset_speed);
-
-            set_fan_percent(ec, cfg, &cfg->fans[i], &states[i], percent,
-                            global_safety_reason(cfg, states));
-        }
+        apply_saved_fan_percentages(ec, cfg, states, json);
     } else if (strcmp(preset, FIRMWARE_AUTO_PRESET) == 0) {
         string_copy(preset, preset_len, FIRMWARE_AUTO_PRESET);
-
-        for (int i = 0; i < cfg->fan_len; i++) {
-            const int percent = json_saved_percent_for_fan(
-                json, cfg->fans[i].id, cfg->fans[i].reset_speed);
-
-            states[i].percent = percent;
-            states[i].requested_percent = percent;
-        }
+        restore_saved_fan_targets(cfg, states, json);
 
         if (!apply_firmware_auto_fan_mode(ec, cfg))
             string_copy(preset, preset_len, "manual");
@@ -148,14 +168,7 @@ bool restore_control_state_from_json(struct ec_device *ec,
     } else {
         string_copy(preset, preset_len, "manual");
         apply_daemon_control_fan_mode(ec, cfg);
-
-        for (int i = 0; i < cfg->fan_len; i++) {
-            const int percent = json_saved_percent_for_fan(
-                json, cfg->fans[i].id, cfg->fans[i].reset_speed);
-
-            set_fan_percent(ec, cfg, &cfg->fans[i], &states[i], percent,
-                            global_safety_reason(cfg, states));
-        }
+        apply_saved_fan_percentages(ec, cfg, states, json);
     }
 
     if (cfg->fan_modes.available && !firmware_auto_mode(*auto_mode, preset))
