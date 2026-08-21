@@ -7,9 +7,7 @@
 #include "platform/power_source.h"
 #include "util/file.h"
 #include "util/format.h"
-#include "util/string.h"
 
-#include <stdio.h>
 #include <time.h>
 
 void write_status(const struct ans_config *cfg, struct ec_device *ec,
@@ -103,10 +101,9 @@ void write_status(const struct ans_config *cfg, struct ec_device *ec,
                                                         states[i].safety_active);
         char active_percent[16];
 
-        if (firmware_mode && !states[i].safety_active)
-            string_copy(active_percent, sizeof(active_percent), "null");
-        else
-            snprintf(active_percent, sizeof(active_percent), "%d", states[i].percent);
+        status_active_percent_text(active_percent, sizeof(active_percent),
+                                   firmware_mode, states[i].safety_active,
+                                   states[i].percent, "null");
 
         text_buffer_append(
             &out,
@@ -129,7 +126,8 @@ void write_status(const struct ans_config *cfg, struct ec_device *ec,
             states[i].temp_available ? "true" : "false",
             states[i].control_temp_available ? "true" : "false",
             control, active_percent,
-            firmware_mode && !states[i].safety_active ? "true" : "false",
+            status_fan_firmware_controlled(firmware_mode, states[i].safety_active) ?
+                "true" : "false",
             states[i].percent,
             states[i].requested_percent > 0 ?
                 states[i].requested_percent : states[i].percent,

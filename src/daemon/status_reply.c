@@ -6,9 +6,6 @@
 #include "fan/control.h"
 #include "platform/control.h"
 #include "platform/power_source.h"
-#include "util/string.h"
-
-#include <stdio.h>
 
 void reply_status(const int client, const struct ans_config *cfg,
                   const fan_state states[ANS_MAX_FANS], const bool auto_mode,
@@ -29,10 +26,9 @@ void reply_status(const int client, const struct ans_config *cfg,
                                                         states[i].safety_active);
         char active_percent[16];
 
-        if (firmware_mode && !states[i].safety_active)
-            string_copy(active_percent, sizeof(active_percent), "firmware");
-        else
-            snprintf(active_percent, sizeof(active_percent), "%d", states[i].percent);
+        status_active_percent_text(active_percent, sizeof(active_percent),
+                                   firmware_mode, states[i].safety_active,
+                                   states[i].percent, "firmware");
 
         control_reply(client, "%s rpm=%d temp=%d control=%s active_percent=%s requested=%d effective=%d percent=%d write_value=%d safety=%s%s%s critical_samples=%d ec_read_failures=%d ec_write_failures=%d\n",
                 cfg->fans[i].id, states[i].rpm, states[i].temp_c,
