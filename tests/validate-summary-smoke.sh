@@ -40,11 +40,11 @@ export INITIAL_PRESET=firmware-auto
 export INITIAL_CPU_REQUESTED=55
 export INITIAL_GPU_REQUESTED=52
 
-. "$ROOT_DIR/scripts/lib/validate-logging.sh"
-. "$ROOT_DIR/scripts/lib/validate-summary-features.sh"
-. "$ROOT_DIR/scripts/lib/validate-summary-status.sh"
-. "$ROOT_DIR/scripts/lib/validate-summary-calibration.sh"
-. "$ROOT_DIR/scripts/lib/validate-summary.sh"
+. "$ROOT_DIR/scripts/hardware/lib/validate-logging.sh"
+. "$ROOT_DIR/scripts/hardware/lib/validate-summary-features.sh"
+. "$ROOT_DIR/scripts/hardware/lib/validate-summary-status.sh"
+. "$ROOT_DIR/scripts/hardware/lib/validate-summary-calibration.sh"
+. "$ROOT_DIR/scripts/hardware/lib/validate-summary.sh"
 
 cat > "$OUT_DIR/daily-observation.status.log" <<'EOF'
 # label=daily-observation

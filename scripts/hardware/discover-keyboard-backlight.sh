@@ -11,7 +11,7 @@ OUT_DIR="${OUT_DIR:-/tmp/acer-nitro-sense-keyboard-backlight-$(date +%Y%m%d-%H%M
 LOG_FILE="$OUT_DIR/keyboard-backlight-discovery.log"
 STARTED_AT="$(date --iso-8601=seconds 2>/dev/null || date)"
 SCRIPT_DIR="$(CDPATH= cd "$(dirname "$0")" && pwd)"
-PROJECT_DIR="$(CDPATH= cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_DIR="$(CDPATH= cd "$SCRIPT_DIR/../.." && pwd)"
 
 case "$STEPS" in
     ''|*[!0-9]*)
