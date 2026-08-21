@@ -29,6 +29,25 @@ static bool candidate_name(const char *name)
            string_contains_case(name, "platform::kbd");
 }
 
+static int percent_from_range(const int value, const int min_value,
+                              const int max_value)
+{
+    const int range = max_value - min_value;
+
+    if (range <= 0)
+        return -1;
+
+    return ((value - min_value) * 100 + range / 2) / range;
+}
+
+static int value_from_percent(const struct keyboard_backlight_config *cfg,
+                              const int percent)
+{
+    const int range = cfg->max_value - cfg->min_value;
+
+    return cfg->min_value + (percent * range + 50) / 100;
+}
+
 static int read_int_file(const char *path)
 {
     char *text = read_text_file(path, 64);
@@ -46,6 +65,19 @@ static int read_int_file(const char *path)
     return (int)value;
 }
 
+static bool init_sysfs_status(struct keyboard_backlight_status *status,
+                              const char *name)
+{
+    const size_t name_len = strlen(name);
+
+    if (name_len >= sizeof(status->name))
+        return false;
+
+    string_copy(status->name, sizeof(status->name), name);
+    snprintf(status->path, sizeof(status->path), "/sys/class/leds/%s", name);
+    return true;
+}
+
 bool keyboard_backlight_read(struct keyboard_backlight_status *status)
 {
     DIR *dir;
@@ -61,16 +93,12 @@ bool keyboard_backlight_read(struct keyboard_backlight_status *status)
     while ((entry = readdir(dir))) {
         char brightness_path[640];
         char max_brightness_path[640];
-        const size_t name_len = strlen(entry->d_name);
 
         if (entry->d_name[0] == '.' || !candidate_name(entry->d_name))
             continue;
-        if (name_len >= sizeof(status->name))
+        if (!init_sysfs_status(status, entry->d_name))
             continue;
 
-        memcpy(status->name, entry->d_name, name_len + 1);
-        snprintf(status->path, sizeof(status->path), "/sys/class/leds/%s",
-                 entry->d_name);
         snprintf(brightness_path, sizeof(brightness_path), "%s/brightness",
                  status->path);
         snprintf(max_brightness_path, sizeof(max_brightness_path),
@@ -81,8 +109,8 @@ bool keyboard_backlight_read(struct keyboard_backlight_status *status)
         status->available = status->brightness >= 0 && status->max_brightness > 0;
         if (status->available)
             status->percent =
-                (status->brightness * 100 + status->max_brightness / 2) /
-                status->max_brightness;
+                percent_from_range(status->brightness, 0,
+                                   status->max_brightness);
         closedir(dir);
         return status->available;
     }
@@ -113,10 +141,9 @@ static bool keyboard_backlight_read_ec(struct ec_device *ec,
 
     status->available = true;
     status->brightness = value;
-    status->percent =
-        ((value - cfg->keyboard_backlight.min_value) * 100 +
-         (cfg->keyboard_backlight.max_value - cfg->keyboard_backlight.min_value) / 2) /
-        (cfg->keyboard_backlight.max_value - cfg->keyboard_backlight.min_value);
+    status->percent = percent_from_range(value,
+                                         cfg->keyboard_backlight.min_value,
+                                         cfg->keyboard_backlight.max_value);
 
     return true;
 }
@@ -140,8 +167,7 @@ bool keyboard_backlight_set_percent(struct ec_device *ec,
 {
     const int range = cfg->keyboard_backlight.max_value -
         cfg->keyboard_backlight.min_value;
-    const int value = cfg->keyboard_backlight.min_value +
-        (percent * range + 50) / 100;
+    const int value = value_from_percent(&cfg->keyboard_backlight, percent);
 
     if (!cfg->keyboard_backlight.available || range <= 0)
         return false;
