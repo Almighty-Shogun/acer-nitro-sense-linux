@@ -23,13 +23,7 @@ static bool extract_lspci_field(const char *line, const int index, char *out,
         current++;
 
         if (current == index) {
-            size_t len = (size_t)(end - start);
-
-            if (len >= out_len)
-                len = out_len - 1;
-
-            memcpy(out, start, len);
-            out[len] = '\0';
+            string_copy_span(out, out_len, start, (size_t)(end - start));
 
             return true;
         }
@@ -81,13 +75,9 @@ static void simplify_gpu_name(const char *vendor, const char *device, char *out,
 
     if (open && close && close > open + 1) {
         char model[128];
-        size_t len = (size_t)(close - open - 1);
 
-        if (len >= sizeof(model))
-            len = sizeof(model) - 1;
-
-        memcpy(model, open + 1, len);
-        model[len] = '\0';
+        string_copy_span(model, sizeof(model), open + 1,
+                         (size_t)(close - open - 1));
         format_name_pair(out, out_len, brand, model);
     } else {
         format_name_pair(out, out_len, brand, device);
