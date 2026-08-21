@@ -7,6 +7,7 @@
 #include "platform/control.h"
 #include "platform/power_source.h"
 #include "sensors/sensors.h"
+#include "util/format.h"
 #include "util/string.h"
 
 #include <stdio.h>
@@ -17,7 +18,7 @@ void reply_coolboost_status(const int client, const struct ans_config *cfg,
 {
     control_reply(client, "coolboost=%s\n",
             cfg->fan_modes.available ?
-                (coolboost_enabled ? "on" : "off") :
+                on_off_text(coolboost_enabled) :
                 "unavailable");
 }
 
@@ -66,12 +67,10 @@ void reply_power_source_status(const int client, struct ec_device *ec,
     control_reply(client,
             "power_source=%s policy=%s auto_apply=%s ac_profile=%s battery_profile=%s current_profile=%s target_profile=%s\n",
             power_source_name(source),
-            power_source_profile_policy_available(cfg) ? "available" : "unavailable",
-            runtime && runtime->power_source_auto_apply ? "on" : "off",
-            cfg->power_source_profiles.ac_profile[0] ?
-                cfg->power_source_profiles.ac_profile : "unavailable",
-            cfg->power_source_profiles.battery_profile[0] ?
-                cfg->power_source_profiles.battery_profile : "unavailable",
+            availability_text(power_source_profile_policy_available(cfg)),
+            on_off_text(runtime && runtime->power_source_auto_apply),
+            fallback_text(cfg->power_source_profiles.ac_profile, "unavailable"),
+            fallback_text(cfg->power_source_profiles.battery_profile, "unavailable"),
             cfg->platform_profiles.available && value >= 0 ?
                 platform_profile_value_name(cfg, value) : "unavailable",
             power_source_profile_for(cfg, source) ?
@@ -145,17 +144,17 @@ void reply_keyboard_backlight_status(const int client, struct ec_device *ec,
 
     control_reply(client,
             "keyboard_backlight=%s timeout=%s timeout_seconds=%d timeout_backend=%s timed_off=%s restore_percent=%d name=%s brightness=%d max_brightness=%d percent=%d backend=%s register=%s reason=%s\n",
-            keyboard_backlight.available ? "available" : "unavailable",
-            timeout_supported ? (timeout_enabled ? "on" : "off") : "unsupported",
+            availability_text(keyboard_backlight.available),
+            timeout_supported ? on_off_text(timeout_enabled) : "unsupported",
             timeout_supported ? cfg->keyboard_backlight.timeout_seconds : 0,
             timeout_supported ? "input-activity" : "unsupported",
             runtime && runtime->keyboard_backlight_timed_off ? "yes" : "no",
             runtime ? runtime->keyboard_backlight_restore_percent : -1,
-            keyboard_backlight.name[0] ? keyboard_backlight.name : "unavailable",
+            fallback_text(keyboard_backlight.name, "unavailable"),
             keyboard_backlight.brightness,
             keyboard_backlight.max_brightness,
             keyboard_backlight.percent,
-            keyboard_backlight.backend[0] ? keyboard_backlight.backend : "none",
+            fallback_text(keyboard_backlight.backend, "none"),
             reg_text,
             keyboard_backlight_reason(&keyboard_backlight));
 }
