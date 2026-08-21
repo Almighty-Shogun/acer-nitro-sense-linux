@@ -13,6 +13,28 @@
 #include <sys/un.h>
 #include <unistd.h>
 
+static void append_capture_output(char *out, const size_t out_len,
+                                  size_t *used, const char *text)
+{
+    size_t len;
+    size_t available;
+
+    if (!out || out_len == 0 || *used >= out_len - 1)
+        return;
+
+    available = out_len - *used - 1;
+    len = strlen(text);
+    if (len > available)
+        len = available;
+
+    if (len == 0)
+        return;
+
+    memcpy(out + *used, text, len);
+    *used += len;
+    out[*used] = '\0';
+}
+
 int client_print_status_file(void)
 {
     char *status = read_text_file(ANS_STATUS_PATH, 64 * 1024);
@@ -87,21 +109,10 @@ int client_send_command_capture(const char *command, bool quiet, char *out,
             break;
 
         buf[n] = '\0';
-        if (out && out_len > 0) {
-            size_t available = out_len - used - 1;
-            size_t len = strlen(buf);
-
-            if (len > available)
-                len = available;
-
-            if (len > 0) {
-                memcpy(out + used, buf, len);
-                used += len;
-                out[used] = '\0';
-            }
-        } else {
+        if (out && out_len > 0)
+            append_capture_output(out, out_len, &used, buf);
+        else
             fputs(buf, stdout);
-        }
     }
 
     close(fd);
