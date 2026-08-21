@@ -20,8 +20,6 @@ void reply_status(const int client, const struct ans_config *cfg,
             power_source_name(power_source));
 
     for (int i = 0; i < cfg->fan_len; i++) {
-        const int requested = states[i].requested_percent > 0 ?
-            states[i].requested_percent : states[i].percent;
         const char *control = status_fan_control_source(firmware_mode,
                                                         states[i].safety_active);
         char active_percent[16];
@@ -32,7 +30,8 @@ void reply_status(const int client, const struct ans_config *cfg,
 
         control_reply(client, "%s rpm=%d temp=%d control=%s active_percent=%s requested=%d effective=%d percent=%d write_value=%d safety=%s%s%s critical_samples=%d ec_read_failures=%d ec_write_failures=%d\n",
                 cfg->fans[i].id, states[i].rpm, states[i].temp_c,
-                control, active_percent, requested, states[i].percent,
+                control, active_percent, status_requested_percent(&states[i]),
+                states[i].percent,
                 states[i].percent, states[i].write_value,
                 states[i].safety_active ? "active" : "ok",
                 states[i].safety_active ? " reason=" : "",
@@ -48,8 +47,7 @@ void reply_preset_show(const int client, const struct ans_config *cfg,
 {
     control_reply(client, "mode=%s preset=%s\n", control_mode(auto_mode, preset), preset);
     for (int i = 0; i < cfg->fan_len; i++) {
-        const int requested = states[i].requested_percent > 0 ?
-            states[i].requested_percent : states[i].percent;
+        const int requested = status_requested_percent(&states[i]);
 
         control_reply(client, "%s requested=%d effective=%d percent=%d\n",
                 cfg->fans[i].id, requested, states[i].percent, requested);
