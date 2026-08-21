@@ -5,6 +5,17 @@
 
 #include <stdio.h>
 
+static bool config_key_present(const char *json, const char *key)
+{
+    return json_find_key(json, key) != NULL;
+}
+
+static bool config_int_value_valid(const int value, const int min,
+                                   const int max)
+{
+    return value >= min && value <= max;
+}
+
 int config_invalid(const char *message)
 {
     fprintf(stderr, "invalid config: %s\n", message);
@@ -13,7 +24,7 @@ int config_invalid(const char *message)
 
 bool config_optional_int_key(const char *json, const char *key, int *value)
 {
-    if (!json_find_key(json, key))
+    if (!config_key_present(json, key))
         return true;
 
     return json_int_key_checked(json, key, value);
@@ -21,7 +32,7 @@ bool config_optional_int_key(const char *json, const char *key, int *value)
 
 bool config_optional_bool_key(const char *json, const char *key, bool *value)
 {
-    if (!json_find_key(json, key))
+    if (!config_key_present(json, key))
         return true;
 
     return json_bool_key_checked(json, key, value);
@@ -30,7 +41,7 @@ bool config_optional_bool_key(const char *json, const char *key, bool *value)
 bool config_optional_string_key(const char *json, const char *key,
                                 char *out, const size_t out_len)
 {
-    if (!json_find_key(json, key))
+    if (!config_key_present(json, key))
         return true;
 
     return json_string_key_checked(json, key, out, out_len);
@@ -59,15 +70,15 @@ bool config_required_string_key(const char *json, const char *key,
 
 bool config_byte_value_valid(const int value)
 {
-    return value >= 0 && value <= 255;
+    return config_int_value_valid(value, 0, 255);
 }
 
 bool config_percent_value_valid(const int value)
 {
-    return value >= 1 && value <= 100;
+    return config_int_value_valid(value, 1, 100);
 }
 
 bool config_speed_value_valid(const int value)
 {
-    return value >= 0 && value <= 100;
+    return config_int_value_valid(value, 0, 100);
 }
