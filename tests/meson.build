@@ -1,0 +1,27 @@
+unit_sources = files(
+  'unit/command_ec.c',
+  'unit/command_fan.c',
+  'unit/command_firmware.c',
+  'unit/command_invalid.c',
+  'unit/commands.c',
+  'unit/platform_fan_mode.c',
+  'unit/platform_keyboard_backlight.c',
+  'unit/platform_power.c',
+  'unit/platform_commands.c',
+  'unit/platform_status.c',
+  'unit/daemon_args.c',
+  'unit/state.c',
+  'unit/daemon.c',
+  'unit/fan_auto.c',
+  'unit/fan_control.c',
+  'unit/fan_ec.c',
+  'unit/fan_resume.c',
+  'unit/fan_safety.c',
+  'unit/fan_temperature.c',
+  'unit/parser.c',
+  'unit/helpers.c',
+  'unit/fixture.c',
+  'unit/utility.c',
+)
+
+unit_main = files('unit/main.c')
