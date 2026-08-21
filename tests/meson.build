@@ -1,0 +1,27 @@
+selftest_sources = files(
+  'selftest/command_ec.c',
+  'selftest/command_fan.c',
+  'selftest/command_firmware.c',
+  'selftest/command_invalid.c',
+  'selftest/commands.c',
+  'selftest/platform_fan_mode.c',
+  'selftest/platform_keyboard_backlight.c',
+  'selftest/platform_power.c',
+  'selftest/platform_commands.c',
+  'selftest/platform_status.c',
+  'selftest/daemon_args.c',
+  'selftest/state.c',
+  'selftest/daemon.c',
+  'selftest/fan_auto.c',
+  'selftest/fan_control.c',
+  'selftest/fan_ec.c',
+  'selftest/fan_resume.c',
+  'selftest/fan_safety.c',
+  'selftest/fan_temperature.c',
+  'selftest/parser.c',
+  'selftest/helpers.c',
+  'selftest/fixture.c',
+  'selftest/utility.c',
+)
+
+selftest_main = files('selftest/main.c')
