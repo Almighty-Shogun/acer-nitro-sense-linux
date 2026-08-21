@@ -7,30 +7,79 @@
 #include <stdio.h>
 #include <string.h>
 
+static bool text_has_value(const char *text)
+{
+    return text && text[0] != '\0';
+}
+
+static int critical_safety_percent(const struct ans_config *cfg,
+                                   const struct fan_config *fan,
+                                   const int percent,
+                                   const char *reason)
+{
+    if (strcmp(reason, "critical-temperature") == 0 &&
+        !cfg->safety.critical_full_speed)
+        return clamp_int(percent + cfg->safety.critical_step_percent,
+                         fan->write_min, fan->write_max);
+
+    return clamp_int(cfg->safety.critical_speed_percent, fan->write_min,
+                     fan->write_max);
+}
+
+static int missing_temperature_percent(const struct ans_config *cfg,
+                                       const struct fan_config *fan)
+{
+    return fan->missing_temperature_speed_percent > 0 ?
+        fan->missing_temperature_speed_percent :
+        cfg->safety.missing_temperature_speed_percent;
+}
+
+static void log_safety_active(const struct fan_config *fan,
+                              const fan_state *state,
+                              const char *reason,
+                              const int requested_percent,
+                              const int effective_percent)
+{
+    if (daemon_quiet_logs)
+        return;
+
+    fprintf(stderr,
+            "safety active fan=%s reason=%s requested=%d effective=%d temp=%d control_temp=%d rpm=%d ec_read_failures=%d ec_write_failures=%d\n",
+            fan->id, reason, requested_percent, effective_percent,
+            state->temp_c, state->control_temp_c, state->rpm,
+            state->ec_read_failures, state->ec_write_failures);
+}
+
+static void log_safety_cleared(const struct fan_config *fan,
+                               const fan_state *state,
+                               const int requested_percent,
+                               const int effective_percent)
+{
+    if (daemon_quiet_logs)
+        return;
+
+    fprintf(stderr,
+            "safety cleared fan=%s previous=%s requested=%d effective=%d temp=%d control_temp=%d rpm=%d\n",
+            fan->id, state->safety_reason, requested_percent,
+            effective_percent, state->temp_c, state->control_temp_c,
+            state->rpm);
+}
+
 void fan_update_safety_state(const struct fan_config *fan, fan_state *state,
                              const char *reason, const int requested_percent,
                              const int effective_percent)
 {
-    const bool active = reason && reason[0] != '\0';
+    const bool active = text_has_value(reason);
     const bool changed = active != state->safety_active ||
                          (active && strcmp(state->safety_reason, reason) != 0);
 
     if (changed) {
-        if (active) {
-            if (!daemon_quiet_logs)
-                fprintf(stderr,
-                        "safety active fan=%s reason=%s requested=%d effective=%d temp=%d control_temp=%d rpm=%d ec_read_failures=%d ec_write_failures=%d\n",
-                        fan->id, reason, requested_percent, effective_percent,
-                        state->temp_c, state->control_temp_c, state->rpm,
-                        state->ec_read_failures, state->ec_write_failures);
-        } else {
-            if (!daemon_quiet_logs)
-                fprintf(stderr,
-                        "safety cleared fan=%s previous=%s requested=%d effective=%d temp=%d control_temp=%d rpm=%d\n",
-                        fan->id, state->safety_reason, requested_percent,
-                        effective_percent, state->temp_c, state->control_temp_c,
-                        state->rpm);
-        }
+        if (active)
+            log_safety_active(fan, state, reason, requested_percent,
+                              effective_percent);
+        else
+            log_safety_cleared(fan, state, requested_percent,
+                               effective_percent);
     }
 
     state->safety_active = active;
@@ -47,27 +96,18 @@ int fan_safety_adjust_percent(const struct ans_config *cfg,
 
     *reason = "";
 
-    if (forced_reason && forced_reason[0] != '\0') {
+    if (text_has_value(forced_reason)) {
         *reason = forced_reason;
-        if (strcmp(forced_reason, "critical-temperature") == 0 &&
-            !cfg->safety.critical_full_speed)
-            return clamp_int(percent + cfg->safety.critical_step_percent,
-                             fan->write_min, fan->write_max);
-
-        return clamp_int(cfg->safety.critical_speed_percent, fan->write_min,
-                         fan->write_max);
+        return critical_safety_percent(cfg, fan, percent, forced_reason);
     }
 
     if (state->ec_write_failures >= cfg->safety.max_ec_write_failures) {
         *reason = "ec-write-failure";
-        return clamp_int(cfg->safety.critical_speed_percent, fan->write_min,
-                         fan->write_max);
+        return critical_safety_percent(cfg, fan, percent, *reason);
     }
 
     if (!state->control_temp_available) {
-        const int fallback_percent = fan->missing_temperature_speed_percent > 0 ?
-            fan->missing_temperature_speed_percent :
-            cfg->safety.missing_temperature_speed_percent;
+        const int fallback_percent = missing_temperature_percent(cfg, fan);
 
         if (percent < fallback_percent) {
             *reason = "temperature-unknown";
@@ -78,12 +118,7 @@ int fan_safety_adjust_percent(const struct ans_config *cfg,
 
     if (state->critical_temp_samples >= cfg->safety.critical_consecutive_samples) {
         *reason = "critical-temperature";
-        if (!cfg->safety.critical_full_speed)
-            return clamp_int(percent + cfg->safety.critical_step_percent,
-                             fan->write_min, fan->write_max);
-
-        return clamp_int(cfg->safety.critical_speed_percent, fan->write_min,
-                         fan->write_max);
+        return critical_safety_percent(cfg, fan, percent, *reason);
     }
 
     if (state->control_temp_c >= cfg->safety.min_speed_temperature_c &&
@@ -163,7 +198,7 @@ int auto_ramped_percent(const struct ans_config *cfg, const fan_state *state,
 
     if (step <= 0 || target_percent <= current_percent)
         return target_percent;
-    if (forced_reason && forced_reason[0] != '\0')
+    if (text_has_value(forced_reason))
         return target_percent;
     if (cfg->safety.auto_ramp_bypass_temperature_c > 0 &&
         state->control_temp_available &&
