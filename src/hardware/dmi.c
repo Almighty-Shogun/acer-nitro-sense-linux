@@ -4,8 +4,20 @@
 #include "util/file.h"
 #include "util/string.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+static void append_model_part(char *model, const size_t model_len,
+                              const char *text)
+{
+    const size_t used = strlen(model);
+
+    if (used >= model_len - 1)
+        return;
+
+    snprintf(model + used, model_len - used, "%s%s", used > 0 ? " " : "", text);
+}
 
 const char *load_dmi_model(void)
 {
@@ -27,8 +39,7 @@ const char *load_dmi_model(void)
             free(text);
             continue;
         }
-        strncat(model, text, sizeof(model) - strlen(model) - 1);
-        strncat(model, " ", sizeof(model) - strlen(model) - 1);
+        append_model_part(model, sizeof(model), text);
         free(text);
     }
 
