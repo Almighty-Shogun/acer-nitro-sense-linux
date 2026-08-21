@@ -89,5 +89,6 @@ client_sources = files(
   'util/fd.c',
   'util/file.c',
   'util/number.c',
+  'util/process.c',
   'util/string.c',
 )

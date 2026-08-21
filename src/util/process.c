@@ -2,10 +2,12 @@
 
 #include <errno.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
-FILE *process_open_stdout(const char *file, char *const argv[], pid_t *pid_out)
+FILE *process_open_output(const char *file, const char *const argv[],
+                          const bool stderr_to_stdout, pid_t *pid_out)
 {
     int fds[2];
     pid_t pid;
@@ -32,8 +34,10 @@ FILE *process_open_stdout(const char *file, char *const argv[], pid_t *pid_out)
         close(fds[0]);
         if (dup2(fds[1], STDOUT_FILENO) < 0)
             _exit(126);
+        if (stderr_to_stdout && dup2(fds[1], STDERR_FILENO) < 0)
+            _exit(126);
         close(fds[1]);
-        execvp(file, argv);
+        execvp(file, (char *const *)argv);
         _exit(127);
     }
 
@@ -51,6 +55,12 @@ FILE *process_open_stdout(const char *file, char *const argv[], pid_t *pid_out)
 
     *pid_out = pid;
     return stream;
+}
+
+FILE *process_open_stdout(const char *file, const char *const argv[],
+                          pid_t *pid_out)
+{
+    return process_open_output(file, argv, false, pid_out);
 }
 
 int process_close_stdout(FILE *stream, const pid_t pid)

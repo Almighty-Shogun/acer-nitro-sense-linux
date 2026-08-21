@@ -82,9 +82,8 @@ static int unit_run_config_helpers(void)
 
 static int unit_run_process_helpers(void)
 {
-    char command[] = "printf";
-    char text[] = "fan";
-    char *const argv[] = {command, text, NULL};
+    const char *const argv[] = {"printf", "fan", NULL};
+    const char *const stderr_argv[] = {"sh", "-c", "printf fan-error >&2", NULL};
     char buf[16];
     pid_t pid;
     int failures = 0;
@@ -103,6 +102,24 @@ static int unit_run_process_helpers(void)
     const int status = process_close_stdout(stream, pid);
     if (status < 0 || !WIFEXITED(status) || WEXITSTATUS(status) != 0) {
         fprintf(stderr, "unit-test failed: process stdout close\n");
+        failures++;
+    }
+
+    stream = process_open_output("sh", stderr_argv, true, &pid);
+    if (!stream) {
+        fprintf(stderr, "unit-test failed: process stderr open\n");
+        return failures + 1;
+    }
+
+    if (!fgets(buf, sizeof(buf), stream) || strcmp(buf, "fan-error") != 0) {
+        fprintf(stderr, "unit-test failed: process stderr read\n");
+        failures++;
+    }
+
+    const int stderr_status = process_close_stdout(stream, pid);
+    if (stderr_status < 0 || !WIFEXITED(stderr_status) ||
+        WEXITSTATUS(stderr_status) != 0) {
+        fprintf(stderr, "unit-test failed: process stderr close\n");
         failures++;
     }
 

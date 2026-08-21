@@ -65,9 +65,7 @@ static void simplify_gpu_name(const char *vendor, const char *device, char *out,
 
 void load_gpu_name(char *out, const size_t out_len)
 {
-    char command[] = "lspci";
-    char option[] = "-Dmm";
-    char *const argv[] = {command, option, NULL};
+    const char *const argv[] = {"lspci", "-Dmm", NULL};
     pid_t pid;
     FILE *lspci = process_open_stdout("lspci", argv, &pid);
     char fallback[160] = "GPU";
