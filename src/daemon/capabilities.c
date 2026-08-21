@@ -5,6 +5,7 @@
 #include "keyboard/backlight.h"
 #include "platform/power_source.h"
 #include "sensors/sensors.h"
+#include "util/format.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -71,22 +72,20 @@ void reply_capabilities(const int client, const struct ans_config *cfg,
 
     control_reply(client, "fan_control=available modes=manual,preset,auto,firmware-auto\n");
     control_reply(client, "coolboost=%s backend=%s\n",
-            cfg->fan_modes.available ? "available" : "unavailable",
+            availability_text(cfg->fan_modes.available),
             cfg->fan_modes.available ? "fan-mode-turbo" : "unavailable");
     control_reply(client, "fan_mode=%s modes=%s\n",
-            cfg->fan_modes.available ? "available" : "unavailable",
+            availability_text(cfg->fan_modes.available),
             cfg->fan_modes.available ? "auto,manual,turbo" : "unavailable");
     control_reply(client, "platform_profile=%s profiles=%s\n",
-            cfg->platform_profiles.available ? "available" : "unavailable",
+            availability_text(cfg->platform_profiles.available),
             profiles);
     control_reply(client,
             "power_source_profile=%s auto_apply=%s ac_profile=%s battery_profile=%s\n",
-            power_source_profile_policy_available(cfg) ? "available" : "unavailable",
-            runtime && runtime->power_source_auto_apply ? "on" : "off",
-            cfg->power_source_profiles.ac_profile[0] ?
-                cfg->power_source_profiles.ac_profile : "unavailable",
-            cfg->power_source_profiles.battery_profile[0] ?
-                cfg->power_source_profiles.battery_profile : "unavailable");
+            availability_text(power_source_profile_policy_available(cfg)),
+            on_off_text(runtime && runtime->power_source_auto_apply),
+            fallback_text(cfg->power_source_profiles.ac_profile, "unavailable"),
+            fallback_text(cfg->power_source_profiles.battery_profile, "unavailable"));
     control_reply(client,
             "gpu_temperature=%s source=%s live_policy=%s current_policy=%s\n",
             (gpu_power_control_available ||
@@ -96,10 +95,10 @@ void reply_capabilities(const int client, const struct ans_config *cfg,
             gpu_power_control_available ? gpu_power_control : "unavailable");
     control_reply(client,
             "keyboard_backlight=%s control=%s timeout=%s timeout_backend=%s reason=%s\n",
-            (cfg->keyboard_backlight.available ||
-             keyboard_backlight.available) ? "available" : "unavailable",
+            availability_text(cfg->keyboard_backlight.available ||
+                              keyboard_backlight.available),
             keyboard_backlight_control(cfg, &keyboard_backlight),
-            cfg->keyboard_backlight.timeout_supported ? "available" : "unsupported",
+            supported_text(cfg->keyboard_backlight.timeout_supported),
             cfg->keyboard_backlight.timeout_supported ?
                 "input-activity" : "unsupported",
             cfg->keyboard_backlight.available ? "ok" :
