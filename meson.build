@@ -25,8 +25,11 @@ if get_option('dev_checks')
       '-Wformat=2',
       '-Wundef',
       '-Wshadow',
+      '-Wmissing-prototypes',
+      '-Wmissing-declarations',
       '-Wstrict-prototypes',
       '-Wold-style-definition',
+      '-Wwrite-strings',
     ]),
     language: 'c')
 endif

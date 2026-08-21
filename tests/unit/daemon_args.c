@@ -9,7 +9,8 @@
 static int expect_default_args(void)
 {
     struct daemon_args args;
-    char *argv[] = {"acer-nitro-sensed"};
+    char arg0[] = "acer-nitro-sensed";
+    char *const argv[] = {arg0};
 
     if (daemon_args_parse(1, argv, &args) != 0 ||
         strcmp(args.config_path, ANS_DEFAULT_CONFIG) != 0 ||
@@ -25,14 +26,14 @@ static int expect_default_args(void)
 static int expect_config_and_flags(void)
 {
     struct daemon_args args;
-    char *argv[] = {
-        "acer-nitro-sensed",
-        "--config", "/tmp/model.json",
-        "--force-model",
-        "--check-config",
-        "--probe",
-        "--validate-model",
-    };
+    char arg0[] = "acer-nitro-sensed";
+    char arg1[] = "--config";
+    char arg2[] = "/tmp/model.json";
+    char arg3[] = "--force-model";
+    char arg4[] = "--check-config";
+    char arg5[] = "--probe";
+    char arg6[] = "--validate-model";
+    char *const argv[] = {arg0, arg1, arg2, arg3, arg4, arg5, arg6};
 
     if (daemon_args_parse(7, argv, &args) != 0 ||
         strcmp(args.config_path, "/tmp/model.json") != 0 ||
@@ -49,7 +50,9 @@ static int expect_config_and_flags(void)
 static int expect_help(void)
 {
     struct daemon_args args;
-    char *argv[] = {"acer-nitro-sensed", "--help"};
+    char arg0[] = "acer-nitro-sensed";
+    char arg1[] = "--help";
+    char *const argv[] = {arg0, arg1};
 
     if (daemon_args_parse(2, argv, &args) != 1) {
         fprintf(stderr, "unit-test failed: daemon args help\n");
@@ -63,8 +66,12 @@ static int expect_invalid_args(void)
 {
     int failures = 0;
     struct daemon_args args;
-    char *unknown[] = {"acer-nitro-sensed", "--unknown"};
-    char *missing_config[] = {"acer-nitro-sensed", "--config"};
+    char unknown_arg0[] = "acer-nitro-sensed";
+    char unknown_arg1[] = "--unknown";
+    char missing_arg0[] = "acer-nitro-sensed";
+    char missing_arg1[] = "--config";
+    char *const unknown[] = {unknown_arg0, unknown_arg1};
+    char *const missing_config[] = {missing_arg0, missing_arg1};
 
     if (daemon_args_parse(2, unknown, &args) != -1) {
         fprintf(stderr, "unit-test failed: daemon args unknown option\n");

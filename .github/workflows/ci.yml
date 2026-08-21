@@ -1,0 +1,101 @@
+name: 🧪 CI
+
+on:
+    push:
+        branches: [ main, dev ]
+    pull_request:
+        branches: [ main, dev ]
+
+permissions:
+    contents: read
+
+concurrency:
+    group: ci-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    debian:
+        name: 🧪 Debian build and test
+        runs-on: ubuntu-latest
+        container:
+            image: debian:12
+
+        steps:
+            -   name: 👀 Checkout
+                uses: actions/checkout@v6
+
+            -   name: ⚙️ Install dependencies
+                run: |
+                    set -Eeuo pipefail
+
+                    apt-get update
+                    apt-get install -y --no-install-recommends \
+                        ca-certificates \
+                        gcc \
+                        libsystemd-dev \
+                        meson \
+                        ninja-build \
+                        pkg-config
+
+            -   name: 🔨 Build and test
+                run: |
+                    set -Eeuo pipefail
+
+                    meson setup build --wipe --prefix=/usr --sysconfdir=/etc
+                    meson compile -C build
+                    meson test -C build --print-errorlogs
+
+            -   name: 🔨 Strict build and test
+                run: |
+                    set -Eeuo pipefail
+
+                    meson setup build-strict --wipe \
+                        --prefix=/usr \
+                        --sysconfdir=/etc \
+                        -Ddev_checks=true \
+                        -Dwarning_level=3 \
+                        -Dwerror=true
+                    meson compile -C build-strict
+                    meson test -C build-strict --print-errorlogs
+
+    fedora:
+        name: 🧪 Fedora build and test
+        runs-on: ubuntu-latest
+        container:
+            image: fedora:44
+
+        steps:
+            -   name: 👀 Checkout
+                uses: actions/checkout@v6
+
+            -   name: ⚙️ Install dependencies
+                run: |
+                    set -Eeuo pipefail
+
+                    dnf install -y \
+                        gcc \
+                        meson \
+                        ninja-build \
+                        pkgconf-pkg-config \
+                        systemd-devel
+
+            -   name: 🔨 Build and test
+                run: |
+                    set -Eeuo pipefail
+
+                    meson setup build --wipe --prefix=/usr --sysconfdir=/etc
+                    meson compile -C build
+                    meson test -C build --print-errorlogs
+
+            -   name: 🔨 Strict build and test
+                run: |
+                    set -Eeuo pipefail
+
+                    meson setup build-strict --wipe \
+                        --prefix=/usr \
+                        --sysconfdir=/etc \
+                        -Ddev_checks=true \
+                        -Dwarning_level=3 \
+                        -Dwerror=true
+                    meson compile -C build-strict
+                    meson test -C build-strict --print-errorlogs

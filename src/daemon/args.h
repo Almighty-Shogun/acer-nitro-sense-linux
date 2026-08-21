@@ -13,6 +13,6 @@ struct daemon_args {
 };
 
 void daemon_args_init(struct daemon_args *args);
-int daemon_args_parse(int argc, char **argv, struct daemon_args *args);
+int daemon_args_parse(int argc, char *const argv[], struct daemon_args *args);
 
 #endif

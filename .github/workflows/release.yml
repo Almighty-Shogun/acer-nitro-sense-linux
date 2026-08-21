@@ -92,6 +92,7 @@ jobs:
                         --prefix=/usr \
                         --sysconfdir=/etc \
                         --buildtype=release \
+                        -Ddev_checks=true \
                         -Dwarning_level=3 \
                         -Dwerror=true
                     meson compile -C build-review
