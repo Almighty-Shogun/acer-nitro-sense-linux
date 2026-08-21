@@ -1,5 +1,6 @@
 #include "client/doctor.h"
 
+#include "client/doctor_probes.h"
 #include "client/doctor_util.h"
 #include "client/transport.h"
 
@@ -10,7 +11,7 @@ int client_doctor(void)
     char status_response[4096];
 
     doctor_print_section("Acer Nitro Sense Doctor");
-    doctor_run_command("date", "date --iso-8601=seconds 2>/dev/null || date");
+    doctor_run_command("date", DOCTOR_PROBE_DATE);
     doctor_run_command("uname", "uname -a");
     doctor_print_os_pretty_name();
 
@@ -33,37 +34,38 @@ int client_doctor(void)
     doctor_run_command("gpu_temp", "acer-nitro-sense gpu-temp status 2>&1");
 
     doctor_print_section("Install And Permissions");
-    doctor_run_command("which", "command -v acer-nitro-sense; command -v ans; command -v acer-nitro-sensed");
-    doctor_run_command("config", "ls -l /etc/acer-nitro-sense/model.json 2>&1; readlink -f /etc/acer-nitro-sense/model.json 2>&1");
+    doctor_run_command("which", DOCTOR_PROBE_INSTALL_PATHS);
+    doctor_run_command("config", DOCTOR_PROBE_MODEL_CONFIG);
     doctor_print_socket_permissions();
     doctor_print_user_groups();
 
     doctor_print_section("Service");
-    doctor_run_command("systemctl", "systemctl --no-pager --full status acer-nitro-sense.service 2>&1");
-    doctor_run_command("journal_current_daemon", "since=$(systemctl show -P ActiveEnterTimestamp acer-nitro-sense.service 2>/dev/null); if [ -n \"$since\" ]; then journalctl -u acer-nitro-sense.service --since \"$since\" --no-pager 2>&1; else journalctl -u acer-nitro-sense.service -n 80 --no-pager 2>&1; fi");
-    doctor_run_command("journal", "journalctl -u acer-nitro-sense.service -n 80 --no-pager 2>&1");
+    doctor_run_command("systemctl", DOCTOR_PROBE_SERVICE_STATUS);
+    doctor_run_command("journal_current_daemon",
+                       DOCTOR_PROBE_CURRENT_DAEMON_JOURNAL);
+    doctor_run_command("journal", DOCTOR_PROBE_RECENT_DAEMON_JOURNAL);
 
     doctor_print_section("EC Access");
-    doctor_run_command("ec", "ls -l /dev/ec /sys/kernel/debug/ec/ec0/io 2>&1 || true");
-    doctor_run_command("modules", "lsmod | grep -E '(^acpi_ec|^ec_sys)' || true");
+    doctor_run_command("ec", DOCTOR_PROBE_EC_ACCESS);
+    doctor_run_command("modules", DOCTOR_PROBE_EC_MODULES);
     doctor_print_file_value("kernel_lockdown", "/sys/kernel/security/lockdown");
 
     doctor_print_section("Sensors");
-    doctor_run_command("hwmon", "for h in /sys/class/hwmon/hwmon*; do [ -e \"$h\" ] || continue; printf '%s name=' \"$h\"; cat \"$h/name\" 2>/dev/null || echo unknown; for t in \"$h\"/temp*_input; do [ -e \"$t\" ] || continue; printf '  %s=' \"$(basename \"$t\")\"; cat \"$t\" 2>&1; done; done");
-    doctor_run_command("nvidia", "for d in /sys/bus/pci/devices/*; do [ -r \"$d/vendor\" ] || continue; if [ \"$(cat \"$d/vendor\")\" = \"0x10de\" ]; then echo \"$d\"; cat \"$d/device\" 2>/dev/null; cat \"$d/power/runtime_status\" 2>/dev/null; cat \"$d/power/control\" 2>/dev/null; fi; done");
+    doctor_run_command("hwmon", DOCTOR_PROBE_HWMON);
+    doctor_run_command("nvidia", DOCTOR_PROBE_NVIDIA_PCI_POWER);
 
     doctor_print_section("Power Profiles");
-    doctor_run_command("powerprofilesctl", "command -v powerprofilesctl >/dev/null && powerprofilesctl 2>&1 || echo powerprofilesctl=unavailable");
-    doctor_run_command("powerprofilesd", "systemctl --no-pager --full status power-profiles-daemon.service 2>&1 || true");
-    doctor_run_command("platform_profile", "ls -l /sys/firmware/acpi/platform_profile /sys/firmware/acpi/platform_profile_choices 2>&1; cat /sys/firmware/acpi/platform_profile /sys/firmware/acpi/platform_profile_choices 2>&1 || true");
+    doctor_run_command("powerprofilesctl", DOCTOR_PROBE_POWERPROFILESCTL);
+    doctor_run_command("powerprofilesd", DOCTOR_PROBE_POWER_PROFILE_DAEMON);
+    doctor_run_command("platform_profile", DOCTOR_PROBE_PLATFORM_PROFILE);
 
     doctor_print_section("AC And Battery");
-    doctor_run_command("power_supply", "for p in /sys/class/power_supply/*; do [ -e \"$p\" ] || continue; echo \"$p\"; for f in type online status capacity charge_now charge_full energy_now energy_full power_now voltage_now manufacturer model_name; do [ -r \"$p/$f\" ] && printf '  %s=' \"$f\" && cat \"$p/$f\" 2>&1; done; done");
+    doctor_run_command("power_supply", DOCTOR_PROBE_POWER_SUPPLY);
 
     doctor_print_section("Keyboard Backlight");
     doctor_run_command("keyboard_backlight", "acer-nitro-sense keyboard-backlight status 2>&1");
-    doctor_run_command("leds", "ls -l /sys/class/leds 2>&1");
-    doctor_run_command("led_details", "for l in /sys/class/leds/*; do [ -e \"$l\" ] || continue; echo \"$l\"; for f in brightness max_brightness trigger delay_on delay_off; do [ -r \"$l/$f\" ] && printf '  %s=' \"$f\" && cat \"$l/$f\" 2>&1; done; [ -e \"$l/device\" ] && printf '  device=' && readlink -f \"$l/device\" 2>&1; done; true");
+    doctor_run_command("leds", DOCTOR_PROBE_LED_LIST);
+    doctor_run_command("led_details", DOCTOR_PROBE_LED_DETAILS);
 
     return 0;
 }
