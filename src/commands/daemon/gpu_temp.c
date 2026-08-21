@@ -1,6 +1,6 @@
-#include "commands/platform_handlers.h"
+#include "commands/daemon/platform_handlers.h"
 
-#include "commands/parser.h"
+#include "commands/parser/parser.h"
 #include "control/protocol.h"
 #include "sensors/sensors.h"
 

@@ -1,4 +1,4 @@
-#include "commands/parser_internal.h"
+#include "commands/parser/internal.h"
 
 #include "util/number.h"
 

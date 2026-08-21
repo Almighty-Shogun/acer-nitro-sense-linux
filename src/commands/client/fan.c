@@ -1,4 +1,4 @@
-#include "commands/client_fan.h"
+#include "commands/client/fan.h"
 
 #include "client/parse.h"
 #include "client/transport.h"

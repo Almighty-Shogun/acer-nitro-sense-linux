@@ -1,8 +1,8 @@
-#include "commands/client_dispatch.h"
+#include "commands/client/dispatch.h"
 
 #include "client/doctor.h"
-#include "commands/client_fan.h"
-#include "commands/client_platform.h"
+#include "commands/client/fan.h"
+#include "commands/client/platform.h"
 #include "client/service.h"
 #include "client/status.h"
 #include "client/transport.h"

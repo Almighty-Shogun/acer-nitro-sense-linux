@@ -1,6 +1,6 @@
-#include "commands/readonly.h"
+#include "commands/daemon/readonly.h"
 
-#include "commands/parser.h"
+#include "commands/parser/parser.h"
 #include "daemon/capabilities.h"
 #include "daemon/feature_status.h"
 #include "daemon/status.h"

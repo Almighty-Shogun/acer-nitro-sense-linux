@@ -32,8 +32,8 @@ if get_option('dev_checks')
 endif
 
 core_sources = [
-  'src/commands/parser.c',
-  'src/commands/tokens.c',
+  'src/commands/parser/parser.c',
+  'src/commands/parser/tokens.c',
   'src/control/protocol.c',
   'src/config/config.c',
   'src/config/fans.c',
@@ -45,11 +45,11 @@ core_sources = [
   'src/control/socket.c',
   'src/daemon/args.c',
   'src/daemon/capabilities.c',
-  'src/commands/daemon.c',
+  'src/commands/daemon/daemon.c',
   'src/daemon/diagnostics.c',
   'src/daemon/feature_status.c',
   'src/daemon/loop.c',
-  'src/commands/readonly.c',
+  'src/commands/daemon/readonly.c',
   'src/daemon/state.c',
   'src/daemon/status.c',
   'src/daemon/status_reply.c',
@@ -77,11 +77,11 @@ core_sources = [
 ]
 
 fan_sources = [
-  'src/commands/coolboost.c',
-  'src/commands/ec.c',
-  'src/commands/fan.c',
-  'src/commands/fan_mode.c',
-  'src/commands/gpu_temp.c',
+  'src/commands/daemon/coolboost.c',
+  'src/commands/daemon/ec.c',
+  'src/commands/daemon/fan.c',
+  'src/commands/daemon/fan_mode.c',
+  'src/commands/daemon/gpu_temp.c',
   'src/fan/control.c',
   'src/fan/lifecycle.c',
   'src/fan/observation.c',
@@ -91,10 +91,10 @@ fan_sources = [
 ]
 
 platform_sources = [
-  'src/commands/keyboard_backlight.c',
-  'src/commands/platform.c',
-  'src/commands/power_source.c',
-  'src/commands/profile.c',
+  'src/commands/daemon/keyboard_backlight.c',
+  'src/commands/daemon/platform.c',
+  'src/commands/daemon/power_source.c',
+  'src/commands/daemon/profile.c',
   'src/keyboard/backlight.c',
   'src/keyboard/backlight_timeout.c',
   'src/platform/control.c',
@@ -146,12 +146,12 @@ unit = executable('acer-nitro-sense-unit-test',
 executable('acer-nitro-sense',
   [
     'src/client.c',
-    'src/commands/client_dispatch.c',
+    'src/commands/client/dispatch.c',
     'src/client/doctor.c',
     'src/client/doctor_util.c',
-    'src/commands/client_fan.c',
+    'src/commands/client/fan.c',
     'src/client/parse.c',
-    'src/commands/client_platform.c',
+    'src/commands/client/platform.c',
     'src/client/service.c',
     'src/client/status.c',
     'src/client/transport.c',

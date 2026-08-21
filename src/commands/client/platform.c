@@ -1,4 +1,4 @@
-#include "commands/client_platform.h"
+#include "commands/client/platform.h"
 
 #include "client/status.h"
 #include "client/transport.h"

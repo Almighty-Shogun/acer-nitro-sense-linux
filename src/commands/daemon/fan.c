@@ -1,6 +1,6 @@
-#include "commands/fan.h"
+#include "commands/daemon/fan.h"
 
-#include "commands/parser.h"
+#include "commands/parser/parser.h"
 #include "config/config.h"
 #include "control/protocol.h"
 #include "daemon/state.h"

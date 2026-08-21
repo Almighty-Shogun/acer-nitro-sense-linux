@@ -1,7 +1,7 @@
-#include "commands/ec.h"
+#include "commands/daemon/ec.h"
 
 #include "control/protocol.h"
-#include "commands/parser.h"
+#include "commands/parser/parser.h"
 #include "daemon/status.h"
 
 #include <stdio.h>
