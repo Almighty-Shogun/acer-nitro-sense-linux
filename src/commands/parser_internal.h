@@ -12,5 +12,13 @@ bool command_parse_int_token(const char *text, int min_value, int max_value,
                              int *value);
 bool command_parse_action(const char *cmd, const char *expected_command,
                           char *action, size_t action_len);
+bool command_parse_subaction(const char *cmd, const char *expected_command,
+                             const char *expected_action, char *value,
+                             size_t value_len);
+bool command_parse_int_action(const char *cmd, const char *expected_command,
+                              int min_value, int max_value, int *value);
+bool command_parse_int_subaction(const char *cmd, const char *expected_command,
+                                 const char *expected_action, int min_value,
+                                 int max_value, int *value);
 
 #endif
