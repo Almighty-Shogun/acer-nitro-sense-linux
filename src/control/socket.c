@@ -15,10 +15,50 @@
 #include <sys/un.h>
 #include <unistd.h>
 
-int make_socket(void)
+static int bind_control_socket(const int fd)
 {
     struct sockaddr_un addr;
 
+    memset(&addr, 0, sizeof(addr));
+    addr.sun_family = AF_UNIX;
+    snprintf(addr.sun_path, sizeof(addr.sun_path), "%s", ANS_SOCKET_PATH);
+
+    return bind(fd, (struct sockaddr *)&addr, sizeof(addr));
+}
+
+static void assign_socket_group(void)
+{
+    const struct group *group = getgrnam(ANS_CONTROL_GROUP);
+
+    if (!group) {
+        fprintf(stderr, "warning: group %s does not exist; control socket requires root\n",
+                ANS_CONTROL_GROUP);
+        return;
+    }
+
+    struct stat st;
+
+    if (stat(ANS_SOCKET_PATH, &st) == 0 && st.st_gid != group->gr_gid &&
+        chown(ANS_SOCKET_PATH, (uid_t)-1, group->gr_gid) < 0)
+        fprintf(stderr,
+                "warning: failed to set control socket group to %s: %s\n",
+                ANS_CONTROL_GROUP, strerror(errno));
+}
+
+static int finish_control_socket(const int fd)
+{
+    if (chmod(ANS_SOCKET_PATH, 0660) < 0 || listen(fd, 8) < 0) {
+        close(fd);
+        unlink(ANS_SOCKET_PATH);
+
+        return -1;
+    }
+
+    return fd;
+}
+
+int make_socket(void)
+{
     if (mkdir_p(ANS_RUN_DIR) < 0)
         return -1;
 
@@ -29,40 +69,41 @@ int make_socket(void)
     if (fd < 0)
         return -1;
 
-    memset(&addr, 0, sizeof(addr));
-    addr.sun_family = AF_UNIX;
-    snprintf(addr.sun_path, sizeof(addr.sun_path), "%s", ANS_SOCKET_PATH);
-
-    if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+    if (bind_control_socket(fd) < 0) {
         close(fd);
         unlink(ANS_SOCKET_PATH);
 
         return -1;
     }
 
-    const struct group *group = getgrnam(ANS_CONTROL_GROUP);
+    assign_socket_group();
+    return finish_control_socket(fd);
+}
 
-    if (group) {
-        struct stat st;
+static bool groups_line_has_group(const char *line, const gid_t group)
+{
+    const char *p = strchr(line, ':');
 
-        if (stat(ANS_SOCKET_PATH, &st) == 0 && st.st_gid != group->gr_gid &&
-            chown(ANS_SOCKET_PATH, (uid_t)-1, group->gr_gid) < 0)
-            fprintf(stderr,
-                    "warning: failed to set control socket group to %s: %s\n",
-                    ANS_CONTROL_GROUP, strerror(errno));
-    } else {
-        fprintf(stderr, "warning: group %s does not exist; control socket requires root\n",
-                ANS_CONTROL_GROUP);
+    if (!p)
+        return false;
+
+    p++;
+    while (*p && *p != '\n') {
+        char *end;
+        const long value = strtol(p, &end, 10);
+
+        if (p == end) {
+            p++;
+            continue;
+        }
+
+        if ((gid_t)value == group)
+            return true;
+
+        p = end;
     }
 
-    if (chmod(ANS_SOCKET_PATH, 0660) < 0 || listen(fd, 8) < 0) {
-        close(fd);
-        unlink(ANS_SOCKET_PATH);
-
-        return -1;
-    }
-
-    return fd;
+    return false;
 }
 
 static bool pid_has_group(const pid_t pid, const gid_t group)
@@ -82,32 +123,8 @@ static bool pid_has_group(const pid_t pid, const gid_t group)
     if (!line && strncmp(status, "Groups:", 7) == 0)
         line = status;
 
-    if (line) {
-        const char *p = strchr(line, ':');
-
-        if (p) {
-            p++;
-
-            while (*p && *p != '\n') {
-                char *end;
-                const long value = strtol(p, &end, 10);
-
-                if (p == end) {
-                    p++;
-
-                    continue;
-                }
-
-                if ((gid_t)value == group) {
-                    allowed = true;
-
-                    break;
-                }
-
-                p = end;
-            }
-        }
-    }
+    if (line)
+        allowed = groups_line_has_group(line, group);
 
     free(status);
 
