@@ -33,6 +33,24 @@ static bool switch_to_daemon_control(const int client, struct ec_device *ec,
     return false;
 }
 
+static bool prepare_daemon_control(const int client, struct ec_device *ec,
+                                   const struct ans_config *cfg,
+                                   fan_state states[ANS_MAX_FANS],
+                                   bool *coolboost_enabled)
+{
+    disable_coolboost_if_needed(ec, cfg, states, coolboost_enabled);
+    return switch_to_daemon_control(client, ec, cfg);
+}
+
+static void set_control_mode(bool *auto_mode, char *preset,
+                             const size_t preset_len,
+                             const bool auto_enabled,
+                             const char *preset_name)
+{
+    *auto_mode = auto_enabled;
+    string_copy(preset, preset_len, preset_name);
+}
+
 static bool handle_set_command(const int client, struct ec_device *ec,
                                const struct ans_config *cfg,
                                fan_state states[ANS_MAX_FANS],
@@ -53,12 +71,10 @@ static bool handle_set_command(const int client, struct ec_device *ec,
         return true;
     }
 
-    disable_coolboost_if_needed(ec, cfg, states, coolboost_enabled);
-    if (!switch_to_daemon_control(client, ec, cfg))
+    if (!prepare_daemon_control(client, ec, cfg, states, coolboost_enabled))
         return true;
 
-    *auto_mode = false;
-    string_copy(preset, preset_len, "manual");
+    set_control_mode(auto_mode, preset, preset_len, false, "manual");
     if (!daemon_quiet_logs)
         fprintf(stderr, "mode_change mode=manual fan=%s requested=%d\n", fan, percent);
 
@@ -101,12 +117,10 @@ static bool handle_preset_command(const int client, struct ec_device *ec,
         return true;
     }
 
-    disable_coolboost_if_needed(ec, cfg, states, coolboost_enabled);
-    if (!switch_to_daemon_control(client, ec, cfg))
+    if (!prepare_daemon_control(client, ec, cfg, states, coolboost_enabled))
         return true;
 
-    *auto_mode = false;
-    string_copy(preset, preset_len, p->id);
+    set_control_mode(auto_mode, preset, preset_len, false, p->id);
     if (!daemon_quiet_logs)
         fprintf(stderr, "mode_change mode=preset preset=%s cpu=%d gpu=%d\n",
                 p->id, p->cpu, p->gpu);
@@ -130,12 +144,10 @@ static bool handle_auto_command(const int client, struct ec_device *ec,
     if (!command_is_exact(cmd, "auto"))
         return false;
 
-    disable_coolboost_if_needed(ec, cfg, states, coolboost_enabled);
-    if (!switch_to_daemon_control(client, ec, cfg))
+    if (!prepare_daemon_control(client, ec, cfg, states, coolboost_enabled))
         return true;
 
-    *auto_mode = true;
-    string_copy(preset, preset_len, "auto");
+    set_control_mode(auto_mode, preset, preset_len, true, "auto");
     if (!daemon_quiet_logs)
         fprintf(stderr, "mode_change mode=auto preset=auto\n");
 
@@ -173,9 +185,8 @@ static bool handle_firmware_auto_command(const int client, struct ec_device *ec,
         return true;
     }
 
-    *auto_mode = false;
+    set_control_mode(auto_mode, preset, preset_len, false, FIRMWARE_AUTO_PRESET);
     *coolboost_enabled = false;
-    string_copy(preset, preset_len, FIRMWARE_AUTO_PRESET);
     write_control_state(cfg, states, *auto_mode, preset, *coolboost_enabled,
                         runtime);
     if (!daemon_quiet_logs)
