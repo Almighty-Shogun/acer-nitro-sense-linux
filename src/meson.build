@@ -40,6 +40,7 @@ core_sources = files(
   'util/json.c',
   'util/json_scan.c',
   'util/number.c',
+  'util/process.c',
   'util/string.c',
 )
 

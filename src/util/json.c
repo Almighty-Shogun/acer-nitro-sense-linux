@@ -5,6 +5,57 @@
 #include <stdlib.h>
 #include <string.h>
 
+int json_append_string(text_buffer *out, const char *value)
+{
+    const unsigned char *p = (const unsigned char *)fallback_text(value, "");
+
+    if (text_buffer_append(out, "\"") < 0)
+        return -1;
+
+    for (; *p; p++) {
+        switch (*p) {
+        case '"':
+            if (text_buffer_append(out, "\\\"") < 0)
+                return -1;
+            break;
+        case '\\':
+            if (text_buffer_append(out, "\\\\") < 0)
+                return -1;
+            break;
+        case '\b':
+            if (text_buffer_append(out, "\\b") < 0)
+                return -1;
+            break;
+        case '\f':
+            if (text_buffer_append(out, "\\f") < 0)
+                return -1;
+            break;
+        case '\n':
+            if (text_buffer_append(out, "\\n") < 0)
+                return -1;
+            break;
+        case '\r':
+            if (text_buffer_append(out, "\\r") < 0)
+                return -1;
+            break;
+        case '\t':
+            if (text_buffer_append(out, "\\t") < 0)
+                return -1;
+            break;
+        default:
+            if (*p < 0x20) {
+                if (text_buffer_append(out, "\\u%04x", *p) < 0)
+                    return -1;
+            } else if (text_buffer_append(out, "%c", *p) < 0) {
+                return -1;
+            }
+            break;
+        }
+    }
+
+    return text_buffer_append(out, "\"");
+}
+
 static const char *skip_json_space(const char *p)
 {
     while (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')

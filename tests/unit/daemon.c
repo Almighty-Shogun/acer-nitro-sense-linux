@@ -7,6 +7,7 @@
 #include "unit/fan_control.h"
 #include "unit/parser.h"
 #include "unit/state.h"
+#include "unit/status_json.h"
 #include "unit/fixture.h"
 #include "unit/utility.h"
 
@@ -36,6 +37,7 @@ int run_unit_tests(void)
         bool coolboost_enabled = cfg.coolboost.default_enabled;
 
         failures += unit_run_fan_control(&ec, &cfg, states);
+        failures += unit_run_status_json(&ec, &cfg, states);
         failures += unit_run_state_restore(&ec, &cfg, states,
                                                &coolboost_enabled);
         failures += unit_run_daemon_commands(&ec, &cfg, states);

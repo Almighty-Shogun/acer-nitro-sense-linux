@@ -1,5 +1,6 @@
 #include "hardware/names_internal.h"
 
+#include "util/process.h"
 #include "util/string.h"
 
 #include <stdio.h>
@@ -64,7 +65,11 @@ static void simplify_gpu_name(const char *vendor, const char *device, char *out,
 
 void load_gpu_name(char *out, const size_t out_len)
 {
-    FILE *lspci = popen("lspci -Dmm", "r");
+    char command[] = "lspci";
+    char option[] = "-Dmm";
+    char *const argv[] = {command, option, NULL};
+    pid_t pid;
+    FILE *lspci = process_open_stdout("lspci", argv, &pid);
     char fallback[160] = "GPU";
     char line[512];
 
@@ -99,12 +104,12 @@ void load_gpu_name(char *out, const size_t out_len)
 
         if (is_nvidia) {
             string_copy(out, out_len, name);
-            pclose(lspci);
+            process_close_stdout(lspci, pid);
 
             return;
         }
     }
 
-    pclose(lspci);
+    process_close_stdout(lspci, pid);
     string_copy(out, out_len, fallback);
 }

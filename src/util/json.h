@@ -4,6 +4,9 @@
 #include <stdbool.h>
 #include <stddef.h>
 
+#include "util/format.h"
+
+int json_append_string(text_buffer *out, const char *value);
 const char *json_find_key(const char *json, const char *key);
 const char *json_after_colon(const char *p);
 const char *json_find_array(const char *json, const char *key, const char **end_out);
