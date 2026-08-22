@@ -1,7 +1,7 @@
-#include "unit/platform_cases.h"
+#include "cases.h"
 
 #include "ec/ec.h"
-#include "unit/helpers.h"
+#include "../helpers.h"
 
 #include <stdio.h>
 #include <stdlib.h>

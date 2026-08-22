@@ -1,9 +1,9 @@
-#include "unit/state.h"
+#include "state.h"
 
 #include "daemon/state.h"
 #include "ec/ec.h"
 #include "platform/control.h"
-#include "unit/fixture.h"
+#include "../fixture.h"
 
 #include <stdio.h>
 #include <string.h>

@@ -1,7 +1,7 @@
-#include "unit/fan_cases.h"
+#include "cases.h"
 
 #include "fan/control.h"
-#include "unit/fixture.h"
+#include "../fixture.h"
 
 #include <stdio.h>
 #include <string.h>

@@ -1,10 +1,10 @@
-#include "unit/fan_cases.h"
+#include "cases.h"
 
 #include "daemon/status.h"
 #include "ec/ec.h"
 #include "fan/control.h"
-#include "unit/fixture.h"
-#include "unit/helpers.h"
+#include "../fixture.h"
+#include "../helpers.h"
 
 #include <stdio.h>
 #include <string.h>

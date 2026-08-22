@@ -1,7 +1,7 @@
-#include "unit/command_cases.h"
+#include "cases.h"
 
 #include "ec/ec.h"
-#include "unit/helpers.h"
+#include "../helpers.h"
 
 #include <stdio.h>
 #include <string.h>

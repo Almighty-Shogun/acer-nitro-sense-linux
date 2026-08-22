@@ -1,8 +1,8 @@
-#include "unit/commands.h"
+#include "commands.h"
 
-#include "unit/command_cases.h"
-#include "unit/platform_commands.h"
-#include "unit/fixture.h"
+#include "../fixture.h"
+#include "../platform/commands.h"
+#include "cases.h"
 
 int unit_run_daemon_commands(struct ec_device *ec, const struct ans_config *cfg,
                                  fan_state states[ANS_MAX_FANS])

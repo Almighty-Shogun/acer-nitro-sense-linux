@@ -1,6 +1,6 @@
-#include "unit/fan_control.h"
+#include "control.h"
 
-#include "unit/fan_cases.h"
+#include "cases.h"
 
 int unit_run_fan_control(struct ec_device *ec, struct ans_config *cfg,
                              fan_state states[ANS_MAX_FANS])
