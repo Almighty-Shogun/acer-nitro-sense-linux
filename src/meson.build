@@ -125,6 +125,9 @@ client_command_sources = files(
 client_core_sources = files(
   'client.c',
   'client/doctor.c',
+  'client/doctor_exec.c',
+  'client/doctor_os.c',
+  'client/doctor_permissions.c',
   'client/doctor_probes.c',
   'client/doctor_util.c',
   'client/parse.c',
