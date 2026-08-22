@@ -177,8 +177,8 @@ int client_print_coolboost_status(void)
         return 1;
     }
 
-    char* available = strstr(status, "\"coolboost_available\": true");
     const char* enabled = strstr(status, "\"coolboost\": true");
+    char* available = strstr(status, "\"coolboost_available\": true");
 
     if (!available)
     {

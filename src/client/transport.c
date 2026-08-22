@@ -128,8 +128,7 @@ int client_send_command_capture(const char* command, const bool quiet, char* out
             return 1;
         }
 
-        if (n == 0)
-            break;
+        if (n == 0) break;
 
         buf[n] = '\0';
 
@@ -167,8 +166,9 @@ int client_send_command(const char* command, bool quiet)
  */
 int client_send_commandf(const bool quiet, const char* format, ...)
 {
-    char command[256];
     va_list args;
+
+    char command[256];
 
     va_start(args, format);
     const int written = vsnprintf(command, sizeof(command), format, args);

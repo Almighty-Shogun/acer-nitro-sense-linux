@@ -118,8 +118,9 @@ void doctor_run_command(const char* label, const char* command)
 {
     const char* const argv[] = {"sh", "-c", command, NULL};
 
-    char line[512];
     pid_t pid;
+
+    char line[512];
 
     printf("$ %s\n", command);
 
