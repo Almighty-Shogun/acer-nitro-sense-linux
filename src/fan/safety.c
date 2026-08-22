@@ -2,6 +2,7 @@
 
 #include "ec/ec.h"
 #include "fan/control.h"
+#include "fan/internal.h"
 #include "util/number.h"
 #include "util/string.h"
 

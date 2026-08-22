@@ -1,8 +1,8 @@
 #include "fan/control.h"
 
 #include "config/config.h"
+#include "fan/internal.h"
 #include "fan/observation.h"
-#include "fan/safety.h"
 #include "platform/control.h"
 #include "util/number.h"
 
