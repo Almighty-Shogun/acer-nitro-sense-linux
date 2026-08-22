@@ -86,6 +86,7 @@ sensor_sources = files(
   'sensors/fake.c',
   'sensors/nvidia.c',
   'sensors/power.c',
+  'sensors/power_paths.c',
   'sensors/sensors.c',
 )
 
