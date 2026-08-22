@@ -1,6 +1,6 @@
-#include "unit/platform_cases.h"
+#include "cases.h"
 
-#include "unit/helpers.h"
+#include "../helpers.h"
 
 #include <stdio.h>
 #include <string.h>

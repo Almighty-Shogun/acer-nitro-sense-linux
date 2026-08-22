@@ -1,8 +1,8 @@
-#include "unit/platform_commands.h"
+#include "commands.h"
 
-#include "unit/platform_cases.h"
+#include "cases.h"
 #include "platform/control.h"
-#include "unit/fixture.h"
+#include "../fixture.h"
 
 int unit_run_platform_commands(struct ec_device *ec,
                                    const struct ans_config *cfg,

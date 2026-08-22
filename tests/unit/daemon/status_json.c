@@ -1,4 +1,4 @@
-#include "unit/status_json.h"
+#include "status_json.h"
 
 #include "daemon/status_json.h"
 #include "ec/ec.h"

@@ -1,15 +1,15 @@
-#include "unit/daemon.h"
+#include "daemon.h"
 
 #include "daemon/types.h"
 #include "ec/ec.h"
-#include "unit/commands.h"
-#include "unit/daemon_args.h"
-#include "unit/fan_control.h"
-#include "unit/parser.h"
-#include "unit/state.h"
-#include "unit/status_json.h"
-#include "unit/fixture.h"
-#include "unit/utility.h"
+#include "../commands/commands.h"
+#include "../fan/control.h"
+#include "../fixture.h"
+#include "../parser/parser.h"
+#include "../utility.h"
+#include "args.h"
+#include "state.h"
+#include "status_json.h"
 
 #include <stdio.h>
 

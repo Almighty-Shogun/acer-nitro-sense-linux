@@ -1,8 +1,8 @@
-#include "unit/platform_cases.h"
+#include "cases.h"
 
 #include "ec/ec.h"
 #include "platform/control.h"
-#include "unit/helpers.h"
+#include "../helpers.h"
 
 #include <stdio.h>
 #include <string.h>

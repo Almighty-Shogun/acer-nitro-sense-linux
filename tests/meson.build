@@ -1,43 +1,51 @@
 command_unit_sources = files(
-  'unit/command_daemon.c',
-  'unit/command_ec.c',
-  'unit/command_fan.c',
-  'unit/command_firmware.c',
-  'unit/command_invalid.c',
-  'unit/commands.c',
+  'unit/commands/commands.c',
+  'unit/commands/daemon.c',
+  'unit/commands/ec.c',
+  'unit/commands/fan.c',
+  'unit/commands/firmware.c',
+  'unit/commands/invalid.c',
 )
 
 platform_unit_sources = files(
-  'unit/platform_commands.c',
-  'unit/platform_fan_mode.c',
-  'unit/platform_keyboard_backlight.c',
-  'unit/platform_power.c',
-  'unit/platform_status.c',
+  'unit/platform/commands.c',
+  'unit/platform/fan_mode.c',
+  'unit/platform/keyboard_backlight.c',
+  'unit/platform/power.c',
+  'unit/platform/status.c',
 )
 
 fan_unit_sources = files(
-  'unit/fan_auto.c',
-  'unit/fan_control.c',
-  'unit/fan_ec.c',
-  'unit/fan_resume.c',
-  'unit/fan_safety.c',
-  'unit/fan_temperature.c',
+  'unit/fan/auto.c',
+  'unit/fan/control.c',
+  'unit/fan/ec.c',
+  'unit/fan/resume.c',
+  'unit/fan/safety.c',
+  'unit/fan/temperature.c',
+)
+
+daemon_unit_sources = files(
+  'unit/daemon/args.c',
+  'unit/daemon/daemon.c',
+  'unit/daemon/state.c',
+  'unit/daemon/status_json.c',
+)
+
+parser_unit_sources = files(
+  'unit/parser/parser.c',
 )
 
 core_unit_sources = files(
-  'unit/daemon.c',
-  'unit/daemon_args.c',
   'unit/fixture.c',
   'unit/helpers.c',
-  'unit/parser.c',
-  'unit/state.c',
-  'unit/status_json.c',
   'unit/utility.c',
 )
 
 unit_sources = command_unit_sources
 unit_sources += platform_unit_sources
 unit_sources += fan_unit_sources
+unit_sources += daemon_unit_sources
+unit_sources += parser_unit_sources
 unit_sources += core_unit_sources
 
 unit_main = files('unit/main.c')

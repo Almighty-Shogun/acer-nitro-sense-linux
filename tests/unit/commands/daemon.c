@@ -1,6 +1,6 @@
-#include "unit/command_cases.h"
+#include "cases.h"
 
-#include "unit/helpers.h"
+#include "../helpers.h"
 
 #include <signal.h>
 #include <stdio.h>
