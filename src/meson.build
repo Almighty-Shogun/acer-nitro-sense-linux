@@ -122,6 +122,7 @@ daemon_sources += shared_util_sources
 daemon_sources += daemon_util_sources
 
 client_command_sources = files(
+  'commands/client/builtin.c',
   'commands/client/dispatch.c',
   'commands/client/fan.c',
   'commands/client/platform.c',
