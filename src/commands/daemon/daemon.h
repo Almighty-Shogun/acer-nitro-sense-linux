@@ -3,6 +3,8 @@
 
 #include "daemon/types.h"
 
+/* Exposed for the socket loop and unit tests. Individual command handlers stay
+ * inside src/commands/daemon. */
 void execute_command(int client, struct ec_device *ec, const struct ans_config *cfg,
                      fan_state states[ANS_MAX_FANS], bool *auto_mode,
                      char *preset, size_t preset_len,

@@ -2,6 +2,10 @@ progress() {
     printf '[%s] %s\n' "$(date +%H:%M:%S)" "$*" >&2
 }
 
+print_output_path() {
+    printf '\n---\n%s\n' "$OUT_DIR"
+}
+
 run_log() {
     label="$1"
     shift

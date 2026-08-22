@@ -9,6 +9,12 @@ int unit_run_ec_debug_commands(struct ec_device *ec,
                                    bool *auto_mode, char *preset,
                                    size_t preset_len,
                                    bool *coolboost_enabled);
+int unit_run_daemon_lifecycle_commands(struct ec_device *ec,
+                                           const struct ans_config *cfg,
+                                           fan_state states[ANS_MAX_FANS],
+                                           bool *auto_mode, char *preset,
+                                           size_t preset_len,
+                                           bool *coolboost_enabled);
 int unit_run_fan_socket_commands(struct ec_device *ec,
                                      const struct ans_config *cfg,
                                      fan_state states[ANS_MAX_FANS],

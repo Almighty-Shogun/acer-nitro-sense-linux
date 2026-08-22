@@ -102,7 +102,7 @@ if [ "$SAFETY_VALIDATE" = "1" ]; then
     collect_final_logs
     write_summary
     trap - EXIT INT TERM
-    printf 'Validation logs written to %s\n' "$OUT_DIR"
+    print_output_path
     exit 0
 fi
 
@@ -113,7 +113,7 @@ if [ "$FAN_MODE_SCAN" = "1" ]; then
     collect_final_logs
     write_summary
     trap - EXIT INT TERM
-    printf 'Validation logs written to %s\n' "$OUT_DIR"
+    print_output_path
     exit 0
 fi
 
@@ -124,7 +124,7 @@ if [ "$CALIBRATE_FANS" = "1" ]; then
     collect_final_logs
     write_summary
     trap - EXIT INT TERM
-    printf 'Validation logs written to %s\n' "$OUT_DIR"
+    print_output_path
     exit 0
 fi
 
@@ -133,7 +133,7 @@ if [ "$DAILY_MODE" = "1" ]; then
     collect_final_logs
     write_summary
     trap - EXIT INT TERM
-    printf 'Validation logs written to %s\n' "$OUT_DIR"
+    print_output_path
     exit 0
 fi
 
@@ -175,4 +175,4 @@ collect_final_logs
 write_summary
 trap - EXIT INT TERM
 
-printf 'Validation logs written to %s\n' "$OUT_DIR"
+print_output_path
