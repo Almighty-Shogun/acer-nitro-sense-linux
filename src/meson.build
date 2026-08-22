@@ -76,6 +76,8 @@ hardware_sources = files(
 platform_sources = files(
   'input/activity.c',
   'keyboard/backlight.c',
+  'keyboard/backlight_ec.c',
+  'keyboard/backlight_sysfs.c',
   'keyboard/backlight_timeout.c',
   'platform/control.c',
   'platform/fan_mode.c',
