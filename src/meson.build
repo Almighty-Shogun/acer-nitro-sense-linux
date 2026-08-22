@@ -62,6 +62,8 @@ fan_sources = files(
   'fan/lifecycle.c',
   'fan/observation.c',
   'fan/safety.c',
+  'fan/safety_log.c',
+  'fan/safety_policy.c',
   'fan/temperature_cache.c',
   'fan/temperature_filter.c',
 )
