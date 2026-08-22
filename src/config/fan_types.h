@@ -5,13 +5,27 @@
 
 #include <stdbool.h>
 
-struct threshold {
+/**
+ * One temperature threshold in a fan curve.
+ *
+ * The daemon ramps up when a temperature reaches `up`, ramps down after it
+ * falls below `down`, and applies the configured speed between those bounds.
+ */
+struct threshold
+{
     int up;
     int down;
     int speed;
 };
 
-struct fan_config {
+/**
+ * Model-specific configuration for one controllable fan.
+ *
+ * A fan profile ties together EC registers, temperature sources, write ranges,
+ * fallback behavior, and the automatic fan curve for one component.
+ */
+struct fan_config
+{
     char id[16];
     char name[64];
     char sensor_group[16];
@@ -32,13 +46,27 @@ struct fan_config {
     int curve_len;
 };
 
-struct ec_write_config {
+/**
+ * EC register write applied during daemon startup and reset.
+ *
+ * Init writes prepare model-specific EC state. Reset values let the daemon
+ * restore firmware-friendly defaults when stopping.
+ */
+struct ec_write_config
+{
     int reg;
     int value;
     int reset_value;
 };
 
-struct preset_config {
+/**
+ * Named fan-speed preset exposed to users and integrations.
+ *
+ * Presets contain the requested CPU and GPU percentages that should be applied
+ * together.
+ */
+struct preset_config
+{
     char id[32];
     int cpu;
     int gpu;
