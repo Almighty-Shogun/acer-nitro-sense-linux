@@ -21,6 +21,9 @@ int unit_run_daemon_commands(struct ec_device *ec, const struct ans_config *cfg,
     failures += unit_run_fan_socket_commands(ec, cfg, states, &auto_mode,
                                                  preset, sizeof(preset),
                                                  &coolboost_enabled);
+    failures += unit_run_daemon_lifecycle_commands(ec, cfg, states, &auto_mode,
+                                                       preset, sizeof(preset),
+                                                       &coolboost_enabled);
     failures += unit_run_firmware_auto_commands(ec, cfg, states,
                                                     &auto_mode, preset,
                                                     sizeof(preset),

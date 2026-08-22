@@ -66,13 +66,5 @@ int unit_run_fan_socket_commands(struct ec_device *ec,
         failures++;
     }
 
-    if (unit_execute_command("resume\n", ec, cfg, states, auto_mode,
-                                 preset, preset_len, coolboost_enabled,
-                                 true, reply, sizeof(reply)) < 0 ||
-        !strstr(reply, "resume=ok mode=auto preset=auto")) {
-        fprintf(stderr, "unit-test failed: resume command path\n");
-        failures++;
-    }
-
     return failures;
 }
