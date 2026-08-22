@@ -22,6 +22,8 @@ daemon_core_sources = files(
   'daemon/args.c',
   'daemon/capabilities.c',
   'daemon/diagnostics.c',
+  'daemon/diagnostics_error.c',
+  'daemon/diagnostics_validate.c',
   'daemon/feature_status.c',
   'daemon/loop.c',
   'daemon/state_persist.c',
