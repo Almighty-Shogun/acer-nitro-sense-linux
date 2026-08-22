@@ -44,7 +44,7 @@ const char *DOCTOR_PROBE_NVIDIA_PCI_POWER =
     "fi; "
     "done";
 
-const char *DOCTOR_PROBE_POWERPROFILESCTL =
+const char *DOCTOR_PROBE_POWER_PROFILES_CTL =
     "command -v powerprofilesctl >/dev/null && "
     "powerprofilesctl 2>&1 || echo powerprofilesctl=unavailable";
 

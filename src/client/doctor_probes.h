@@ -9,7 +9,7 @@ extern const char *DOCTOR_PROBE_EC_ACCESS;
 extern const char *DOCTOR_PROBE_EC_MODULES;
 extern const char *DOCTOR_PROBE_HWMON;
 extern const char *DOCTOR_PROBE_NVIDIA_PCI_POWER;
-extern const char *DOCTOR_PROBE_POWERPROFILESCTL;
+extern const char *DOCTOR_PROBE_POWER_PROFILES_CTL;
 extern const char *DOCTOR_PROBE_POWER_PROFILE_DAEMON;
 extern const char *DOCTOR_PROBE_PLATFORM_PROFILE;
 extern const char *DOCTOR_PROBE_POWER_SUPPLY;

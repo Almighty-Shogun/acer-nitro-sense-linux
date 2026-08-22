@@ -1,26 +1,39 @@
 #include "client/doctor.h"
 
-#include "client/doctor_probes.h"
-#include "client/doctor_util.h"
 #include "client/transport.h"
+#include "client/doctor_util.h"
+#include "client/doctor_probes.h"
 
 #include <stdio.h>
 
-static void doctor_run_daemon_command(const char *label, const char *display,
-                                      const char *command)
+/**
+ * Run one daemon-backed doctor probe.
+ *
+ * These probes use the same control socket as normal CLI commands so doctor
+ * output reflects the installed daemon state rather than duplicate logic.
+ */
+static void doctor_run_daemon_command(const char* label, const char* display, const char* command)
 {
     char response[4096];
 
     printf("$ acer-nitro-sense %s\n", display);
 
-    if (client_send_command_capture(command, true, response, sizeof(response)) == 0) {
+    if (client_send_command_capture(command, true, response, sizeof(response)) == 0)
+    {
         fputs(response, stdout);
+
         return;
     }
 
     printf("%s=unavailable reason=daemon-command-failed\n", label);
 }
 
+/**
+ * Print the full diagnostic report.
+ *
+ * Doctor output is used for support and hardware discovery, so each section
+ * favors explicit facts over inferred state.
+ */
 int client_doctor(void)
 {
     char status_response[4096];
@@ -39,9 +52,13 @@ int client_doctor(void)
     doctor_print_section("ANS Status");
 
     if (client_send_command_capture("status\n", true, status_response, sizeof(status_response)) == 0)
+    {
         fputs(status_response, stdout);
+    }
     else
+    {
         client_print_status_file();
+    }
 
     doctor_run_daemon_command("coolboost", "coolboost status", "coolboost status\n");
     doctor_run_daemon_command("fan_mode", "fan-mode status", "fan-mode status\n");
@@ -56,8 +73,7 @@ int client_doctor(void)
 
     doctor_print_section("Service");
     doctor_run_command("systemctl", DOCTOR_PROBE_SERVICE_STATUS);
-    doctor_run_command("journal_current_daemon",
-                       DOCTOR_PROBE_CURRENT_DAEMON_JOURNAL);
+    doctor_run_command("journal_current_daemon", DOCTOR_PROBE_CURRENT_DAEMON_JOURNAL);
     doctor_run_command("journal", DOCTOR_PROBE_RECENT_DAEMON_JOURNAL);
 
     doctor_print_section("EC Access");
@@ -70,7 +86,7 @@ int client_doctor(void)
     doctor_run_command("nvidia", DOCTOR_PROBE_NVIDIA_PCI_POWER);
 
     doctor_print_section("Power Profiles");
-    doctor_run_command("powerprofilesctl", DOCTOR_PROBE_POWERPROFILESCTL);
+    doctor_run_command("powerprofilesctl", DOCTOR_PROBE_POWER_PROFILES_CTL);
     doctor_run_command("powerprofilesd", DOCTOR_PROBE_POWER_PROFILE_DAEMON);
     doctor_run_command("platform_profile", DOCTOR_PROBE_PLATFORM_PROFILE);
 

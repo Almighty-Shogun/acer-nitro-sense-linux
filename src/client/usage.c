@@ -1,6 +1,12 @@
 #include "client/usage.h"
 
-void client_usage(FILE *out)
+/**
+ * Print command-line usage.
+ *
+ * The CLI uses this helper to keep terminal output and daemon transport
+ * behavior consistent across subcommands.
+ */
+void client_usage(FILE* out)
 {
     fprintf(out,
             "usage:\n"
