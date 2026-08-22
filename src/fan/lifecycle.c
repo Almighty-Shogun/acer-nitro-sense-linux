@@ -1,7 +1,7 @@
 #include "fan/control.h"
 
 #include "ec/ec.h"
-#include "fan/safety.h"
+#include "fan/internal.h"
 
 void apply_init_writes(struct ec_device *ec, const struct ans_config *cfg)
 {
