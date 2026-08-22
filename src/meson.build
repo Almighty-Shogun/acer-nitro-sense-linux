@@ -24,9 +24,11 @@ daemon_core_sources = files(
   'daemon/diagnostics.c',
   'daemon/feature_status.c',
   'daemon/loop.c',
-  'daemon/state.c',
+  'daemon/state_persist.c',
+  'daemon/state_restore.c',
   'daemon/status.c',
   'daemon/status_json.c',
+  'daemon/status_json_fans.c',
   'daemon/status_reply.c',
 )
 
