@@ -14,8 +14,7 @@ bool parse_set_command(const char* cmd, char* fan, const size_t fan_len, int* pe
 {
     const char* cursor = cmd;
 
-    char command[16];
-    char percent_text[16];
+    char command[16], percent_text[16];
 
     if (!command_read_token(&cursor, command, sizeof(command)) || strcmp(command, "set") != 0)
         return false;
@@ -175,9 +174,7 @@ bool parse_ec_dump_command(const char* cmd, int* start, int* end)
 {
     const char* cursor = cmd;
 
-    char command[16];
-    char start_text[16];
-    char end_text[16];
+    char command[16], start_text[16], end_text[16];
 
     if (!command_read_token(&cursor, command, sizeof(command)) || strcmp(command, "ec-dump") != 0)
         return false;
@@ -203,8 +200,9 @@ bool parse_ec_dump_command(const char* cmd, int* start, int* end)
  */
 bool command_is_exact(const char* cmd, const char* name)
 {
-    const char* cursor = cmd;
     char command[32];
+
+    const char* cursor = cmd;
 
     return command_read_token(&cursor, command, sizeof(command))
         && strcmp(command, name) == 0

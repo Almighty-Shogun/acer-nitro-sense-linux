@@ -174,8 +174,9 @@ bool command_parse_int_token(const char* text, const int min_value, const int ma
  */
 bool command_parse_action(const char* cmd, const char* expected_command, char* action, const size_t action_len)
 {
-    const char* cursor = cmd;
     char command[32];
+
+    const char* cursor = cmd;
 
     if (!command_read_token(&cursor, command, sizeof(command)) || strcmp(command, expected_command) != 0)
         return false;
@@ -201,8 +202,8 @@ bool command_parse_sub_action(
     const size_t value_len
 )
 {
-    char action[16];
-    char command[32];
+    char action[16], command[32];
+
     const char* cursor = cmd;
 
     if (!command_read_token(&cursor, command, sizeof(command)) || strcmp(command, expected_command) != 0)

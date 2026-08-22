@@ -13,12 +13,7 @@
  * The registry answers profile status before this function is reached, so the
  * handler only validates and writes named model profile entries.
  */
-bool handle_profile_command(
-    const int client,
-    struct ec_device* ec,
-    const struct ans_config* cfg,
-    const char* cmd
-)
+bool handle_profile_command(const int client, struct ec_device* ec, const struct ans_config* cfg, const char* cmd)
 {
     char action[32];
 

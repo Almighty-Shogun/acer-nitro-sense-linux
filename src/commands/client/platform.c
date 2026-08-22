@@ -323,8 +323,9 @@ static int client_handle_keyboard_backlight_status_command(const int argc, char*
  */
 static int client_handle_keyboard_backlight_set_command(const int argc, char** argv)
 {
-    static const int brightness_steps[] = {0, 25, 50, 75, 100};
     char* end;
+
+    static const int brightness_steps[] = {0, 25, 50, 75, 100};
 
     if (argc != 4)
     {

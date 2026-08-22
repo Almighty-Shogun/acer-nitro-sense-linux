@@ -15,7 +15,8 @@ typedef int (*client_command_handler)(int argc, char** argv);
  * The dispatcher uses this table as the single source of truth for public CLI
  * commands.
  */
-typedef struct {
+typedef struct
+{
     const char* name;
     client_command_handler handler;
 } client_command;

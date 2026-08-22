@@ -9,20 +9,28 @@
 #include <string.h>
 
 /**
+ * Carries daemon lifecycle command dependencies.
+ *
+ * A context keeps the command table compact without forcing every handler to
+ * accept each daemon dependency as a separate parameter.
+ */
+typedef struct
+{
+    int client;
+    struct ec_device* ec;
+    const struct ans_config* cfg;
+    fan_state* states;
+    bool auto_mode;
+    const char* preset;
+} daemon_control_context;
+
+/**
  * Handles one daemon lifecycle command.
  *
- * Lifecycle commands need access to daemon state, EC state, and the original
- * command string because they validate exact usage before taking action.
+ * Lifecycle handlers share a context because resume needs EC and fan state,
+ * while stop only needs the client and daemon run flag.
  */
-typedef bool (*daemon_control_handler)(
-    int client,
-    struct ec_device* ec,
-    const struct ans_config* cfg,
-    fan_state states[ANS_MAX_FANS],
-    bool auto_mode,
-    const char* preset,
-    const char* cmd
-);
+typedef bool (*daemon_control_handler)(const daemon_control_context* ctx, const char* cmd);
 
 /**
  * Maps a lifecycle command name to its daemon handler.
@@ -42,39 +50,31 @@ typedef struct
  * Resume restores init writes, wakes configured sensors, and reapplies either
  * firmware-auto mode or the current daemon fan-control state.
  */
-static bool handle_resume_command(
-    const int client,
-    struct ec_device* ec,
-    const struct ans_config* cfg,
-    fan_state states[ANS_MAX_FANS],
-    const bool auto_mode,
-    const char* preset,
-    const char* cmd
-)
+static bool handle_resume_command(const daemon_control_context* ctx, const char* cmd)
 {
     if (!command_is_exact(cmd, "resume"))
     {
-        control_reply(client, "error usage: resume\n");
+        control_reply(ctx->client, "error usage: resume\n");
 
         return true;
     }
 
-    apply_init_writes(ec, cfg);
-    apply_sensor_power_control(cfg, "on");
+    apply_init_writes(ctx->ec, ctx->cfg);
+    apply_sensor_power_control(ctx->cfg, "on");
 
-    if (firmware_auto_mode(auto_mode, preset))
+    if (firmware_auto_mode(ctx->auto_mode, ctx->preset))
     {
-        apply_firmware_auto_fan_mode(ec, cfg);
+        apply_firmware_auto_fan_mode(ctx->ec, ctx->cfg);
     }
     else
     {
-        apply_current_control_state(ec, cfg, states);
+        apply_current_control_state(ctx->ec, ctx->cfg, ctx->states);
     }
 
     if (!daemon_quiet_logs)
-        fprintf(stderr, "resume_reapply mode=%s preset=%s\n", control_mode(auto_mode, preset), preset);
+        fprintf(stderr, "resume_reapply mode=%s preset=%s\n", control_mode(ctx->auto_mode, ctx->preset), ctx->preset);
 
-    control_reply(client, "resume=ok mode=%s preset=%s\n", control_mode(auto_mode, preset), preset);
+    control_reply(ctx->client, "resume=ok mode=%s preset=%s\n", control_mode(ctx->auto_mode, ctx->preset), ctx->preset);
 
     return true;
 }
@@ -85,32 +85,18 @@ static bool handle_resume_command(
  * The polling loop observes `daemon_running` and performs the normal firmware
  * reset path during service shutdown.
  */
-static bool handle_stop_command(
-    const int client,
-    struct ec_device* ec,
-    const struct ans_config* cfg,
-    fan_state states[ANS_MAX_FANS],
-    const bool auto_mode,
-    const char* preset,
-    const char* cmd
-)
+static bool handle_stop_command(const daemon_control_context* ctx, const char* cmd)
 {
-    (void)ec;
-    (void)cfg;
-    (void)states;
-    (void)auto_mode;
-    (void)preset;
-
     if (!command_is_exact(cmd, "stop"))
     {
-        control_reply(client, "error usage: stop\n");
+        control_reply(ctx->client, "error usage: stop\n");
 
         return true;
     }
 
     daemon_running = 0;
 
-    control_reply(client, "stop=ok reset=firmware\n");
+    control_reply(ctx->client, "stop=ok reset=firmware\n");
 
     return true;
 }
@@ -161,6 +147,15 @@ bool handle_daemon_control_command(
 {
     char command[32];
 
+    const daemon_control_context context = {
+        .client = client,
+        .ec = ec,
+        .cfg = cfg,
+        .states = states,
+        .auto_mode = auto_mode,
+        .preset = preset,
+    };
+
     if (!command_first_token(cmd, command, sizeof(command)))
     {
         control_reply(client, "error unknown command\n");
@@ -171,7 +166,7 @@ bool handle_daemon_control_command(
     const daemon_control_command* entry = find_daemon_control_command(command);
 
     if (entry)
-        return entry->handler(client, ec, cfg, states, auto_mode, preset, cmd);
+        return entry->handler(&context, cmd);
 
     control_reply(client, "error unknown command\n");
 

@@ -46,12 +46,7 @@ bool handle_fan_mode_command(
  * Platform profiles map user-facing names such as quiet or performance to EC
  * values defined by the active model profile.
  */
-bool handle_profile_command(
-    int client,
-    struct ec_device* ec,
-    const struct ans_config* cfg,
-    const char* cmd
-);
+bool handle_profile_command(int client, struct ec_device* ec, const struct ans_config* cfg, const char* cmd);
 
 /**
  * Apply power-source profile policy commands.

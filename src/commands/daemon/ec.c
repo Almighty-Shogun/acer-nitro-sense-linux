@@ -56,8 +56,7 @@ static bool handle_ec_read_command(const int client, struct ec_device* ec, const
  */
 static bool handle_ec_dump_command(const int client, struct ec_device* ec, const char* cmd)
 {
-    int ec_end;
-    int ec_start;
+    int ec_start, ec_end;
 
     if (!parse_ec_dump_command(cmd, &ec_start, &ec_end))
     {

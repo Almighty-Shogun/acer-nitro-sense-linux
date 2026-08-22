@@ -14,7 +14,8 @@
  * CoolBoost status is handled by the registry as a read-only action, so this
  * table only contains the mutating on/off states.
  */
-typedef struct {
+typedef struct
+{
     const char* name;
     bool enabled;
 } coolboost_action;
@@ -56,14 +57,14 @@ static const coolboost_action* find_coolboost_action(const char* name)
  */
 bool handle_coolboost_command(
     const int client,
-    struct ec_device *ec,
-    const struct ans_config *cfg,
+    struct ec_device* ec,
+    const struct ans_config* cfg,
     fan_state states[ANS_MAX_FANS],
     const bool auto_mode,
-    const char *preset,
-    bool *coolboost_enabled,
-    const daemon_runtime_state *runtime,
-    const char *cmd
+    const char* preset,
+    bool* coolboost_enabled,
+    const daemon_runtime_state* runtime,
+    const char* cmd
 )
 {
     char action[16];
@@ -84,19 +85,21 @@ bool handle_coolboost_command(
         return true;
     }
 
-    if (!cfg->fan_modes.available) {
+    if (!cfg->fan_modes.available)
+    {
         control_reply(client, "error coolboost unavailable for this model\n");
 
         return true;
     }
 
     const bool applied = entry->enabled
-        ? apply_coolboost(ec, cfg, states, true)
-        : firmware_auto_mode(auto_mode, preset)
-        ? apply_firmware_auto_fan_mode(ec, cfg)
-        : apply_coolboost(ec, cfg, states, false);
+                             ? apply_coolboost(ec, cfg, states, true)
+                             : firmware_auto_mode(auto_mode, preset)
+                             ? apply_firmware_auto_fan_mode(ec, cfg)
+                             : apply_coolboost(ec, cfg, states, false);
 
-    if (!applied) {
+    if (!applied)
+    {
         control_reply(client, "error coolboost write failed\n");
 
         return true;

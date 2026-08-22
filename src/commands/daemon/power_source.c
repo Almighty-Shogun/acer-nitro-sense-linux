@@ -176,6 +176,7 @@ static bool handle_power_source_apply_command(
 )
 {
     static const char* const actions[] = {"apply"};
+
     char action[16];
     const enum power_source_state source = read_power_source();
     const char* target_profile = power_source_profile_for(cfg, source);

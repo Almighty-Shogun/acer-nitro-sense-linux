@@ -1,7 +1,5 @@
 #include "commands/daemon/registry.h"
 
-#include <stdlib.h>
-
 #include "daemon/status.h"
 #include "control/protocol.h"
 #include "commands/daemon/ec.h"

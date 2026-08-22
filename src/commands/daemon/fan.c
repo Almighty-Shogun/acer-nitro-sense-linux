@@ -38,8 +38,8 @@ typedef struct
  */
 static bool handle_set_command(const fan_command_context* ctx, const char* cmd)
 {
-    char fan[32];
     int percent;
+    char fan[32];
 
     if (!parse_set_command(cmd, fan, sizeof(fan), &percent))
     {

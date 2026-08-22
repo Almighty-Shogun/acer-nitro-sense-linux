@@ -83,8 +83,7 @@ static int client_handle_ec_read_command(const int argc, char** argv)
  */
 static int client_handle_ec_dump_command(const int argc, char** argv)
 {
-    int end;
-    int start;
+    int start, end;
 
     if (argc != 5)
     {
