@@ -20,11 +20,13 @@ const char* power_source_name(const enum power_source_state source)
 {
     switch (source)
     {
-    case POWER_SOURCE_AC: return "ac";
-    case POWER_SOURCE_BATTERY: return "battery";
-    case POWER_SOURCE_UNKNOWN:
-    default:
-        return "unknown";
+        case POWER_SOURCE_AC:
+            return "ac";
+        case POWER_SOURCE_BATTERY:
+            return "battery";
+        case POWER_SOURCE_UNKNOWN:
+        default:
+            return "unknown";
     }
 }
 
@@ -128,12 +130,14 @@ enum power_source_state read_power_source(void)
     {
         char path[512], type_path[1024], type[64];
 
-        if (entry->d_name[0] == '.') continue;
+        if (entry->d_name[0] == '.')
+            continue;
 
         snprintf(path, sizeof(path), "/sys/class/power_supply/%s", entry->d_name);
         snprintf(type_path, sizeof(type_path), "%s/type", path);
 
-        if (!read_trimmed_file(type_path, type, sizeof(type))) continue;
+        if (!read_trimmed_file(type_path, type, sizeof(type)))
+            continue;
 
         if (strcmp(type, "Battery") == 0)
         {
@@ -142,7 +146,8 @@ enum power_source_state read_power_source(void)
             continue;
         }
 
-        if (!power_supply_type_is_mains(type)) continue;
+        if (!power_supply_type_is_mains(type))
+            continue;
 
         has_mains = true;
 
@@ -196,8 +201,8 @@ const char* power_source_profile_for(const struct ans_config* cfg, const enum po
 bool power_source_profile_policy_available(const struct ans_config* cfg)
 {
     return cfg->platform_profiles.available
-        && cfg->power_source_profiles.ac_profile[0] != '\0'
-        && cfg->power_source_profiles.battery_profile[0] != '\0';
+           && cfg->power_source_profiles.ac_profile[0] != '\0'
+           && cfg->power_source_profiles.battery_profile[0] != '\0';
 }
 
 /**
