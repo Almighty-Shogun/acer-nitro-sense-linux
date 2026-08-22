@@ -6,7 +6,7 @@
  * The process should do setup, delegate to the real entry path, and return an
  * ordinary shell status without leaving partially initialized state behind.
  */
-int main(const int argc, char **argv)
+int main(const int argc, char** argv)
 {
     return client_run(argc, argv);
 }

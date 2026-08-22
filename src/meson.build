@@ -44,10 +44,9 @@ daemon_command_sources = files(
   'commands/daemon/fan_mode.c',
   'commands/daemon/gpu_temp.c',
   'commands/daemon/keyboard_backlight.c',
-  'commands/daemon/platform.c',
   'commands/daemon/power_source.c',
   'commands/daemon/profile.c',
-  'commands/daemon/readonly.c',
+  'commands/daemon/registry.c',
 )
 
 ec_sources = files(
@@ -145,4 +144,4 @@ client_core_sources = files(
   'client/usage.c',
 )
 
-client_sources = client_core_sources + client_command_sources + shared_util_sources
+client_sources = client_core_sources + client_command_sources + command_parser_sources + shared_util_sources
