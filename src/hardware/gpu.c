@@ -85,7 +85,10 @@ static void format_name_pair(char* out, const size_t out_len, const char* left, 
 {
     if (out_len == 0) return;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-truncation"
     snprintf(out, out_len, "%s %s", left, right);
+#pragma GCC diagnostic pop
 }
 
 /**
