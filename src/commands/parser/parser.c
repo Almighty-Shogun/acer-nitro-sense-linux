@@ -128,11 +128,10 @@ bool parse_keyboard_backlight_command(const char* cmd, char* action, const size_
 }
 
 /**
- * Parse set.
+ * Parse a keyboard backlight brightness command.
  *
- * Command handlers rely on this narrow grammar check before mutating daemon
- * state. Keeping parsing isolated makes malformed socket input fail
- * consistently.
+ * The brightness argument is range-checked against 0 to 100 before any
+ * backlight write, so malformed socket input fails consistently.
  */
 bool parse_keyboard_backlight_set_command(const char* cmd, int* percent)
 {

@@ -1,10 +1,10 @@
 #include "commands/client/dispatch.h"
 
 /**
- * Start the executable entry point.
+ * Start the client executable entry point.
  *
- * The process should do setup, delegate to the real entry path, and return an
- * ordinary shell status without leaving partially initialized state behind.
+ * Argument handling and command routing belong to the dispatcher, so this
+ * forwards its exit status unchanged and owns no process state of its own.
  */
 int main(const int argc, char** argv)
 {

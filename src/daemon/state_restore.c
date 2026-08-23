@@ -119,11 +119,11 @@ static void restore_auto_control_state(
 }
 
 /**
- * Restore auto state.
+ * Restore firmware-auto state.
  *
- * Persisted state lets the daemon restart without surprising the user with a
- * different fan mode. Restore paths intentionally validate before applying
- * saved values.
+ * Firmware-auto leaves live fan speed to the Acer firmware, so saved targets
+ * are restored for reporting only. The preset falls back to manual when the
+ * firmware mode cannot be applied.
  */
 static void restore_firmware_auto_control_state(
     struct ec_device* ec,
