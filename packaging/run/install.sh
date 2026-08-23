@@ -42,6 +42,14 @@ require_root() {
     fi
 }
 
+require_mutable_usr() {
+    if [ -f /run/ostree-booted ]; then
+        info "this system has a read-only /usr managed by ostree"
+        info "install the RPM instead: sudo rpm-ostree install acer-nitro-sense-linux"
+        die "generic installer cannot write to /usr on an atomic system"
+    fi
+}
+
 list_models() {
     for model in "$ROOT_DIR/usr/share/$APP_NAME/models/"*.json; do
         [ -e "$model" ] || continue
@@ -173,6 +181,7 @@ while [ "$#" -gt 0 ]; do
 done
 
 require_root
+require_mutable_usr
 if [ "$UNINSTALL" -eq 1 ]; then
     uninstall_app
     exit 0
