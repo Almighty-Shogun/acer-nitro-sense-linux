@@ -3,7 +3,12 @@
 
 #include "daemon/types.h"
 
-int unit_run_status_json(struct ec_device *ec, struct ans_config *cfg,
-                         fan_state states[ANS_MAX_FANS]);
+/**
+ * Run status JSON formatting tests.
+ *
+ * These cases verify that the integration status file exposes stable fan and
+ * feature fields.
+ */
+int unit_run_status_json(struct ec_device* ec, const struct ans_config* cfg, fan_state states[ANS_MAX_FANS]);
 
 #endif
