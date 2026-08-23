@@ -44,9 +44,7 @@ module. See [EC access](docs/ec-access.md).
 
 ## 🚀 Installation
 
-Install from a release artifact.
-
-Fedora:
+### Fedora Workstation, COPR Repository
 
 ```sh
 sudo dnf install dnf-plugins-core
@@ -54,37 +52,60 @@ sudo dnf copr enable almighty-shogun/acer-nitro-sense-linux
 sudo dnf install acer-nitro-sense-linux
 ```
 
-Debian/Ubuntu:
+### Fedora Atomic, COPR repository
+
+Silverblue, Kinoite, Bazzite, Aurora, and other ostree-based variants layer the
+same RPM. They do not all ship `dnf`, so add the COPR repository by writing its
+repo file directly:
 
 ```sh
-sudo apt install ./acer-nitro-sense-linux_*.deb
+sudo curl -o /etc/yum.repos.d/almighty-shogun-acer-nitro-sense-linux.repo \
+    "https://copr.fedorainfracloud.org/coprs/almighty-shogun/acer-nitro-sense-linux/repo/fedora-$(rpm -E %fedora)/almighty-shogun-acer-nitro-sense-linux-fedora-$(rpm -E %fedora).repo"
+sudo rpm-ostree install acer-nitro-sense-linux
+systemctl reboot
 ```
 
-Generic installer:
+Updates arrive with your normal system upgrade: `sudo dnf upgrade` on Fedora Workstation, or `sudo rpm-ostree upgrade` followed by a reboot on Fedora Atomic.
+
+### Debian/Ubuntu:
 
 ```sh
-chmod +x acer-nitro-sense-linux-*.run
-./acer-nitro-sense-linux-*.run --list-models
-sudo ./acer-nitro-sense-linux-*.run --model acer-nitro-an517-51
+curl -LO https://github.com/Almighty-Shogun/acer-nitro-sense-linux/releases/latest/download/acer-nitro-sense-linux.deb
+sudo apt install ./acer-nitro-sense-linux.deb
 ```
 
-Log out and back in after installation so your user session picks up the
-`acer-nitro-sense` group.
+### Other distributions
+
+```sh
+curl -LO https://github.com/Almighty-Shogun/acer-nitro-sense-linux/releases/latest/download/acer-nitro-sense-linux.run
+chmod +x acer-nitro-sense-linux.run
+./acer-nitro-sense-linux.run --list-models
+sudo ./acer-nitro-sense-linux.run --model acer-nitro-an517-51
+```
+
+Log out and back in after installation so your user session picks up the `acer-nitro-sense` group.
+
+> [!NOTE]
+> The generic `.run` installer refuses to run on atomic systems, because `/usr`
+is read-only there. Use the COPR package through `rpm-ostree` instead.
 
 The [GNOME Shell extension](https://github.com/Almighty-Shogun/acer-nitro-sense-linux-gnome-extension) is optional and distributed separately. Install the
 daemon first, then install the extension if you want panel status and controls.
 
-Uninstall:
 
+## 🧹 Uninstall
 ```sh
 # Fedora
 sudo dnf remove acer-nitro-sense-linux
+
+# Fedora Atomic
+sudo rpm-ostree uninstall acer-nitro-sense-linux
 
 # Debian/Ubuntu
 sudo apt remove acer-nitro-sense-linux
 
 # Generic
-sudo ./acer-nitro-sense-linux-*.run --uninstall
+sudo ./acer-nitro-sense-linux.run --uninstall
 ```
 
 ## 🔧 Building
