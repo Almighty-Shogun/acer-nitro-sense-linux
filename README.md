@@ -92,7 +92,6 @@ is read-only there. Use the COPR package through `rpm-ostree` instead.
 The [GNOME Shell extension](https://github.com/Almighty-Shogun/acer-nitro-sense-linux-gnome-extension) is optional and distributed separately. Install the
 daemon first, then install the extension if you want panel status and controls.
 
-
 ## 🧹 Uninstall
 ```sh
 # Fedora
