@@ -95,7 +95,9 @@ static bool json_value_ended(const char* p)
  * Read and validate an integer JSON key.
  *
  * The parser rejects missing keys, overflow, trailing garbage, and values that
- * cannot fit in the daemon's integer fields.
+ * cannot fit in the daemon's integer fields. Number syntax is checked against
+ * the JSON grammar first, so a leading plus sign or leading zero is refused
+ * even though `strtol` would accept both.
  */
 bool json_int_key_checked(const char* json, const char* key, int* out)
 {
@@ -108,6 +110,14 @@ bool json_int_key_checked(const char* json, const char* key, int* out)
     p = json_after_colon(p);
 
     if (!p)
+        return false;
+
+    const char* digits = *p == '-' ? p + 1 : p;
+
+    if (*digits < '0' || *digits > '9')
+        return false;
+
+    if (*digits == '0' && digits[1] >= '0' && digits[1] <= '9')
         return false;
 
     errno = 0;
