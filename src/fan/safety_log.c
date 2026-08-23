@@ -39,8 +39,7 @@ static void log_safety_active(
     const int effective_percent
 )
 {
-    if (daemon_quiet_logs)
-        return;
+    if (daemon_quiet_logs) return;
 
     fprintf(
         stderr,
@@ -70,8 +69,7 @@ static void log_safety_cleared(
     const int effective_percent
 )
 {
-    if (daemon_quiet_logs)
-        return;
+    if (daemon_quiet_logs) return;
 
     fprintf(
         stderr,

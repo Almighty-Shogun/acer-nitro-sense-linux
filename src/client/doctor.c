@@ -94,8 +94,7 @@ int client_doctor(void)
     doctor_run_command("power_supply", DOCTOR_PROBE_POWER_SUPPLY);
 
     doctor_print_section("Keyboard Backlight");
-    doctor_run_daemon_command("keyboard_backlight", "keyboard-backlight status",
-                              "keyboard-backlight status\n");
+    doctor_run_daemon_command("keyboard_backlight", "keyboard-backlight status", "keyboard-backlight status\n");
     doctor_run_command("leds", DOCTOR_PROBE_LED_LIST);
     doctor_run_command("led_details", DOCTOR_PROBE_LED_DETAILS);
 

@@ -116,7 +116,7 @@ static bool initialize_nvml_device(
  */
 static bool read_nvml_temperature_sample(
     const nvml_device_get_temperature_fn get_temperature,
-    const nvmlDevice_t device,
+    nvmlDevice_t device, /* NOLINT(misc-const-correctness): NVML handle is an opaque pointer typedef. */
     unsigned int* temp
 )
 {
@@ -129,7 +129,10 @@ static bool read_nvml_temperature_sample(
  * A failed read returns `-1` so higher-level sensor code can fall back to sysfs
  * or report an unavailable GPU temperature.
  */
-static int read_nvml_temperature_c(const nvml_device_get_temperature_fn get_temperature, const nvmlDevice_t device)
+static int read_nvml_temperature_c(
+    const nvml_device_get_temperature_fn get_temperature,
+    nvmlDevice_t device /* NOLINT(misc-const-correctness): NVML handle is an opaque pointer typedef. */
+)
 {
     unsigned int temp;
 

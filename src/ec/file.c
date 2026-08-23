@@ -15,7 +15,7 @@
  * writes behind one small interface. Callers should not care whether the byte
  * came from acpi_ec, a file, or tests.
  */
-int ec_open_file_backend(const char *path, const enum ec_backend backend, const char *name, struct ec_device *ec)
+int ec_open_file_backend(const char* path, const enum ec_backend backend, const char* name, struct ec_device* ec)
 {
     ec->fd = open(path, O_RDWR | O_CLOEXEC);
 
@@ -36,14 +36,16 @@ int ec_open_file_backend(const char *path, const enum ec_backend backend, const 
  * writes behind one small interface. Callers should not care whether the byte
  * came from acpi_ec, a file, or tests.
  */
-int ec_file_read_byte(const struct ec_device *ec, const int reg)
+int ec_file_read_byte(const struct ec_device* ec, const int reg)
 {
     ssize_t n;
     uint8_t value = 0;
 
-    do {
+    do
+    {
         n = pread(ec->fd, &value, 1, reg);
-    } while (n < 0 && errno == EINTR);
+    }
+    while (n < 0 && errno == EINTR);
 
     if (n != 1)
         return -1;
@@ -58,15 +60,17 @@ int ec_file_read_byte(const struct ec_device *ec, const int reg)
  * writes behind one small interface. Callers should not care whether the byte
  * came from acpi_ec, a file, or tests.
  */
-int ec_file_write_byte(const struct ec_device *ec, const int reg, const int value)
+int ec_file_write_byte(const struct ec_device* ec, const int reg, const int value)
 {
     ssize_t n;
 
     const uint8_t byte = (uint8_t)clamp_int(value, 0, 255);
 
-    do {
+    do
+    {
         n = pwrite(ec->fd, &byte, 1, reg);
-    } while (n < 0 && errno == EINTR);
+    }
+    while (n < 0 && errno == EINTR);
 
     return n == 1 ? 0 : -1;
 }
@@ -78,7 +82,7 @@ int ec_file_write_byte(const struct ec_device *ec, const int reg, const int valu
  * writes behind one small interface. Callers should not care whether the byte
  * came from acpi_ec, a file, or tests.
  */
-void ec_file_close(const struct ec_device *ec)
+void ec_file_close(const struct ec_device* ec)
 {
     if (ec->fd >= 0)
         close(ec->fd);

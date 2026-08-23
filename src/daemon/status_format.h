@@ -59,7 +59,7 @@ static ANS_STATUS_FORMAT_UNUSED int status_requested_percent(const fan_state* st
  * control state. They keep human CLI output and machine-readable state in
  * sync.
  */
-static inline ANS_STATUS_FORMAT_UNUSED void status_active_percent_text(
+static ANS_STATUS_FORMAT_UNUSED void status_active_percent_text(
     char* out,
     const size_t out_len,
     const bool firmware_mode,

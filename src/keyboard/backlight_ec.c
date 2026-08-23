@@ -12,6 +12,7 @@
 bool keyboard_backlight_read_ec(struct ec_device* ec, const struct ans_config* cfg, struct keyboard_backlight_status* status)
 {
     keyboard_backlight_init_status(status);
+
     string_copy(status->backend, sizeof(status->backend), "ec");
     string_copy(status->name, sizeof(status->name), "acer-ec");
 

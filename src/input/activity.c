@@ -3,7 +3,6 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <dirent.h>
-#include <limits.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdbool.h>
@@ -71,6 +70,7 @@ void input_activity_close(input_activity_monitor* monitor)
 
         monitor->fds[i] = -1;
     }
+
     monitor->fd_len = 0;
 }
 
@@ -95,8 +95,7 @@ void input_activity_open(input_activity_monitor* monitor, const int64_t now_ms)
     {
         char path[PATH_MAX];
 
-        if (strncmp(entry->d_name, "event", 5) != 0) continue;
-        if (strlen(entry->d_name) > sizeof(path) - sizeof("/dev/input/")) continue;
+        if (strncmp(entry->d_name, "event", 5) != 0 || strlen(entry->d_name) > sizeof(path) - sizeof("/dev/input/")) continue;
 
         snprintf(path, sizeof(path), "/dev/input/%s", entry->d_name);
 
@@ -149,11 +148,9 @@ void input_activity_handle_ready(input_activity_monitor* monitor, const fd_set* 
         bool active = false;
         struct input_event ev;
 
-        ssize_t n;
-
         if (monitor->fds[i] < 0 || !FD_ISSET(monitor->fds[i], readfds)) continue;
 
-        while ((n = read(monitor->fds[i], &ev, sizeof(ev))) == sizeof(ev))
+        while (read(monitor->fds[i], &ev, sizeof(ev)) == sizeof(ev))
         {
             if (ev.type == EV_KEY && ev.value != 0)
                 active = true;

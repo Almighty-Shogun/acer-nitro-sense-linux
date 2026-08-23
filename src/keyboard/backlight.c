@@ -1,7 +1,7 @@
 #include "keyboard/backlight.h"
 
-#include "keyboard/backlight_internal.h"
 #include "util/string.h"
+#include "keyboard/backlight_internal.h"
 
 #include <string.h>
 

@@ -27,8 +27,8 @@ static bool text_has_value(const char* text)
 static bool auto_ramp_bypass_temperature_reached(const struct ans_config* cfg, const fan_state* state)
 {
     return cfg->safety.auto_ramp_bypass_temperature_c > 0
-        && state->control_temp_available
-        && state->control_temp_c >= cfg->safety.auto_ramp_bypass_temperature_c;
+           && state->control_temp_available
+           && state->control_temp_c >= cfg->safety.auto_ramp_bypass_temperature_c;
 }
 
 /**
@@ -82,7 +82,8 @@ int set_fan_percent(
             requested_percent,
             effective_percent,
             state->percent,
-            reason[0] ? "active" : "ok", reason[0] ? " reason=" : "",
+            reason[0] ? "active" : "ok",
+            reason[0] ? " reason=" : "",
             reason[0] ? reason : ""
         );
 

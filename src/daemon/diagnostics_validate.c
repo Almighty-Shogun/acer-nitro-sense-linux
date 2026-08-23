@@ -120,7 +120,8 @@ void validate_model(struct ec_device* ec, const struct ans_config* cfg, const ch
 
     printf(
         DIAGNOSTIC_FORMAT_SAFETY,
-        cfg->safety.min_speed_percent, cfg->safety.min_speed_temperature_c,
+        cfg->safety.min_speed_percent,
+        cfg->safety.min_speed_temperature_c,
         cfg->safety.critical_speed_percent,
         cfg->safety.critical_full_speed ? "true" : "false",
         cfg->safety.critical_step_percent,
@@ -129,7 +130,8 @@ void validate_model(struct ec_device* ec, const struct ans_config* cfg, const ch
         cfg->safety.auto_ramp_up_percent,
         cfg->safety.auto_ramp_bypass_temperature_c,
         cfg->safety.missing_temperature_speed_percent,
-        cfg->safety.max_ec_read_failures, cfg->safety.max_ec_write_failures
+        cfg->safety.max_ec_read_failures,
+        cfg->safety.max_ec_write_failures
     );
 
     printf(
@@ -143,10 +145,14 @@ void validate_model(struct ec_device* ec, const struct ans_config* cfg, const ch
     {
         printf(
             DIAGNOSTIC_FORMAT_FAN_MODES,
-            cfg->fan_modes.cpu_reg, cfg->fan_modes.gpu_reg,
-            cfg->fan_modes.cpu_auto_value, cfg->fan_modes.cpu_manual_value,
-            cfg->fan_modes.cpu_turbo_value, cfg->fan_modes.gpu_auto_value,
-            cfg->fan_modes.gpu_manual_value, cfg->fan_modes.gpu_turbo_value
+            cfg->fan_modes.cpu_reg,
+            cfg->fan_modes.gpu_reg,
+            cfg->fan_modes.cpu_auto_value,
+            cfg->fan_modes.cpu_manual_value,
+            cfg->fan_modes.cpu_turbo_value,
+            cfg->fan_modes.gpu_auto_value,
+            cfg->fan_modes.gpu_manual_value,
+            cfg->fan_modes.gpu_turbo_value
         );
     }
     else

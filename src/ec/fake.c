@@ -16,10 +16,9 @@
  * writes behind one small interface. Callers should not care whether the byte
  * came from acpi_ec, a file, or tests.
  */
-static void fake_set_word(struct ec_device *ec, const int reg, const int value)
+static void fake_set_word(struct ec_device* ec, const int reg, const int value)
 {
-    if (reg < 0 || reg + 1 >= (int)sizeof(ec->fake_regs))
-        return;
+    if (reg < 0 || reg + 1 >= (int)sizeof(ec->fake_regs)) return;
 
     ec->fake_regs[reg] = (uint8_t)(value & 0xff);
     ec->fake_regs[reg + 1] = (uint8_t)((value >> 8) & 0xff);
@@ -34,9 +33,9 @@ static void fake_set_word(struct ec_device *ec, const int reg, const int value)
  */
 static bool fake_ec_write_should_fail(const int reg)
 {
-    char *end;
+    char* end;
 
-    const char *fail_reg = getenv("ANS_FAKE_EC_WRITE_FAIL_REG");
+    const char* fail_reg = getenv("ANS_FAKE_EC_WRITE_FAIL_REG");
 
     if (!fail_reg || fail_reg[0] == '\0')
         return false;
@@ -56,7 +55,7 @@ static bool fake_ec_write_should_fail(const int reg)
  * writes behind one small interface. Callers should not care whether the byte
  * came from acpi_ec, a file, or tests.
  */
-int ec_open_fake(struct ec_device *ec)
+int ec_open_fake(struct ec_device* ec)
 {
     ec->fd = -1;
     ec->backend = EC_BACKEND_FAKE;
@@ -76,9 +75,10 @@ int ec_open_fake(struct ec_device *ec)
  * writes behind one small interface. Callers should not care whether the byte
  * came from acpi_ec, a file, or tests.
  */
-int ec_fake_read_byte(const struct ec_device *ec, const int reg)
+int ec_fake_read_byte(const struct ec_device* ec, const int reg)
 {
-    if (reg < 0 || reg >= (int)sizeof(ec->fake_regs)) {
+    if (reg < 0 || reg >= (int)sizeof(ec->fake_regs))
+    {
         errno = ERANGE;
 
         return -1;
@@ -94,15 +94,17 @@ int ec_fake_read_byte(const struct ec_device *ec, const int reg)
  * writes behind one small interface. Callers should not care whether the byte
  * came from acpi_ec, a file, or tests.
  */
-int ec_fake_write_byte(struct ec_device *ec, const int reg, const int value)
+int ec_fake_write_byte(struct ec_device* ec, const int reg, const int value)
 {
-    if (reg < 0 || reg >= (int)sizeof(ec->fake_regs)) {
+    if (reg < 0 || reg >= (int)sizeof(ec->fake_regs))
+    {
         errno = ERANGE;
 
         return -1;
     }
 
-    if (fake_ec_write_should_fail(reg)) {
+    if (fake_ec_write_should_fail(reg))
+    {
         errno = EIO;
 
         return -1;

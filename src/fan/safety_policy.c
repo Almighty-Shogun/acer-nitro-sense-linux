@@ -107,6 +107,7 @@ int fan_safety_adjust_percent(
     if (state->control_temp_c >= cfg->safety.min_speed_temperature_c && percent < cfg->safety.min_speed_percent)
     {
         *reason = "minimum-safe-speed";
+
         percent = cfg->safety.min_speed_percent;
     }
 

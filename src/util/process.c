@@ -1,11 +1,11 @@
 #include "util/process.h"
 
 #include <errno.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <sys/wait.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 /**
  * Free a mutable argv copy built for exec.
@@ -132,7 +132,7 @@ FILE* process_open_output(const char* file, const char* const argv[], const bool
 
         close(fds[0]);
 
-        while (waitpid(pid, NULL, 0) < 0 && errno == EINTR);
+        while (waitpid(pid, NULL, 0) < 0 && errno == EINTR) {}
 
         errno = saved_errno;
 

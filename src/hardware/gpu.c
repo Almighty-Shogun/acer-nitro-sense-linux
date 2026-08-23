@@ -58,8 +58,8 @@ static bool parse_lspci_gpu_fields(
 )
 {
     return extract_lspci_field(line, 0, class, class_len)
-        && extract_lspci_field(line, 1, vendor, vendor_len)
-        && extract_lspci_field(line, 2, device, device_len);
+           && extract_lspci_field(line, 1, vendor, vendor_len)
+           && extract_lspci_field(line, 2, device, device_len);
 }
 
 /**
@@ -71,8 +71,8 @@ static bool parse_lspci_gpu_fields(
 static bool is_gpu_class(const char* class)
 {
     return string_contains_case(class, "vga")
-        || string_contains_case(class, "3d")
-        || string_contains_case(class, "display");
+           || string_contains_case(class, "3d")
+           || string_contains_case(class, "display");
 }
 
 /**
@@ -141,11 +141,20 @@ void load_gpu_name(char* out, const size_t out_len)
     {
         char class[96], vendor[128], device[160], name[160];
 
-        if (!parse_lspci_gpu_fields(line, class, sizeof(class), vendor, sizeof(vendor), device, sizeof(device))) continue;
+        const bool is_gpu_fields = parse_lspci_gpu_fields(
+            line,
+            class,
+            sizeof(class),
+            vendor,
+            sizeof(vendor),
+            device,
+            sizeof(device)
+        );
 
-        if (!is_gpu_class(class)) continue;
+        if (!is_gpu_fields || !is_gpu_class(class)) continue;
 
         simplify_gpu_name(vendor, device, name, sizeof(name));
+
         const bool is_nvidia = string_contains_case(vendor, "nvidia");
 
         if (strcmp(fallback, "GPU") == 0)

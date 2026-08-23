@@ -84,7 +84,10 @@ static bool read_trimmed_file(const char* path, char* out, const size_t out_len)
  */
 static bool power_supply_type_is_mains(const char* type)
 {
-    return strcmp(type, "Mains") == 0 || strcmp(type, "USB") == 0 || strcmp(type, "USB-C") == 0 || strcmp(type, "USB_PD") == 0;
+    return strcmp(type, "Mains") == 0
+           || strcmp(type, "USB") == 0
+           || strcmp(type, "USB-C") == 0
+           || strcmp(type, "USB_PD") == 0;
 }
 
 /**
@@ -130,14 +133,12 @@ enum power_source_state read_power_source(void)
     {
         char path[512], type_path[1024], type[64];
 
-        if (entry->d_name[0] == '.')
-            continue;
+        if (entry->d_name[0] == '.') continue;
 
         snprintf(path, sizeof(path), "/sys/class/power_supply/%s", entry->d_name);
         snprintf(type_path, sizeof(type_path), "%s/type", path);
 
-        if (!read_trimmed_file(type_path, type, sizeof(type)))
-            continue;
+        if (!read_trimmed_file(type_path, type, sizeof(type))) continue;
 
         if (strcmp(type, "Battery") == 0)
         {

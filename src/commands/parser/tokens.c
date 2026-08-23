@@ -236,7 +236,7 @@ bool command_parse_int_action(
     char value_text[16];
 
     return command_parse_action(cmd, expected_command, value_text, sizeof(value_text))
-        && command_parse_int_token(value_text, min_value, max_value, value);
+           && command_parse_int_token(value_text, min_value, max_value, value);
 }
 
 /**
@@ -258,5 +258,5 @@ bool command_parse_int_sub_action(
     char value_text[16];
 
     return command_parse_sub_action(cmd, expected_command, expected_action, value_text, sizeof(value_text))
-        && command_parse_int_token(value_text, min_value, max_value, value);
+           && command_parse_int_token(value_text, min_value, max_value, value);
 }

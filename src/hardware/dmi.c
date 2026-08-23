@@ -1,8 +1,8 @@
 #include "hardware/hardware.h"
 
-#include "config/types.h"
 #include "util/file.h"
 #include "util/string.h"
+#include "config/types.h"
 
 #include <stdio.h>
 #include <stdlib.h>

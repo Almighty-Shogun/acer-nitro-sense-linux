@@ -16,8 +16,9 @@ void apply_sensor_power_control(const struct ans_config* cfg, const char* contro
 {
     for (int i = 0; i < cfg->fan_len; i++)
     {
-        const struct fan_config* fan = &cfg->fans[i];
         const char* target = "";
+
+        const struct fan_config* fan = &cfg->fans[i];
 
         if (strcmp(control, "auto") == 0 && fan->sensor_power_control[0])
         {

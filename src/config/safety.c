@@ -107,17 +107,17 @@ static bool parse_safety_policy(const char* safety, struct ans_config* cfg)
     );
 
     return min_speed_valid
-        && min_speed_temperature_valid
-        && critical_speed_valid
-        && critical_full_speed_valid
-        && critical_step_valid
-        && critical_samples_valid
-        && critical_release_temperature_valid
-        && auto_ramp_up_valid
-        && auto_ramp_bypass_temperature_valid
-        && missing_temperature_speed_valid
-        && max_read_failures_valid
-        && max_write_failures_valid;
+           && min_speed_temperature_valid
+           && critical_speed_valid
+           && critical_full_speed_valid
+           && critical_step_valid
+           && critical_samples_valid
+           && critical_release_temperature_valid
+           && auto_ramp_up_valid
+           && auto_ramp_bypass_temperature_valid
+           && missing_temperature_speed_valid
+           && max_read_failures_valid
+           && max_write_failures_valid;
 }
 
 /**

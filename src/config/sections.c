@@ -81,11 +81,11 @@ static bool parse_fan_mode_values(const char* fan_modes, struct ans_config* cfg)
     );
 
     return cpu_auto_valid
-        && cpu_manual_valid
-        && cpu_turbo_valid
-        && gpu_auto_valid
-        && gpu_manual_valid
-        && gpu_turbo_valid;
+           && cpu_manual_valid
+           && cpu_turbo_valid
+           && gpu_auto_valid
+           && gpu_manual_valid
+           && gpu_turbo_valid;
 }
 
 /**
@@ -97,11 +97,11 @@ static bool parse_fan_mode_values(const char* fan_modes, struct ans_config* cfg)
 static bool fan_mode_values_valid(const struct ans_config* cfg)
 {
     return config_byte_value_valid(cfg->fan_modes.cpu_auto_value)
-        && config_byte_value_valid(cfg->fan_modes.cpu_manual_value)
-        && config_byte_value_valid(cfg->fan_modes.cpu_turbo_value)
-        && config_byte_value_valid(cfg->fan_modes.gpu_auto_value)
-        && config_byte_value_valid(cfg->fan_modes.gpu_manual_value)
-        && config_byte_value_valid(cfg->fan_modes.gpu_turbo_value);
+           && config_byte_value_valid(cfg->fan_modes.cpu_manual_value)
+           && config_byte_value_valid(cfg->fan_modes.cpu_turbo_value)
+           && config_byte_value_valid(cfg->fan_modes.gpu_auto_value)
+           && config_byte_value_valid(cfg->fan_modes.gpu_manual_value)
+           && config_byte_value_valid(cfg->fan_modes.gpu_turbo_value);
 }
 
 /**

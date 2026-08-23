@@ -17,7 +17,7 @@
  */
 static bool lockdown_blocks_raw_io(void)
 {
-    char *lockdown = read_text_file("/sys/kernel/security/lockdown", 256);
+    char* lockdown = read_text_file("/sys/kernel/security/lockdown", 256);
 
     if (!lockdown)
         return false;
@@ -45,7 +45,8 @@ void print_ec_open_error(void)
     perror("EC backend");
     fprintf(stderr, "EC access failed. Tried ec_sys, acpi_ec (/dev/ec), then direct EC I/O ports.\n");
 
-    if (saved_errno == EPERM && lockdown_blocks_raw_io()) {
+    if (saved_errno == EPERM && lockdown_blocks_raw_io())
+    {
         fprintf(stderr, "Kernel lockdown is active and blocks direct EC I/O even as root.\n");
         fprintf(stderr, "This kernel also needs CONFIG_ACPI_EC_DEBUGFS for the ec_sys backend.\n");
 

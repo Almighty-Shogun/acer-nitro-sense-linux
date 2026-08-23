@@ -50,8 +50,7 @@ int json_append_string(text_buffer* out, const char* value)
                 if (text_buffer_append(out, "\\t") < 0)
                     return -1;
                 break;
-            default:
-            {
+            default: {
                 const int append_result = *p < 0x20 ? text_buffer_append(out, "\\u%04x", *p) : text_buffer_append(out, "%c", *p);
 
                 if (append_result < 0)

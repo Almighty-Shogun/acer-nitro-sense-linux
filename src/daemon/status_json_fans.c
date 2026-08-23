@@ -43,8 +43,11 @@ void append_fan_status_json(
         "\"control_temp_c\": %d, \"control_sensor_temp_c\": %d, "
         "\"temp_available\": %s, \"control_temp_available\": %s, "
         "\"control\": ",
-        states[index].rpm, states[index].temp_c, states[index].sensor_temp_c,
-        states[index].control_temp_c, states[index].control_sensor_temp_c,
+        states[index].rpm,
+        states[index].temp_c,
+        states[index].sensor_temp_c,
+        states[index].control_temp_c,
+        states[index].control_sensor_temp_c,
         bool_text(states[index].temp_available),
         bool_text(states[index].control_temp_available)
     );
@@ -68,7 +71,8 @@ void append_fan_status_json(
         states[index].percent,
         states[index].write_value,
         states[index].critical_temp_samples,
-        states[index].ec_read_failures, states[index].ec_write_failures,
+        states[index].ec_read_failures,
+        states[index].ec_write_failures,
         bool_text(states[index].safety_active)
     );
 

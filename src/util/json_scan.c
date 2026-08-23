@@ -128,7 +128,6 @@ const char* json_next_object(const char* p, const char* end, const char** obj_en
  */
 void json_copy_slice(const char* start, const char* end, char* out, const size_t out_len)
 {
-
     if (!out || out_len == 0) return;
 
     if (!start || !end || end < start)

@@ -80,8 +80,7 @@ static void restore_firmware_auto_mode_if_needed(
     const bool safety_is_active
 )
 {
-    if (!should_restore_firmware_auto_mode(firmware_auto, safety_was_active, safety_is_active))
-        return;
+    if (!should_restore_firmware_auto_mode(firmware_auto, safety_was_active, safety_is_active)) return;
 
     if (!apply_firmware_auto_fan_mode(ec, cfg) && !daemon_quiet_logs)
         fprintf(stderr, "warning: failed to restore firmware-auto fan mode after safety override\n");

@@ -205,6 +205,6 @@ bool command_is_exact(const char* cmd, const char* name)
     const char* cursor = cmd;
 
     return command_read_token(&cursor, command, sizeof(command))
-        && strcmp(command, name) == 0
-        && command_has_only_trailing_space(cursor);
+           && strcmp(command, name) == 0
+           && command_has_only_trailing_space(cursor);
 }

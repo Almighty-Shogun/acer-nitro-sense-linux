@@ -31,7 +31,8 @@ void reply_status(
         STATUS_REPLY_FORMAT_MODEL,
         cfg->model,
         control_mode(auto_mode, preset),
-        auto_mode ? 1 : 0, preset,
+        auto_mode ? 1 : 0,
+        preset,
         cfg->fan_modes.available ? (coolboost_enabled ? "on" : "off") : "unavailable",
         power_source_name(power_source)
     );
@@ -54,14 +55,20 @@ void reply_status(
         control_reply(
             client,
             STATUS_REPLY_FORMAT_FAN,
-            cfg->fans[i].id, states[i].rpm, states[i].temp_c,
-            control, active_percent, status_requested_percent(&states[i]),
+            cfg->fans[i].id,
+            states[i].rpm,
+            states[i].temp_c,
+            control,
+            active_percent,
+            status_requested_percent(&states[i]),
             states[i].percent,
-            states[i].percent, states[i].write_value,
+            states[i].percent,
+            states[i].write_value,
             states[i].safety_active ? "active" : "ok",
             states[i].safety_active ? " reason=" : "",
             states[i].safety_active ? states[i].safety_reason : "",
-            states[i].critical_temp_samples, states[i].ec_read_failures,
+            states[i].critical_temp_samples,
+            states[i].ec_read_failures,
             states[i].ec_write_failures
         );
     }

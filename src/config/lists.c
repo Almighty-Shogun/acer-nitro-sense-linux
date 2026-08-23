@@ -54,8 +54,8 @@ static int parse_init_write(const char* write_json, struct ec_write_config* writ
     const bool fields_present = has_register && has_value && has_reset_value;
 
     const bool byte_values_valid = config_byte_value_valid(write->reg)
-        && config_byte_value_valid(write->value)
-        && config_byte_value_valid(write->reset_value);
+                                   && config_byte_value_valid(write->value)
+                                   && config_byte_value_valid(write->reset_value);
 
     return fields_present && byte_values_valid
                ? 0

@@ -17,9 +17,9 @@
 static bool candidate_name(const char* name)
 {
     return string_contains_case(name, "kbd_backlight")
-    || (string_contains_case(name, "keyboard") && string_contains_case(name, "backlight"))
-    || string_contains_case(name, "::kbd")
-    || string_contains_case(name, "platform::kbd");
+           || (string_contains_case(name, "keyboard") && string_contains_case(name, "backlight"))
+           || string_contains_case(name, "::kbd")
+           || string_contains_case(name, "platform::kbd");
 }
 
 /**
@@ -88,8 +88,7 @@ bool keyboard_backlight_read_sysfs(struct keyboard_backlight_status* status)
         char brightness_path[640];
         char max_brightness_path[640];
 
-        if (entry->d_name[0] == '.' || !candidate_name(entry->d_name)) continue;
-        if (!init_sysfs_status(status, entry->d_name)) continue;
+        if (entry->d_name[0] == '.' || !candidate_name(entry->d_name) || !init_sysfs_status(status, entry->d_name)) continue;
 
         snprintf(brightness_path, sizeof(brightness_path), "%s/brightness", status->path);
         snprintf(max_brightness_path, sizeof(max_brightness_path), "%s/max_brightness", status->path);

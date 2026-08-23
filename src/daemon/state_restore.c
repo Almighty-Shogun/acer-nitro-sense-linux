@@ -44,10 +44,15 @@ static void restore_runtime_state_from_json(const struct ans_config* cfg, daemon
 {
     if (!runtime) return;
 
+    const bool keyboard_backlight_timeout_enabled = json_bool_key(
+        json,
+        "keyboard_backlight_timeout_enabled",
+        cfg->keyboard_backlight.timeout_default_enabled
+    );
+
     runtime->power_source_auto_apply = json_bool_key(json, "power_source_auto_apply", cfg->power_source_profiles.auto_apply);
 
-    runtime->keyboard_backlight_timeout_enabled = cfg->keyboard_backlight.timeout_supported
-        && json_bool_key(json, "keyboard_backlight_timeout_enabled", cfg->keyboard_backlight.timeout_default_enabled);
+    runtime->keyboard_backlight_timeout_enabled = cfg->keyboard_backlight.timeout_supported && keyboard_backlight_timeout_enabled;
 
     runtime->keyboard_backlight_timeout_seconds = cfg->keyboard_backlight.timeout_seconds;
 }
@@ -68,8 +73,7 @@ static void apply_saved_fan_percentages(
 {
     for (int i = 0; i < cfg->fan_len; i++)
     {
-        const int percent = json_saved_percent_for_fan(
-            json, cfg->fans[i].id, cfg->fans[i].reset_speed);
+        const int percent = json_saved_percent_for_fan(json, cfg->fans[i].id, cfg->fans[i].reset_speed);
 
         set_fan_percent(ec, cfg, &cfg->fans[i], &states[i], percent, global_safety_reason(cfg, states));
     }

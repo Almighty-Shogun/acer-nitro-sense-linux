@@ -22,11 +22,11 @@ static bool parse_curve_entry(const char* threshold_json, struct threshold* thre
         return false;
 
     return threshold->up >= 0
-        && threshold->up <= 130
-        && threshold->down >= 0
-        && threshold->down <= 130
-        && threshold->down <= threshold->up
-        && config_speed_value_valid(threshold->speed);
+           && threshold->up <= 130
+           && threshold->down >= 0
+           && threshold->down <= 130
+           && threshold->down <= threshold->up
+           && config_speed_value_valid(threshold->speed);
 }
 
 /**
@@ -246,11 +246,11 @@ static int parse_fan_numeric_limits(const char* fan_json, struct fan_config* fan
     );
 
     const bool numeric_limits_valid = read_min_valid
-        && read_max_valid
-        && write_min_valid
-        && write_max_valid
-        && reset_speed_valid
-        && missing_temperature_speed_valid;
+                                      && read_max_valid
+                                      && write_min_valid
+                                      && write_max_valid
+                                      && reset_speed_valid
+                                      && missing_temperature_speed_valid;
 
     if (!numeric_limits_valid)
         return config_invalid("fan numeric limits are invalid");
@@ -269,8 +269,8 @@ static int validate_fan_numeric_ranges(const struct fan_config* fan)
     const bool read_range_valid = fan->read_min >= 0 && fan->read_max > fan->read_min;
 
     const bool write_range_valid = fan->write_min >= 0
-        && fan->write_max <= 100
-        && fan->write_max > fan->write_min;
+                                   && fan->write_max <= 100
+                                   && fan->write_max > fan->write_min;
 
     const bool reset_speed_valid = fan->reset_speed >= fan->write_min && fan->reset_speed <= fan->write_max;
 

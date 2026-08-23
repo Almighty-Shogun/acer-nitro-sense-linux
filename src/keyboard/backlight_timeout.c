@@ -19,9 +19,9 @@
 static bool keyboard_backlight_timeout_can_run(const struct ans_config* cfg, const daemon_runtime_state* runtime)
 {
     return cfg->keyboard_backlight.available
-        && cfg->keyboard_backlight.timeout_supported
-        && runtime->keyboard_backlight_timeout_enabled
-        && runtime->keyboard_backlight_timeout_seconds > 0;
+           && cfg->keyboard_backlight.timeout_supported
+           && runtime->keyboard_backlight_timeout_enabled
+           && runtime->keyboard_backlight_timeout_seconds > 0;
 }
 
 /**
@@ -106,7 +106,7 @@ static void keyboard_backlight_log_restored(const struct keyboard_backlight_stat
 void keyboard_backlight_timeout_init(const struct ans_config* cfg, daemon_runtime_state* runtime)
 {
     runtime->keyboard_backlight_timeout_enabled = cfg->keyboard_backlight.timeout_supported
-        && cfg->keyboard_backlight.timeout_default_enabled;
+                                                  && cfg->keyboard_backlight.timeout_default_enabled;
 
     runtime->keyboard_backlight_timeout_seconds = cfg->keyboard_backlight.timeout_seconds;
     runtime->keyboard_backlight_timed_off = false;
@@ -152,6 +152,7 @@ void keyboard_backlight_timeout_tick(
         if (keyboard_backlight_set_percent(ec, cfg, 0, &status))
         {
             runtime->keyboard_backlight_timed_off = true;
+
             keyboard_backlight_log_timed_off(idle_ms, runtime->keyboard_backlight_restore_percent);
         }
 

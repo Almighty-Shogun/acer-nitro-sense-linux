@@ -229,6 +229,6 @@ bool client_can_control(const int client)
         return false;
 
     return cred.gid == group->gr_gid
-        || pid_has_group(cred.pid, group->gr_gid)
-        || uid_is_group_member(cred.uid, group->gr_gid);
+           || pid_has_group(cred.pid, group->gr_gid)
+           || uid_is_group_member(cred.uid, group->gr_gid);
 }

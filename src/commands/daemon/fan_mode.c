@@ -33,9 +33,27 @@ typedef struct
  * must be persisted after the EC write succeeds.
  */
 static const fan_mode_action FAN_MODE_ACTIONS[] = {
-    {.name = "auto", .coolboost_enabled = false, .updates_control_mode = true, .preset = NULL, .apply_current_control = false},
-    {.name = "manual", .coolboost_enabled = false, .updates_control_mode = true, .preset = "manual", .apply_current_control = true},
-    {.name = "turbo", .coolboost_enabled = true, .updates_control_mode = false, .preset = NULL, .apply_current_control = false},
+    {
+        .name = "auto",
+        .coolboost_enabled = false,
+        .updates_control_mode = true,
+        .preset = NULL,
+        .apply_current_control = false
+    },
+    {
+        .name = "manual",
+        .coolboost_enabled = false,
+        .updates_control_mode = true,
+        .preset = "manual",
+        .apply_current_control = true
+    },
+    {
+        .name = "turbo",
+        .coolboost_enabled = true,
+        .updates_control_mode = false,
+        .preset = NULL,
+        .apply_current_control = false
+    },
 };
 
 /**

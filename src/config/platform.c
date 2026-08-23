@@ -201,11 +201,11 @@ static bool parse_keyboard_backlight_fields(const char* section, struct ans_conf
     );
 
     return has_register
-        && has_max_value
-        && has_min_value
-        && timeout_supported_valid
-        && timeout_default_valid
-        && timeout_seconds_valid;
+           && has_max_value
+           && has_min_value
+           && timeout_supported_valid
+           && timeout_default_valid
+           && timeout_seconds_valid;
 }
 
 /**
@@ -217,8 +217,8 @@ static bool parse_keyboard_backlight_fields(const char* section, struct ans_conf
 static bool keyboard_backlight_values_valid(const struct ans_config* cfg, const int reg, const int min_value, const int max_value)
 {
     const bool byte_values_valid = config_byte_value_valid(reg)
-        && config_byte_value_valid(min_value)
-        && config_byte_value_valid(max_value);
+                                   && config_byte_value_valid(min_value)
+                                   && config_byte_value_valid(max_value);
 
     const bool brightness_range_valid = min_value < max_value;
     const bool timeout_seconds_valid = cfg->keyboard_backlight.timeout_seconds >= 5 && cfg->keyboard_backlight.timeout_seconds <= 3600;

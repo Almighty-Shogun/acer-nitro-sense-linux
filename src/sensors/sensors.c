@@ -23,14 +23,14 @@ bool sensor_group_matches(const char* group, const char* name)
 
     if (strcmp(group, "cpu") == 0)
         return string_contains_case(name, "coretemp")
-            || string_contains_case(name, "k10temp")
-            || string_contains_case(name, "zenpower");
+               || string_contains_case(name, "k10temp")
+               || string_contains_case(name, "zenpower");
 
     if (strcmp(group, "gpu") == 0)
         return string_contains_case(name, "amdgpu")
-            || string_contains_case(name, "nvidia")
-            || string_contains_case(name, "nouveau")
-            || string_contains_case(name, "radeon");
+               || string_contains_case(name, "nvidia")
+               || string_contains_case(name, "nouveau")
+               || string_contains_case(name, "radeon");
 
     return false;
 }
