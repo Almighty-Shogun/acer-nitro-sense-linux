@@ -1,0 +1,116 @@
+#include "ec/backend.h"
+
+#include "util/number.h"
+#include "util/string.h"
+
+#include <errno.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
+/**
+ * Set word.
+ *
+ * EC access is hardware-sensitive, so backend helpers keep raw reads and
+ * writes behind one small interface. Callers should not care whether the byte
+ * came from acpi_ec, a file, or tests.
+ */
+static void fake_set_word(struct ec_device* ec, const int reg, const int value)
+{
+    if (reg < 0 || reg + 1 >= (int)sizeof(ec->fake_regs)) return;
+
+    ec->fake_regs[reg] = (uint8_t)(value & 0xff);
+    ec->fake_regs[reg + 1] = (uint8_t)((value >> 8) & 0xff);
+}
+
+/**
+ * Write should fail.
+ *
+ * EC access is hardware-sensitive, so backend helpers keep raw reads and
+ * writes behind one small interface. Callers should not care whether the byte
+ * came from acpi_ec, a file, or tests.
+ */
+static bool fake_ec_write_should_fail(const int reg)
+{
+    char* end;
+
+    const char* fail_reg = getenv("ANS_FAKE_EC_WRITE_FAIL_REG");
+
+    if (!fail_reg || fail_reg[0] == '\0')
+        return false;
+
+    if (strcmp(fail_reg, "all") == 0)
+        return true;
+
+    const long parsed = strtol(fail_reg, &end, 0);
+
+    return end != fail_reg && *end == '\0' && parsed == reg;
+}
+
+/**
+ * Open EC fake.
+ *
+ * EC access is hardware-sensitive, so backend helpers keep raw reads and
+ * writes behind one small interface. Callers should not care whether the byte
+ * came from acpi_ec, a file, or tests.
+ */
+int ec_open_fake(struct ec_device* ec)
+{
+    ec->fd = -1;
+    ec->backend = EC_BACKEND_FAKE;
+
+    string_copy(ec->name, sizeof(ec->name), "fake");
+
+    fake_set_word(ec, 0x13, 3000);
+    fake_set_word(ec, 0x15, 2600);
+
+    return 0;
+}
+
+/**
+ * Read byte.
+ *
+ * EC access is hardware-sensitive, so backend helpers keep raw reads and
+ * writes behind one small interface. Callers should not care whether the byte
+ * came from acpi_ec, a file, or tests.
+ */
+int ec_fake_read_byte(const struct ec_device* ec, const int reg)
+{
+    if (reg < 0 || reg >= (int)sizeof(ec->fake_regs))
+    {
+        errno = ERANGE;
+
+        return -1;
+    }
+
+    return ec->fake_regs[reg];
+}
+
+/**
+ * Write byte.
+ *
+ * EC access is hardware-sensitive, so backend helpers keep raw reads and
+ * writes behind one small interface. Callers should not care whether the byte
+ * came from acpi_ec, a file, or tests.
+ */
+int ec_fake_write_byte(struct ec_device* ec, const int reg, const int value)
+{
+    if (reg < 0 || reg >= (int)sizeof(ec->fake_regs))
+    {
+        errno = ERANGE;
+
+        return -1;
+    }
+
+    if (fake_ec_write_should_fail(reg))
+    {
+        errno = EIO;
+
+        return -1;
+    }
+
+    ec->fake_regs[reg] = (uint8_t)clamp_int(value, 0, 255);
+
+    return 0;
+}

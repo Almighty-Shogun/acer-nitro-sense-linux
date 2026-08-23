@@ -1,0 +1,470 @@
+name: 🚀 Release
+
+on:
+    release:
+        types: [ published ]
+
+permissions:
+    contents: write
+
+concurrency:
+    group: release-${{ github.event.release.tag_name }}
+    cancel-in-progress: false
+
+jobs:
+    debian:
+        name: 📦 Build generic and Debian assets
+        runs-on: ubuntu-latest
+        container:
+            image: debian:12
+
+        env:
+            RELEASE_TAG: ${{ github.event.release.tag_name }}
+            DEB_RELEASE: "1"
+            DEFAULT_MODEL: acer-nitro-an517-51
+
+        steps:
+            -   name: ⚙️ Validate release version
+                run: |
+                    set -Eeuo pipefail
+
+                    [[ "${RELEASE_TAG}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+                    [[ "$(git rev-parse "${RELEASE_TAG}^{commit}")" == "$(git rev-parse HEAD)" ]]
+
+                    {
+                        echo "VERSION=${RELEASE_TAG}"
+                        echo "PACKAGE_NAME=acer-nitro-sense-linux"
+                        echo "SOURCE_ARCHIVE=build/meson-dist/acer-nitro-sense-linux-${RELEASE_TAG}.tar.gz"
+                        echo "RUN_ASSET=acer-nitro-sense-linux-${RELEASE_TAG}.run"
+                        echo "DEB_ASSET=acer-nitro-sense-linux_${RELEASE_TAG}-${DEB_RELEASE}_amd64.deb"
+                    } >> "${GITHUB_ENV}"
+
+            -   name: 👀 Checkout
+                uses: actions/checkout@v6
+
+            -   name: ⚙️ Install build dependencies
+                run: |
+                    set -Eeuo pipefail
+
+                    apt-get update
+                    apt-get install -y --no-install-recommends \
+                        ca-certificates \
+                        coreutils \
+                        dpkg-dev \
+                        file \
+                        findutils \
+                        gcc \
+                        git \
+                        gzip \
+                        libsystemd-dev \
+                        meson \
+                        ninja-build \
+                        pkg-config \
+                        tar
+
+            -   name: ⚙️ Trust checked-out workspace
+                run: |
+                    set -Eeuo pipefail
+                    git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+
+            -   name: 🔨 Build and test
+                run: |
+                    set -Eeuo pipefail
+
+                    meson setup build --wipe \
+                        --prefix=/usr \
+                        --sysconfdir=/etc \
+                        --buildtype=release
+                    meson compile -C build
+                    meson test -C build --print-errorlogs
+
+                    MESON_VERSION="$(
+                        meson introspect build --projectinfo |
+                            sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p'
+                    )"
+                    [[ "${MESON_VERSION}" == "${VERSION}" ]]
+
+            -   name: 🔨 Warning-as-error build and test
+                run: |
+                    set -Eeuo pipefail
+
+                    meson setup build-review --wipe \
+                        --prefix=/usr \
+                        --sysconfdir=/etc \
+                        --buildtype=release \
+                        -Ddev_checks=true \
+                        -Dwarning_level=3 \
+                        -Dwerror=true
+                    meson compile -C build-review
+                    meson test -C build-review --print-errorlogs
+
+            -   name: 🔨 Build source archive
+                run: |
+                    set -Eeuo pipefail
+
+                    meson dist -C build --formats=gztar
+                    [[ -f "${SOURCE_ARCHIVE}" ]]
+
+            -   name: 🔨 Stage install tree
+                run: |
+                    set -Eeuo pipefail
+
+                    rm -rf package-root
+                    DESTDIR="${PWD}/package-root" meson install -C build
+
+                    mkdir -p package-root/etc/acer-nitro-sense
+                    ln -sfn \
+                        "../../usr/share/acer-nitro-sense/models/${DEFAULT_MODEL}.json" \
+                        package-root/etc/acer-nitro-sense/model.json
+
+            -   name: 🔨 Build runfile
+                run: |
+                    set -Eeuo pipefail
+
+                    DIST_DIR="${PWD}/dist"
+                    WORK_DIR="$(mktemp -d)"
+                    PAYLOAD_DIR="${WORK_DIR}/${PACKAGE_NAME}-${VERSION}"
+                    PAYLOAD_ARCHIVE="${DIST_DIR}/${PACKAGE_NAME}-${VERSION}.payload.tar.gz"
+
+                    rm -rf "${DIST_DIR}"
+                    mkdir -p "${DIST_DIR}" "${PAYLOAD_DIR}"
+
+                    cp -a package-root/usr "${PAYLOAD_DIR}/"
+                    cp packaging/run/install.sh "${PAYLOAD_DIR}/install.sh"
+                    chmod 0755 "${PAYLOAD_DIR}/install.sh"
+
+                    {
+                        printf 'Acer Nitro Sense Linux %s\n\n' "${VERSION}"
+                        printf 'Install:\n'
+                        printf '  sudo ./install.sh --model %s\n\n' "${DEFAULT_MODEL}"
+                        printf 'List bundled models:\n'
+                        printf '  ./install.sh --list-models\n'
+                    } > "${PAYLOAD_DIR}/README.install"
+
+                    tar -C "${WORK_DIR}" -czf "${PAYLOAD_ARCHIVE}" "${PACKAGE_NAME}-${VERSION}"
+                    cp packaging/run/self-extract-header.sh "${DIST_DIR}/${RUN_ASSET}"
+                    cat "${PAYLOAD_ARCHIVE}" >> "${DIST_DIR}/${RUN_ASSET}"
+                    chmod 0755 "${DIST_DIR}/${RUN_ASSET}"
+
+            -   name: 🔨 Build Debian package
+                run: |
+                    set -Eeuo pipefail
+
+                    DEB_ROOT="${PWD}/build/deb-root"
+                    rm -rf "${DEB_ROOT}"
+                    mkdir -p "${DEB_ROOT}/DEBIAN"
+
+                    cp -a package-root/. "${DEB_ROOT}/"
+                    cp packaging/debian/postinst "${DEB_ROOT}/DEBIAN/postinst"
+                    cp packaging/debian/prerm "${DEB_ROOT}/DEBIAN/prerm"
+                    cp packaging/debian/postrm "${DEB_ROOT}/DEBIAN/postrm"
+                    chmod 0755 \
+                        "${DEB_ROOT}/DEBIAN/postinst" \
+                        "${DEB_ROOT}/DEBIAN/prerm" \
+                        "${DEB_ROOT}/DEBIAN/postrm"
+
+                    INSTALLED_SIZE="$(du -sk "${DEB_ROOT}" | cut -f1)"
+                    sed \
+                        -e "s/@VERSION@/${VERSION}/g" \
+                        -e "s/@DEB_RELEASE@/${DEB_RELEASE}/g" \
+                        -e "s/@INSTALLED_SIZE@/${INSTALLED_SIZE}/g" \
+                        packaging/debian/control.in > "${DEB_ROOT}/DEBIAN/control"
+
+                    dpkg-deb --build --root-owner-group "${DEB_ROOT}" "dist/${DEB_ASSET}"
+
+            -   name: ⚙️ Verify Debian and generic assets
+                run: |
+                    set -Eeuo pipefail
+
+                    mkdir -p release-assets
+
+                    [[ -f "dist/${RUN_ASSET}" ]]
+                    [[ -f "dist/${DEB_ASSET}" ]]
+                    [[ -f "${SOURCE_ARCHIVE}" ]]
+
+                    "dist/${RUN_ASSET}" --list-models | grep -qx "${DEFAULT_MODEL}"
+
+                    tar -tzf "dist/${PACKAGE_NAME}-${VERSION}.payload.tar.gz" |
+                        tee release-assets/run-files.txt
+                    ! grep -Ei 'gnome|extension|gnome-shell' release-assets/run-files.txt
+
+                    dpkg-deb --field "dist/${DEB_ASSET}" Version |
+                        grep -qx "${VERSION}-${DEB_RELEASE}"
+                    dpkg-deb --contents "dist/${DEB_ASSET}" |
+                        tee release-assets/deb-files.txt
+                    dpkg-deb --info "dist/${DEB_ASSET}" |
+                        tee release-assets/deb-info.txt
+                    ! grep -Ei 'gnome|extension|gnome-shell' release-assets/deb-files.txt
+
+                    cp -- "dist/${RUN_ASSET}" release-assets/
+                    cp -- "dist/${DEB_ASSET}" release-assets/
+                    cp -- "${SOURCE_ARCHIVE}" release-assets/
+
+            -   name: 🚀 Upload Debian release assets
+                uses: actions/upload-artifact@v4
+                with:
+                    name: acer-nitro-sense-linux-debian-assets
+                    path: release-assets/
+                    if-no-files-found: error
+
+    fedora:
+        name: 📦 Build Fedora 44 RPM assets
+        runs-on: ubuntu-latest
+        container:
+            image: fedora:44
+
+        env:
+            RELEASE_TAG: ${{ github.event.release.tag_name }}
+            RPM_RELEASE: "1"
+            DEFAULT_MODEL: acer-nitro-an517-51
+
+        steps:
+            -   name: ⚙️ Validate release version
+                run: |
+                    set -Eeuo pipefail
+
+                    [[ "${RELEASE_TAG}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+                    [[ "${RPM_RELEASE}" =~ ^[0-9]+$ ]]
+                    [[ "$(git rev-parse "${RELEASE_TAG}^{commit}")" == "$(git rev-parse HEAD)" ]]
+
+                    {
+                        echo "VERSION=${RELEASE_TAG}"
+                        echo "PACKAGE_NAME=acer-nitro-sense-linux"
+                        echo "SOURCE_ARCHIVE=build/meson-dist/acer-nitro-sense-linux-${RELEASE_TAG}.tar.gz"
+                    } >> "${GITHUB_ENV}"
+
+            -   name: 👀 Checkout
+                uses: actions/checkout@v6
+
+            -   name: ⚙️ Install build dependencies
+                run: |
+                    set -Eeuo pipefail
+
+                    dnf -y \
+                        --setopt=install_weak_deps=False \
+                        --setopt=tsflags=nodocs \
+                        install \
+                        cpio \
+                        gcc \
+                        git \
+                        gzip \
+                        meson \
+                        ninja-build \
+                        pkgconf-pkg-config \
+                        redhat-rpm-config \
+                        rpm-build \
+                        systemd-devel \
+                        systemd-rpm-macros \
+                        tar
+
+            -   name: ⚙️ Trust checked-out workspace
+                run: |
+                    set -Eeuo pipefail
+                    git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+
+            -   name: 🔨 Build and test
+                run: |
+                    set -Eeuo pipefail
+
+                    meson setup build --wipe \
+                        --prefix=/usr \
+                        --sysconfdir=/etc \
+                        --buildtype=release
+                    meson compile -C build
+                    meson test -C build --print-errorlogs
+
+                    MESON_VERSION="$(
+                        meson introspect build --projectinfo |
+                            sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p'
+                    )"
+                    [[ "${MESON_VERSION}" == "${VERSION}" ]]
+
+            -   name: 🔨 Build source archive
+                run: |
+                    set -Eeuo pipefail
+
+                    meson dist -C build --formats=gztar
+                    [[ -f "${SOURCE_ARCHIVE}" ]]
+
+            -   name: 🔨 Build Fedora RPMs
+                run: |
+                    set -Eeuo pipefail
+
+                    RPM_TOPDIR="$(rpm --eval '%{_topdir}')"
+                    mkdir -p \
+                        "${RPM_TOPDIR}/BUILD" \
+                        "${RPM_TOPDIR}/BUILDROOT" \
+                        "${RPM_TOPDIR}/RPMS" \
+                        "${RPM_TOPDIR}/SOURCES" \
+                        "${RPM_TOPDIR}/SPECS" \
+                        "${RPM_TOPDIR}/SRPMS" \
+                        "${RPM_TOPDIR}/tmp"
+
+                    cp -- "${SOURCE_ARCHIVE}" "${RPM_TOPDIR}/SOURCES/"
+                    sed \
+                        -e "s/@VERSION@/${VERSION}/g" \
+                        -e "s/@RPM_RELEASE@/${RPM_RELEASE}/g" \
+                        -e "s/@DEFAULT_MODEL@/${DEFAULT_MODEL}/g" \
+                        -e "s#@GITHUB_REPOSITORY@#${GITHUB_REPOSITORY}#g" \
+                        -e "s/@RPM_CHANGELOG_DATE@/$(LC_ALL=C date -u '+%a %b %d %Y')/g" \
+                        packaging/fedora/acer-nitro-sense-linux.spec.in > \
+                        "${RPM_TOPDIR}/SPECS/${PACKAGE_NAME}.spec"
+
+                    rpmbuild \
+                        --define "_tmppath ${RPM_TOPDIR}/tmp" \
+                        -ba "${RPM_TOPDIR}/SPECS/${PACKAGE_NAME}.spec"
+
+                    mapfile -t BINARY_RPMS < <(
+                        find "${RPM_TOPDIR}/RPMS" \
+                            -type f \
+                            -name "${PACKAGE_NAME}-${VERSION}-${RPM_RELEASE}.fc44.*.rpm" \
+                            ! -name "*debug*" \
+                            -print
+                    )
+                    mapfile -t SOURCE_RPMS < <(
+                        find "${RPM_TOPDIR}/SRPMS" \
+                            -type f \
+                            -name "${PACKAGE_NAME}-${VERSION}-${RPM_RELEASE}.fc44.src.rpm" \
+                            -print
+                    )
+
+                    [[ "${#BINARY_RPMS[@]}" == "1" ]]
+                    [[ "${#SOURCE_RPMS[@]}" == "1" ]]
+
+                    {
+                        echo "BINARY_RPM=${BINARY_RPMS[0]}"
+                        echo "SOURCE_RPM=${SOURCE_RPMS[0]}"
+                    } >> "${GITHUB_ENV}"
+
+            -   name: ⚙️ Verify Fedora RPM assets
+                run: |
+                    set -Eeuo pipefail
+
+                    mkdir -p release-assets
+
+                    [[ "$(rpm -qp --qf '%{VERSION}' "${BINARY_RPM}")" == "${VERSION}" ]]
+                    [[ "$(rpm -qp --qf '%{RELEASE}' "${BINARY_RPM}")" == "${RPM_RELEASE}.fc44" ]]
+                    [[ "$(rpm -qp --qf '%{VERSION}' "${SOURCE_RPM}")" == "${VERSION}" ]]
+                    [[ "$(rpm -qp --qf '%{RELEASE}' "${SOURCE_RPM}")" == "${RPM_RELEASE}.fc44" ]]
+
+                    rpm -qpi "${BINARY_RPM}" | tee release-assets/rpm-info.txt
+                    rpm -qlp "${BINARY_RPM}" | tee release-assets/rpm-files.txt
+                    rpm -qpR "${BINARY_RPM}" | tee release-assets/rpm-requires.txt
+                    ! grep -Ei 'gnome|extension|gnome-shell' release-assets/rpm-files.txt
+
+                    cp -- "${BINARY_RPM}" release-assets/
+                    cp -- "${SOURCE_RPM}" release-assets/
+
+            -   name: 🚀 Upload Fedora release assets
+                uses: actions/upload-artifact@v4
+                with:
+                    name: acer-nitro-sense-linux-fedora-assets
+                    path: release-assets/
+                    if-no-files-found: error
+
+    upload:
+        name: 🚀 Upload GitHub release assets
+        runs-on: ubuntu-latest
+        needs: [ debian, fedora ]
+
+        env:
+            RELEASE_TAG: ${{ github.event.release.tag_name }}
+            GH_TOKEN: ${{ github.token }}
+
+        steps:
+            -   name: ⚙️ Validate release tag
+                run: |
+                    set -Eeuo pipefail
+                    [[ "${RELEASE_TAG}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+
+            -   name: ⚙️ Download build artifacts
+                uses: actions/download-artifact@v4
+                with:
+                    path: release-assets
+                    merge-multiple: true
+
+            -   name: ⚙️ Generate checksums
+                run: |
+                    set -Eeuo pipefail
+
+                    find release-assets -maxdepth 1 -type f \
+                        \( -name "*.run" -o -name "*.tar.gz" -o -name "*.deb" -o -name "*.rpm" \) \
+                        -printf '%f\n' |
+                        sort |
+                        while IFS= read -r file; do
+                            sha256sum "release-assets/${file}"
+                        done > release-assets/SHA256SUMS
+
+                    cat release-assets/SHA256SUMS
+
+            -   name: 🚀 Upload release assets
+                run: |
+                    set -Eeuo pipefail
+
+                    gh release upload "${RELEASE_TAG}" \
+                        release-assets/*.run \
+                        release-assets/*.tar.gz \
+                        release-assets/*.deb \
+                        release-assets/*.rpm \
+                        release-assets/SHA256SUMS \
+                        --repo "${GITHUB_REPOSITORY}" \
+                        --clobber
+
+    copr:
+        name: 🚀 Publish COPR build
+        runs-on: ubuntu-latest
+        needs: [ fedora, upload ]
+        container:
+            image: fedora:44
+
+        env:
+            RELEASE_TAG: ${{ github.event.release.tag_name }}
+            RPM_RELEASE: "1"
+            COPR_CONFIG: ${{ secrets.COPR_CONFIG }}
+            COPR_PROJECT: ${{ vars.COPR_PROJECT }}
+
+        steps:
+            -   name: ⚙️ Validate COPR configuration
+                run: |
+                    set -Eeuo pipefail
+
+                    if [[ -z "${COPR_CONFIG}" ]]; then
+                        echo "::error title=Missing COPR_CONFIG secret::Use the contents of ~/.config/copr."
+                        exit 1
+                    fi
+
+                    if [[ -z "${COPR_PROJECT}" ]]; then
+                        echo "::error title=Missing COPR_PROJECT variable::Use almighty-shogun/acer-nitro-sense-linux."
+                        exit 1
+                    fi
+
+            -   name: ⚙️ Install COPR client
+                run: |
+                    set -Eeuo pipefail
+
+                    dnf -y \
+                        --setopt=install_weak_deps=False \
+                        --setopt=tsflags=nodocs \
+                        install \
+                        copr-cli
+
+            -   name: ⚙️ Download Fedora build artifact
+                uses: actions/download-artifact@v4
+                with:
+                    name: acer-nitro-sense-linux-fedora-assets
+                    path: release-assets
+
+            -   name: 🚀 Submit source RPM to COPR
+                run: |
+                    set -Eeuo pipefail
+
+                    SOURCE_RPM="release-assets/acer-nitro-sense-linux-${RELEASE_TAG}-${RPM_RELEASE}.fc44.src.rpm"
+
+                    [[ "${RELEASE_TAG}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+                    [[ -f "${SOURCE_RPM}" ]]
+
+                    mkdir -p "${HOME}/.config"
+                    printf '%s\n' "${COPR_CONFIG}" > "${HOME}/.config/copr"
+                    chmod 600 "${HOME}/.config/copr"
+
+                    copr-cli build --nowait "${COPR_PROJECT}" "${SOURCE_RPM}"

@@ -1,0 +1,27 @@
+[Unit]
+Description=Acer Nitro Sense fan control daemon
+After=multi-user.target
+
+[Service]
+Type=simple
+Group=acer-nitro-sense
+ExecStartPre=-/usr/bin/modprobe -q ec_sys
+ExecStartPre=-/usr/bin/modprobe -q acpi_ec
+ExecStart=/usr/bin/acer-nitro-sensed --config /etc/acer-nitro-sense/model.json
+Restart=on-failure
+RestartSec=2
+RuntimeDirectory=acer-nitro-sense
+RuntimeDirectoryMode=0775
+StateDirectory=acer-nitro-sense
+StateDirectoryMode=0755
+
+# The daemon uses /dev/ec from acpi_ec, or ec_sys debugfs if available.
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true
+CapabilityBoundingSet=CAP_SYS_RAWIO
+ReadWritePaths=/run/acer-nitro-sense /var/lib/acer-nitro-sense -/sys/kernel/debug/ec -/sys/devices
+
+[Install]
+WantedBy=multi-user.target

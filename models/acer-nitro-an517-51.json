@@ -1,0 +1,333 @@
+{
+    "schema": 1,
+    "model": "Acer Nitro 5 AN517-51",
+    "default_preset": "firmware-auto",
+    "source": "Hardware-tuned Acer Nitro 5 AN517-51 profile.",
+    "allowed_dmi_substrings": [
+        "AN517-51",
+        "AN715-51",
+        "AN515-51"
+    ],
+    "ec": {
+        "path": "/sys/kernel/debug/ec/ec0/io",
+        "poll_interval_ms": 3000,
+        "read_words": true,
+        "critical_temperature_c": 90,
+        "safety": {
+            "min_speed_percent": 30,
+            "min_speed_temperature_c": 70,
+            "critical_speed_percent": 100,
+            "critical_full_speed": false,
+            "critical_step_percent": 20,
+            "critical_consecutive_samples": 2,
+            "critical_release_temperature_c": 82,
+            "auto_ramp_up_percent": 12,
+            "auto_ramp_bypass_temperature_c": 0,
+            "missing_temperature_speed_percent": 35,
+            "max_ec_read_failures": 3,
+            "max_ec_write_failures": 3
+        },
+        "fan_modes": {
+            "cpu_register": 34,
+            "cpu_auto_value": 4,
+            "cpu_manual_value": 12,
+            "cpu_turbo_value": 8,
+            "gpu_register": 33,
+            "gpu_auto_value": 16,
+            "gpu_manual_value": 48,
+            "gpu_turbo_value": 32
+        },
+        "platform_profiles": {
+            "register": 44,
+            "default_profile": "balanced",
+            "profiles": [
+                {
+                    "id": "quiet",
+                    "value": 0
+                },
+                {
+                    "id": "balanced",
+                    "value": 1
+                },
+                {
+                    "id": "performance",
+                    "value": 4
+                }
+            ]
+        },
+        "power_source_profiles": {
+            "auto_apply": false,
+            "ac": "balanced",
+            "battery": "quiet"
+        },
+        "keyboard_backlight": {
+            "register": 49,
+            "min_value": 0,
+            "max_value": 4,
+            "timeout_supported": true,
+            "timeout_default_enabled": false,
+            "timeout_seconds": 30
+        },
+        "init_writes": [
+            {
+                "register": 34,
+                "value": 12,
+                "reset_value": 4,
+                "description": "CPU fan manual mode"
+            },
+            {
+                "register": 33,
+                "value": 48,
+                "reset_value": 16,
+                "description": "GPU fan manual mode"
+            },
+            {
+                "register": 16,
+                "value": 0,
+                "reset_value": 0,
+                "description": "Disable legacy firmware boost flag"
+            }
+        ]
+    },
+    "fans": [
+        {
+            "id": "cpu",
+            "name": "CPU fan",
+            "read_register": 19,
+            "write_register": 55,
+            "read_min": 0,
+            "read_max": 6122,
+            "write_min": 0,
+            "write_max": 100,
+            "reset_speed": 50,
+            "sensor_group": "cpu",
+            "control_sensor_group": "max",
+            "curve": [
+                {
+                    "up": 0,
+                    "down": 0,
+                    "speed": 0
+                },
+                {
+                    "up": 40,
+                    "down": 40,
+                    "speed": 30
+                },
+                {
+                    "up": 42,
+                    "down": 41,
+                    "speed": 32
+                },
+                {
+                    "up": 44,
+                    "down": 43,
+                    "speed": 34
+                },
+                {
+                    "up": 48,
+                    "down": 46,
+                    "speed": 36
+                },
+                {
+                    "up": 52,
+                    "down": 50,
+                    "speed": 38
+                },
+                {
+                    "up": 54,
+                    "down": 53,
+                    "speed": 41
+                },
+                {
+                    "up": 58,
+                    "down": 56,
+                    "speed": 44
+                },
+                {
+                    "up": 62,
+                    "down": 60,
+                    "speed": 47
+                },
+                {
+                    "up": 64,
+                    "down": 63,
+                    "speed": 50
+                },
+                {
+                    "up": 68,
+                    "down": 66,
+                    "speed": 55
+                },
+                {
+                    "up": 72,
+                    "down": 70,
+                    "speed": 61
+                },
+                {
+                    "up": 74,
+                    "down": 73,
+                    "speed": 68
+                },
+                {
+                    "up": 78,
+                    "down": 76,
+                    "speed": 76
+                },
+                {
+                    "up": 82,
+                    "down": 80,
+                    "speed": 85
+                },
+                {
+                    "up": 84,
+                    "down": 83,
+                    "speed": 94
+                },
+                {
+                    "up": 88,
+                    "down": 86,
+                    "speed": 100
+                }
+            ]
+        },
+        {
+            "id": "gpu",
+            "name": "GPU fan",
+            "read_register": 21,
+            "write_register": 58,
+            "temperature_register": 42,
+            "read_min": 0,
+            "read_max": 6122,
+            "write_min": 0,
+            "write_max": 100,
+            "reset_speed": 50,
+            "sensor_group": "gpu",
+            "control_sensor_group": "max",
+            "sensor_power_control": "auto",
+            "curve": [
+                {
+                    "up": 0,
+                    "down": 0,
+                    "speed": 0
+                },
+                {
+                    "up": 40,
+                    "down": 40,
+                    "speed": 22
+                },
+                {
+                    "up": 42,
+                    "down": 41,
+                    "speed": 24
+                },
+                {
+                    "up": 44,
+                    "down": 43,
+                    "speed": 26
+                },
+                {
+                    "up": 48,
+                    "down": 46,
+                    "speed": 28
+                },
+                {
+                    "up": 52,
+                    "down": 50,
+                    "speed": 30
+                },
+                {
+                    "up": 54,
+                    "down": 53,
+                    "speed": 34
+                },
+                {
+                    "up": 58,
+                    "down": 56,
+                    "speed": 38
+                },
+                {
+                    "up": 62,
+                    "down": 60,
+                    "speed": 42
+                },
+                {
+                    "up": 64,
+                    "down": 63,
+                    "speed": 46
+                },
+                {
+                    "up": 68,
+                    "down": 66,
+                    "speed": 52
+                },
+                {
+                    "up": 72,
+                    "down": 70,
+                    "speed": 59
+                },
+                {
+                    "up": 74,
+                    "down": 73,
+                    "speed": 67
+                },
+                {
+                    "up": 78,
+                    "down": 76,
+                    "speed": 76
+                },
+                {
+                    "up": 82,
+                    "down": 80,
+                    "speed": 86
+                },
+                {
+                    "up": 84,
+                    "down": 83,
+                    "speed": 96
+                },
+                {
+                    "up": 88,
+                    "down": 86,
+                    "speed": 100
+                }
+            ]
+        }
+    ],
+    "presets": [
+        {
+            "id": "silent",
+            "cpu": 25,
+            "gpu": 25
+        },
+        {
+            "id": "quiet",
+            "cpu": 35,
+            "gpu": 30
+        },
+        {
+            "id": "balanced",
+            "cpu": 45,
+            "gpu": 40
+        },
+        {
+            "id": "cool",
+            "cpu": 65,
+            "gpu": 60
+        },
+        {
+            "id": "performance",
+            "cpu": 75,
+            "gpu": 75
+        },
+        {
+            "id": "turbo",
+            "cpu": 90,
+            "gpu": 90
+        },
+        {
+            "id": "max",
+            "cpu": 100,
+            "gpu": 100
+        }
+    ]
+}

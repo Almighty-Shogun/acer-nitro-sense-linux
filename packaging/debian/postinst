@@ -1,0 +1,17 @@
+#!/bin/sh
+set -e
+
+if command -v systemd-sysusers >/dev/null 2>&1; then
+    systemd-sysusers /usr/lib/sysusers.d/acer-nitro-sense.conf || true
+fi
+
+if command -v systemctl >/dev/null 2>&1; then
+    systemctl daemon-reload || true
+    if [ -d /run/systemd/system ]; then
+        systemctl enable --now acer-nitro-sense.service || true
+    else
+        systemctl enable acer-nitro-sense.service || true
+    fi
+fi
+
+exit 0
