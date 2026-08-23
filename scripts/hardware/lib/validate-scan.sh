@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 run_fan_mode_scan() {
     file="$OUT_DIR/fan-mode-scan.status.log"
 

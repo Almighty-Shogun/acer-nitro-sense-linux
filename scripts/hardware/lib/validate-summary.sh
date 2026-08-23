@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 write_summary_header() {
     printf 'Acer Nitro Sense validation summary\n\n'
     printf 'Output directory: %s\n' "$OUT_DIR"

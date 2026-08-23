@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 write_feature_summary() {
     printf 'Acer Nitro feature discovery:\n'
     if [ -f "$OUT_DIR/feature-power.txt" ]; then

@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 SAMPLES="${SAMPLES:-10}"
 INTERVAL="${INTERVAL:-2}"
 OUT_DIR="${OUT_DIR:-/tmp/acer-nitro-sense-validation-$(date +%Y%m%d-%H%M%S)}"
@@ -28,4 +30,4 @@ SAFETY_VALIDATE_PRESET="${SAFETY_VALIDATE_PRESET:-quiet}"
 SAFETY_VALIDATE_SETTLE_SECONDS="${SAFETY_VALIDATE_SETTLE_SECONDS:-8}"
 ANS="${ANS:-ans}"
 VALIDATION_STARTED_AT="$(date --iso-8601=seconds 2>/dev/null || date)"
-LOAD_PIDS=""
+export VALIDATION_STARTED_AT

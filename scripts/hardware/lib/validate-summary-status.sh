@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 write_status_log_summaries() {
     for file in "$OUT_DIR"/*.status.log; do
         [ -e "$file" ] || continue
