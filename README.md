@@ -87,7 +87,7 @@ sudo apt remove acer-nitro-sense-linux
 sudo ./acer-nitro-sense-linux-*.run --uninstall
 ```
 
-## 🛠️ Building
+## 🔧 Building
 
 ```sh
 meson setup build --prefix=/usr --sysconfdir=/etc
