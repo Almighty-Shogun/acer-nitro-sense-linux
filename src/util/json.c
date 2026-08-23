@@ -192,7 +192,9 @@ bool json_bool_key(const char* json, const char* key, const bool fallback)
  * Read and validate a string JSON key.
  *
  * Model strings are currently simple ASCII tokens. Escaped strings are rejected
- * rather than partially decoded so unsupported input fails predictably.
+ * rather than partially decoded so unsupported input fails predictably. A value
+ * too long for the destination is truncated and reported as a failure, matching
+ * `string_copy`, so callers never mistake a shortened value for the real one.
  */
 bool json_string_key_checked(const char* json, const char* key, char* out, const size_t out_len)
 {
@@ -222,10 +224,16 @@ bool json_string_key_checked(const char* json, const char* key, char* out, const
     if (!json_value_ended(end + 1))
         return false;
 
-    size_t len = (size_t)(end - p);
+    const size_t len = (size_t)(end - p);
 
     if (len >= out_len)
-        len = out_len - 1;
+    {
+        memcpy(out, p, out_len - 1);
+
+        out[out_len - 1] = '\0';
+
+        return false;
+    }
 
     memcpy(out, p, len);
 
