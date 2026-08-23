@@ -11,11 +11,41 @@
 #include <sys/stat.h>
 
 /**
+ * Create one path segment, accepting an existing directory.
+ *
+ * `EEXIST` alone does not prove the path is usable, so an existing entry is
+ * stat'd and anything that is not a directory fails with `ENOTDIR` rather than
+ * reporting success the caller cannot rely on.
+ */
+static int mkdir_segment(const char* path)
+{
+    struct stat st;
+
+    if (mkdir(path, 0755) == 0)
+        return 0;
+
+    if (errno != EEXIST)
+        return -1;
+
+    if (stat(path, &st) < 0)
+        return -1;
+
+    if (!S_ISDIR(st.st_mode))
+    {
+        errno = ENOTDIR;
+
+        return -1;
+    }
+
+    return 0;
+}
+
+/**
  * Create a directory path recursively.
  *
  * State and runtime paths may be missing on first startup. Each parent segment
- * is created with daemon-safe directory permissions and existing directories are
- * accepted.
+ * is created with daemon-safe directory permissions, and an existing entry is
+ * accepted only when it is already a directory.
  */
 int mkdir_p(const char* path)
 {
@@ -33,14 +63,14 @@ int mkdir_p(const char* path)
         {
             *p = '\0';
 
-            if (mkdir(tmp, 0755) < 0 && errno != EEXIST)
+            if (mkdir_segment(tmp) < 0)
                 return -1;
 
             *p = '/';
         }
     }
 
-    if (mkdir(tmp, 0755) < 0 && errno != EEXIST)
+    if (mkdir_segment(tmp) < 0)
         return -1;
 
     return 0;
