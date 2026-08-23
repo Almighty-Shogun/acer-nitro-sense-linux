@@ -28,25 +28,6 @@ jobs:
             DEFAULT_MODEL: acer-nitro-an517-51
 
         steps:
-            -   name: ⚙️ Validate release version
-                run: |
-                    set -Eeuo pipefail
-
-                    [[ "${RELEASE_TAG}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
-                    [[ "$(git rev-parse "${RELEASE_TAG}^{commit}")" == "$(git rev-parse HEAD)" ]]
-
-                    {
-                        echo "VERSION=${RELEASE_TAG}"
-                        echo "ANS_VERSION=${RELEASE_TAG}"
-                        echo "PACKAGE_NAME=acer-nitro-sense-linux"
-                        echo "SOURCE_ARCHIVE=build/meson-dist/acer-nitro-sense-linux-${RELEASE_TAG}.tar.gz"
-                        echo "RUN_ASSET=acer-nitro-sense-linux-${RELEASE_TAG}.run"
-                        echo "DEB_ASSET=acer-nitro-sense-linux_${RELEASE_TAG}-${DEB_RELEASE}_amd64.deb"
-                    } >> "${GITHUB_ENV}"
-
-            -   name: 👀 Checkout
-                uses: actions/checkout@v6
-
             -   name: ⚙️ Install build dependencies
                 run: |
                     set -Eeuo pipefail
@@ -66,6 +47,25 @@ jobs:
                         ninja-build \
                         pkg-config \
                         tar
+
+            -   name: 👀 Checkout
+                uses: actions/checkout@v6
+
+            -   name: ⚙️ Validate release version
+                run: |
+                    set -Eeuo pipefail
+
+                    [[ "${RELEASE_TAG}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+                    [[ "$(git rev-parse "${RELEASE_TAG}^{commit}")" == "$(git rev-parse HEAD)" ]]
+
+                    {
+                        echo "VERSION=${RELEASE_TAG}"
+                        echo "ANS_VERSION=${RELEASE_TAG}"
+                        echo "PACKAGE_NAME=acer-nitro-sense-linux"
+                        echo "SOURCE_ARCHIVE=build/meson-dist/acer-nitro-sense-linux-${RELEASE_TAG}.tar.gz"
+                        echo "RUN_ASSET=acer-nitro-sense-linux-${RELEASE_TAG}.run"
+                        echo "DEB_ASSET=acer-nitro-sense-linux_${RELEASE_TAG}-${DEB_RELEASE}_amd64.deb"
+                    } >> "${GITHUB_ENV}"
 
             -   name: ⚙️ Trust checked-out workspace
                 run: |
@@ -224,24 +224,6 @@ jobs:
             DEFAULT_MODEL: acer-nitro-an517-51
 
         steps:
-            -   name: ⚙️ Validate release version
-                run: |
-                    set -Eeuo pipefail
-
-                    [[ "${RELEASE_TAG}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
-                    [[ "${RPM_RELEASE}" =~ ^[0-9]+$ ]]
-                    [[ "$(git rev-parse "${RELEASE_TAG}^{commit}")" == "$(git rev-parse HEAD)" ]]
-
-                    {
-                        echo "VERSION=${RELEASE_TAG}"
-                        echo "ANS_VERSION=${RELEASE_TAG}"
-                        echo "PACKAGE_NAME=acer-nitro-sense-linux"
-                        echo "SOURCE_ARCHIVE=build/meson-dist/acer-nitro-sense-linux-${RELEASE_TAG}.tar.gz"
-                    } >> "${GITHUB_ENV}"
-
-            -   name: 👀 Checkout
-                uses: actions/checkout@v6
-
             -   name: ⚙️ Install build dependencies
                 run: |
                     set -Eeuo pipefail
@@ -262,6 +244,24 @@ jobs:
                         systemd-devel \
                         systemd-rpm-macros \
                         tar
+
+            -   name: 👀 Checkout
+                uses: actions/checkout@v6
+
+            -   name: ⚙️ Validate release version
+                run: |
+                    set -Eeuo pipefail
+
+                    [[ "${RELEASE_TAG}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+                    [[ "${RPM_RELEASE}" =~ ^[0-9]+$ ]]
+                    [[ "$(git rev-parse "${RELEASE_TAG}^{commit}")" == "$(git rev-parse HEAD)" ]]
+
+                    {
+                        echo "VERSION=${RELEASE_TAG}"
+                        echo "ANS_VERSION=${RELEASE_TAG}"
+                        echo "PACKAGE_NAME=acer-nitro-sense-linux"
+                        echo "SOURCE_ARCHIVE=build/meson-dist/acer-nitro-sense-linux-${RELEASE_TAG}.tar.gz"
+                    } >> "${GITHUB_ENV}"
 
             -   name: ⚙️ Trust checked-out workspace
                 run: |
