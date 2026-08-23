@@ -106,21 +106,21 @@ scripts/hardware/discover-keyboard-backlight.sh
 
 Commands can either be invoked with `acer-nitro-sense` or the shorter alias `ans`.
 
-| Name | Arguments | Description |
-| --- | --- | --- |
-| `status` | `--json`, `--fahrenheit` | Show current model, mode, RPM, temperatures, fan targets, and safety state. |
-| `capabilities` | - | Show which features are available on the current machine. |
-| `doctor` | - | Collect system, EC, sensor, and feature diagnostics. |
-| `firmware-auto` | - | Let Acer firmware own live fan speed while the daemon keeps reporting status. |
-| `auto` | - | Enable the daemon fan curve. |
-| `set` | `[cpu\|gpu\|all] [1-100]` | Set manual fan speed percentages. |
-| `preset` | `[quiet\|balanced\|performance]` | Apply a configured fan preset. |
-| `fan-mode` | `status`, `[auto\|manual\|turbo]` | Read or switch the Acer firmware fan mode. |
-| `coolboost` | `status`, `[on\|off]` | Toggle CoolBoost-style turbo cooling. |
-| `profile` | `status`, `[quiet\|balanced\|performance]` | Read or switch the Nitro profile. |
-| `power-source` | `status`, `apply`, `auto [on\|off]` | Configure AC/battery profile switching. |
-| `gpu-temp` | `status`, `[live\|auto\` | Configure GPU temperature wake policy. |
+| Name | Arguments                                                 | Description |
+| --- |-----------------------------------------------------------| --- |
+| `status` | `--json`, `--fahrenheit`                                  | Show current model, mode, RPM, temperatures, fan targets, and safety state. |
+| `capabilities` | -                                                         | Show which features are available on the current machine. |
+| `doctor` | -                                                         | Collect system, EC, sensor, and feature diagnostics. |
+| `firmware-auto` | -                                                         | Let Acer firmware own live fan speed while the daemon keeps reporting status. |
+| `auto` | -                                                         | Enable the daemon fan curve. |
+| `set` | `[cpu\|gpu\|all] [1-100]`                                 | Set manual fan speed percentages. |
+| `preset` | `quiet`, `balanced`, `performance`                        | Apply a configured fan preset. |
+| `fan-mode` | `status`, `auto`, `manual`, `turbo`                       | Read or switch the Acer firmware fan mode. |
+| `coolboost` | `status`, `[on\|off]`                                     | Toggle CoolBoost-style turbo cooling. |
+| `profile` | `status`, `quiet`, `balanced`, `performance`              | Read or switch the Nitro profile. |
+| `power-source` | `status`, `apply`, `auto [on\|off]`                       | Configure AC/battery profile switching. |
+| `gpu-temp` | `status`, `live`, `auto`                                  | Configure GPU temperature wake policy. |
 | `keyboard-backlight` | `status`, `set [0\|25\|50\|75\|100]`, `timeout [on\|off]` | Control keyboard backlight brightness and timeout. |
-| `start` | - | Start the daemon service. Requires `sudo`. |
-| `restart` | - | Restart the daemon service. Requires `sudo`. |
-| `stop` | - | Ask the daemon to stop. |
+| `start` | -                                                         | Start the daemon service. Requires `sudo`. |
+| `restart` | -                                                         | Restart the daemon service. Requires `sudo`. |
+| `stop` | -                                                         | Ask the daemon to stop. |

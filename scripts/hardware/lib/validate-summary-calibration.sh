@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 write_fan_calibration_summary() {
     [ -f "$OUT_DIR/fan-calibration.status.log" ] || return 0
 

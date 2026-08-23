@@ -1,14 +1,21 @@
 #ifndef ANS_DAEMON_TYPES_H
 #define ANS_DAEMON_TYPES_H
 
-#include "config/types.h"
-#include "core/constants.h"
 #include "ec/types.h"
+#include "config/types.h"
 
-#include <stdbool.h>
 #include <signal.h>
+#include <stdbool.h>
 
-typedef struct {
+/**
+ * Runtime telemetry and control state for one fan.
+ *
+ * The polling loop updates measured values, requested values, filtered
+ * temperature state, and safety counters together so status output can explain
+ * exactly why a speed was chosen.
+ */
+typedef struct
+{
     int rpm;
     int temp_c;
     int sensor_temp_c;
@@ -30,7 +37,14 @@ typedef struct {
     char safety_reason[64];
 } fan_state;
 
-typedef struct {
+/**
+ * Daemon state that is not owned by a single fan.
+ *
+ * These fields describe cross-feature policy such as power-source profile
+ * automation and keyboard backlight timeout behavior.
+ */
+typedef struct
+{
     bool power_source_auto_apply;
     bool keyboard_backlight_timeout_enabled;
     bool keyboard_backlight_timed_off;

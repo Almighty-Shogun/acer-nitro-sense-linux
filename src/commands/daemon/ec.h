@@ -3,6 +3,12 @@
 
 #include "daemon/types.h"
 
-bool handle_ec_command(int client, struct ec_device *ec, const char *cmd);
+/**
+ * Dispatch raw EC debug commands.
+ *
+ * These commands are intended for diagnostics and model bring-up after the
+ * daemon registry has already enforced control permissions.
+ */
+bool handle_ec_command(int client, struct ec_device* ec, const char* cmd);
 
 #endif

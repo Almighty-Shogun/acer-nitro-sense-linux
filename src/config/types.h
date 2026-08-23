@@ -1,14 +1,22 @@
 #ifndef ANS_CONFIG_TYPES_H
 #define ANS_CONFIG_TYPES_H
 
-#include "config/fan_types.h"
-#include "config/platform_types.h"
-#include "config/safety_types.h"
 #include "core/constants.h"
+#include "config/fan_types.h"
+#include "config/safety_types.h"
+#include "config/platform_types.h"
 
 #include <stdbool.h>
 
-struct ans_config {
+/**
+ * Complete model profile loaded from JSON.
+ *
+ * The config is the daemon's hardware contract: it defines supported DMI
+ * models, EC access, fan mappings, safety policy, presets, and platform
+ * feature registers.
+ */
+struct ans_config
+{
     char model[96];
     char default_preset[32];
     char ec_path[256];

@@ -1,21 +1,21 @@
-#include "commands/daemon/daemon.h"
+#include "ec/ec.h"
+#include "util/file.h"
+#include "daemon/args.h"
+#include "daemon/loop.h"
+#include "fan/control.h"
+#include "util/string.h"
+#include "daemon/state.h"
 #include "config/config.h"
 #include "core/constants.h"
 #include "control/socket.h"
-#include "daemon/args.h"
-#include "daemon/diagnostics.h"
-#include "daemon/loop.h"
-#include "daemon/state.h"
-#include "ec/ec.h"
-#include "fan/control.h"
-#include "hardware/hardware.h"
-#include "keyboard/backlight_timeout.h"
 #include "platform/control.h"
-#include "util/file.h"
-#include "util/string.h"
+#include "hardware/hardware.h"
+#include "daemon/diagnostics.h"
+#include "commands/daemon/daemon.h"
+#include "keyboard/backlight_timeout.h"
 
-#include <signal.h>
 #include <stdio.h>
+#include <signal.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -23,6 +23,12 @@ bool daemon_quiet_logs = false;
 bool daemon_persist_control_state = true;
 volatile sig_atomic_t daemon_running = 1;
 
+/**
+ * Record shutdown signals for the daemon loop.
+ *
+ * Signal handlers keep shutdown cooperative so the daemon can restore runtime
+ * state and close EC resources instead of exiting mid-write.
+ */
 static void on_signal(const int sig)
 {
     (void)sig;
@@ -30,6 +36,12 @@ static void on_signal(const int sig)
     daemon_running = 0;
 }
 
+/**
+ * Start the executable entry point.
+ *
+ * The process should do setup, delegate to the real entry path, and return an
+ * ordinary shell status without leaving partially initialized state behind.
+ */
 int main(const int argc, char** argv)
 {
     struct ans_config cfg;
@@ -167,9 +179,9 @@ int main(const int argc, char** argv)
     else if (strcmp(cfg.default_preset, FIRMWARE_AUTO_PRESET) == 0 && apply_firmware_auto_fan_mode(&ec, &cfg))
     {
         auto_mode = false;
+
         string_copy(preset, sizeof(preset), FIRMWARE_AUTO_PRESET);
-        write_control_state(&cfg, states, auto_mode, preset, coolboost_enabled,
-                            &runtime);
+        write_control_state(&cfg, states, auto_mode, preset, coolboost_enabled, &runtime);
     }
     else if (cfg.default_preset[0] && apply_preset(&ec, &cfg, states, cfg.default_preset))
     {

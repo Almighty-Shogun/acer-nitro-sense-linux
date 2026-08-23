@@ -1,22 +1,30 @@
 {
-  "schema": 1,
-  "model": "Acer Nitro Invalid",
-  "default_preset": "auto",
-  "ec": {
-    "path": "fake"
-  },
-  "fans": [
-    {
-      "id": "cpu",
-      "name": "CPU fan",
-      "read_register": 19,
-      "sensor_group": "cpu",
-      "curve": [
-        { "up": 0, "down": 0, "speed": 30 }
-      ]
-    }
-  ],
-  "presets": [
-    { "id": "balanced", "cpu": 50, "gpu": 50 }
-  ]
+    "schema": 1,
+    "model": "Acer Nitro Invalid",
+    "default_preset": "auto",
+    "ec": {
+        "path": "fake"
+    },
+    "fans": [
+        {
+            "id": "cpu",
+            "name": "CPU fan",
+            "read_register": 19,
+            "sensor_group": "cpu",
+            "curve": [
+                {
+                    "up": 0,
+                    "down": 0,
+                    "speed": 30
+                }
+            ]
+        }
+    ],
+    "presets": [
+        {
+            "id": "balanced",
+            "cpu": 50,
+            "gpu": 50
+        }
+    ]
 }

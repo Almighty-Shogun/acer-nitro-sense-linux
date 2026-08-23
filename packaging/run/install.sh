@@ -4,7 +4,7 @@ set -eu
 APP_NAME="acer-nitro-sense"
 SERVICE_NAME="acer-nitro-sense.service"
 CONTROL_GROUP="acer-nitro-sense"
-ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+ROOT_DIR=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
 
 MODEL=""
 ENABLE_SERVICE=1
@@ -126,7 +126,7 @@ uninstall_app() {
     rm -f /usr/lib/systemd/system/$SERVICE_NAME
     rm -f /usr/lib/sysusers.d/$APP_NAME.conf
     rm -f /usr/lib/systemd/system-sleep/$APP_NAME
-    rm -rf /usr/share/$APP_NAME
+    rm -rf "/usr/share/${APP_NAME:?}"
     rm -f /etc/$APP_NAME/model.json
     rmdir /etc/$APP_NAME 2>/dev/null || true
 

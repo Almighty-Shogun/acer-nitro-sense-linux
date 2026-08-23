@@ -3,7 +3,14 @@
 
 #include <stdbool.h>
 
-struct safety_config {
+/**
+ * Safety limits and fallback behavior for daemon fan control.
+ *
+ * These settings bound manual, preset, and automatic control so bad sensor
+ * reads or critical temperatures cannot leave the machine under-cooled.
+ */
+struct safety_config
+{
     int min_speed_percent;
     int min_speed_temperature_c;
     int critical_speed_percent;

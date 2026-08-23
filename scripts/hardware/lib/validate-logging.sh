@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 progress() {
     printf '[%s] %s\n' "$(date +%H:%M:%S)" "$*" >&2
 }
@@ -24,7 +26,7 @@ collect_current_daemon_journal() {
         since="$(systemctl show -P ActiveEnterTimestamp acer-nitro-sense.service 2>/dev/null || true)"
     fi
 
-    run_log "$label" env ANS_JOURNAL_SINCE="$since" sh -c 'if [ -n "$ANS_JOURNAL_SINCE" ]; then journalctl -u acer-nitro-sense.service --since "$ANS_JOURNAL_SINCE" --no-pager 2>&1; else journalctl -u acer-nitro-sense.service -n 120 --no-pager 2>&1; fi'
+    run_log "$label" env ANS_JOURNAL_SINCE="$since" sh -c "if [ -n \"\$ANS_JOURNAL_SINCE\" ]; then journalctl -u acer-nitro-sense.service --since \"\$ANS_JOURNAL_SINCE\" --no-pager 2>&1; else journalctl -u acer-nitro-sense.service -n 120 --no-pager 2>&1; fi"
 }
 
 collect_final_logs() {

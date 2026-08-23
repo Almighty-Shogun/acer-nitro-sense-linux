@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 run_safety_validation() {
     file="$OUT_DIR/safety-validation.status.log"
 

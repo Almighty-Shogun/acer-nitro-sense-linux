@@ -3,6 +3,11 @@
 
 #include <stdio.h>
 
-void client_usage(FILE *out);
+/**
+ * Print command-line usage.
+ *
+ * Command handlers call this when argument shape validation fails.
+ */
+void client_usage(FILE* out);
 
 #endif

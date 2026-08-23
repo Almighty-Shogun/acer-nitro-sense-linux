@@ -1,18 +1,29 @@
 #!/usr/bin/env sh
 set -eu
 
-SCRIPT_DIR="$(CDPATH= cd "$(dirname "$0")" && pwd)"
+SCRIPT_DIR="$(CDPATH='' cd "$(dirname "$0")" && pwd)"
 
+# shellcheck source=scripts/hardware/lib/validate-defaults.sh
 . "$SCRIPT_DIR/lib/validate-defaults.sh"
+# shellcheck source=scripts/hardware/lib/validate-logging.sh
 . "$SCRIPT_DIR/lib/validate-logging.sh"
+# shellcheck source=scripts/hardware/lib/validate-runtime.sh
 . "$SCRIPT_DIR/lib/validate-runtime.sh"
+# shellcheck source=scripts/hardware/lib/validate-summary-features.sh
 . "$SCRIPT_DIR/lib/validate-summary-features.sh"
+# shellcheck source=scripts/hardware/lib/validate-summary-status.sh
 . "$SCRIPT_DIR/lib/validate-summary-status.sh"
+# shellcheck source=scripts/hardware/lib/validate-summary-calibration.sh
 . "$SCRIPT_DIR/lib/validate-summary-calibration.sh"
+# shellcheck source=scripts/hardware/lib/validate-summary.sh
 . "$SCRIPT_DIR/lib/validate-summary.sh"
+# shellcheck source=scripts/hardware/lib/validate-phases.sh
 . "$SCRIPT_DIR/lib/validate-phases.sh"
+# shellcheck source=scripts/hardware/lib/validate-calibration.sh
 . "$SCRIPT_DIR/lib/validate-calibration.sh"
+# shellcheck source=scripts/hardware/lib/validate-scan.sh
 . "$SCRIPT_DIR/lib/validate-scan.sh"
+# shellcheck source=scripts/hardware/lib/validate-safety.sh
 . "$SCRIPT_DIR/lib/validate-safety.sh"
 
 mkdir -p "$OUT_DIR"
@@ -87,8 +98,8 @@ run_log keyboard-backlight "$ANS" keyboard-backlight status
 collect_current_daemon_journal journal-current-daemon
 run_log journal journalctl -u acer-nitro-sense.service -n 120 --no-pager
 run_log feature-power sh -c 'command -v powerprofilesctl >/dev/null && powerprofilesctl 2>&1 || echo powerprofilesctl=unavailable; systemctl --no-pager --full status power-profiles-daemon.service 2>&1 || true; ls -l /sys/firmware/acpi/platform_profile /sys/firmware/acpi/platform_profile_choices 2>&1; cat /sys/firmware/acpi/platform_profile /sys/firmware/acpi/platform_profile_choices 2>&1'
-run_log feature-power-supply sh -c 'for p in /sys/class/power_supply/*; do [ -e "$p" ] || continue; echo "$p"; for f in type online status capacity charge_now charge_full energy_now energy_full power_now voltage_now manufacturer model_name; do [ -r "$p/$f" ] && printf "  %s=" "$f" && cat "$p/$f" 2>&1; done; done'
-run_log feature-keyboard-backlight sh -c 'acer-nitro-sense keyboard-backlight status 2>&1; ls -l /sys/class/leds 2>&1; for l in /sys/class/leds/*; do [ -e "$l" ] || continue; echo "$l"; for f in brightness max_brightness trigger delay_on delay_off; do [ -r "$l/$f" ] && printf "  %s=" "$f" && cat "$l/$f" 2>&1; done; [ -e "$l/device" ] && printf "  device=" && readlink -f "$l/device" 2>&1; done'
+run_log feature-power-supply sh -c "for p in /sys/class/power_supply/*; do [ -e \"\$p\" ] || continue; echo \"\$p\"; for f in type online status capacity charge_now charge_full energy_now energy_full power_now voltage_now manufacturer model_name; do [ -r \"\$p/\$f\" ] && printf '  %s=' \"\$f\" && cat \"\$p/\$f\" 2>&1; done; done"
+run_log feature-keyboard-backlight sh -c "acer-nitro-sense keyboard-backlight status 2>&1; ls -l /sys/class/leds 2>&1; for l in /sys/class/leds/*; do [ -e \"\$l\" ] || continue; echo \"\$l\"; for f in brightness max_brightness trigger delay_on delay_off; do [ -r \"\$l/\$f\" ] && printf '  %s=' \"\$f\" && cat \"\$l/\$f\" 2>&1; done; [ -e \"\$l/device\" ] && printf '  device=' && readlink -f \"\$l/device\" 2>&1; done"
 
 if [ "$SAFETY_VALIDATE" = "1" ]; then
     if [ -n "$LOAD_CMD" ]; then

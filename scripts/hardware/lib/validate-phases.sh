@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 run_phase() {
     label="$1"
     coolboost="$2"

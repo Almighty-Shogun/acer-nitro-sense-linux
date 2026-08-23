@@ -59,5 +59,5 @@ fi
 %config(noreplace) %{_sysconfdir}/acer-nitro-sense/model.json
 
 %changelog
-* @RPM_CHANGELOG_DATE@ Almighty Shogun <contact@shogun.ms> - @VERSION@-@RPM_RELEASE@
+* @RPM_CHANGELOG_DATE@ Almighty Shogun <alm1ghtyshogun1998@gmail.com> - @VERSION@-@RPM_RELEASE@
 - Build release package

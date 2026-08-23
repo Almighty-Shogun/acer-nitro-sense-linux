@@ -10,8 +10,9 @@ EC_DUMP_RANGES="${EC_DUMP_RANGES:-0x00-0x7f 0x80-0xff}"
 OUT_DIR="${OUT_DIR:-/tmp/acer-nitro-sense-keyboard-backlight-$(date +%Y%m%d-%H%M%S)}"
 LOG_FILE="$OUT_DIR/keyboard-backlight-discovery.log"
 STARTED_AT="$(date --iso-8601=seconds 2>/dev/null || date)"
-SCRIPT_DIR="$(CDPATH= cd "$(dirname "$0")" && pwd)"
-PROJECT_DIR="$(CDPATH= cd "$SCRIPT_DIR/../.." && pwd)"
+SCRIPT_DIR="$(CDPATH='' cd "$(dirname "$0")" && pwd)"
+PROJECT_DIR="$(CDPATH='' cd "$SCRIPT_DIR/../.." && pwd)"
+export LOG_FILE
 
 case "$STEPS" in
     ''|*[!0-9]*)
@@ -37,6 +38,7 @@ esac
 mkdir -p "$OUT_DIR"
 cd "$PROJECT_DIR"
 
+# shellcheck source=scripts/hardware/lib/keyboard-backlight-discovery.sh
 . "$SCRIPT_DIR/lib/keyboard-backlight-discovery.sh"
 
 write_ec_diff() {
@@ -200,9 +202,9 @@ while [ "$i" -le "$STEPS" ]; do
     i=$((i + 1))
 done
 
-run_cmd "kernel-journal-since-start" env ANS_JOURNAL_SINCE="$STARTED_AT" sh -c '
-    journalctl -k --since "$ANS_JOURNAL_SINCE" --no-pager 2>&1 || true
-'
+run_cmd "kernel-journal-since-start" env ANS_JOURNAL_SINCE="$STARTED_AT" sh -c "
+    journalctl -k --since \"\$ANS_JOURNAL_SINCE\" --no-pager 2>&1 || true
+"
 
 write_summary
 log "keyboard backlight discovery complete"

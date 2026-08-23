@@ -3,8 +3,19 @@
 
 #include <stdbool.h>
 
+/**
+ * Clamp an integer to an inclusive range.
+ *
+ * Fan and config code use this when safety policy produces bounded values.
+ */
 int clamp_int(int value, int min, int max);
-bool parse_int_range(const char *text, int min_value, int max_value,
-                     int base, int *value);
+
+/**
+ * Parse a complete integer token inside an inclusive range.
+ *
+ * Partial conversions and out-of-range values are rejected instead of silently
+ * clamped.
+ */
+bool parse_int_range(const char* text, int min_value, int max_value, int base, int* value);
 
 #endif

@@ -1,3 +1,5 @@
+#!/usr/bin/env sh
+
 coolboost_state() {
     "$ANS" coolboost status 2>/dev/null | sed -n 's/^coolboost=//p' | head -n 1
 }
@@ -150,10 +152,9 @@ stop_load() {
         LOAD_PID=""
     fi
 
-    if [ -n "$LOAD_PIDS" ]; then
-        # shellcheck disable=SC2086
-        kill $LOAD_PIDS >/dev/null 2>&1 || true
+    if [ -n "${LOAD_PIDS:-}" ]; then
         for pid in $LOAD_PIDS; do
+            kill "$pid" >/dev/null 2>&1 || true
             wait "$pid" 2>/dev/null || true
         done
         LOAD_PIDS=""
@@ -165,16 +166,20 @@ start_builtin_load() {
     progress "starting built-in CPU load with $LOAD_WORKERS workers"
     while [ "$i" -le "$LOAD_WORKERS" ]; do
         (while :; do :; done) &
-        LOAD_PIDS="${LOAD_PIDS}${LOAD_PIDS:+ }$!"
+        load_pids="${LOAD_PIDS:-}"
+        LOAD_PIDS="${load_pids}${load_pids:+ }$!"
         i=$((i + 1))
     done
 }
 
 start_load() {
-    case "$LOAD_CMD" in
+    case "${LOAD_CMD:-}" in
         builtin|auto)
             start_builtin_load
             return 0
+            ;;
+        '')
+            return 1
             ;;
     esac
 

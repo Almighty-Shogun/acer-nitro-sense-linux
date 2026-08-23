@@ -3,7 +3,7 @@ Version: @VERSION@-@DEB_RELEASE@
 Section: utils
 Priority: optional
 Architecture: amd64
-Maintainer: Almighty Shogun <contact@shogun.ms>
+Maintainer: Almighty Shogun <alm1ghtyshogun1998@gmail.com>
 Installed-Size: @INSTALLED_SIZE@
 Depends: libc6, kmod, systemd
 Description: Acer Nitro fan control daemon and CLI
