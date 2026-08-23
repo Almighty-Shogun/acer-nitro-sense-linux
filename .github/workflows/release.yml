@@ -369,6 +369,7 @@ jobs:
 
         env:
             RELEASE_TAG: ${{ github.event.release.tag_name }}
+            PACKAGE_NAME: acer-nitro-sense-linux
             GH_TOKEN: ${{ github.token }}
 
         steps:
@@ -382,6 +383,24 @@ jobs:
                 with:
                     path: release-assets
                     merge-multiple: true
+
+            -   name: ⚙️ Normalize asset names
+                run: |
+                    set -Eeuo pipefail
+
+                    rename_one() {
+                        mapfile -t matches < <(
+                            find release-assets -maxdepth 1 -type f -name "$1" -printf '%f\n'
+                        )
+                        [[ "${#matches[@]}" == "1" ]]
+                        mv -- "release-assets/${matches[0]}" "release-assets/$2"
+                    }
+
+                    rename_one "*.run" "${PACKAGE_NAME}.run"
+                    rename_one "*_amd64.deb" "${PACKAGE_NAME}.deb"
+                    rename_one "*.tar.gz" "${PACKAGE_NAME}.tar.gz"
+                    rename_one "*.src.rpm" "${PACKAGE_NAME}.src.rpm"
+                    rename_one "*.x86_64.rpm" "${PACKAGE_NAME}.x86_64.rpm"
 
             -   name: ⚙️ Generate checksums
                 run: |
