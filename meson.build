@@ -1,5 +1,41 @@
 project('acer-nitro-sense-linux', 'c',
-  version: '0.1.0',
+  version: run_command(
+    'sh',
+    '-c',
+    '''
+if [ -n "${ANS_VERSION:-}" ]; then
+  printf '%s\n' "${ANS_VERSION}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$' || exit 1
+  printf '%s\n' "${ANS_VERSION}"
+  exit 0
+fi
+
+tag="$(git describe --tags --exact-match 2>/dev/null || true)"
+
+if printf '%s\n' "${tag}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+  printf '%s\n' "${tag}"
+  exit 0
+fi
+
+for path in \
+  "${MESON_SOURCE_ROOT:-}" \
+  "$(pwd)" \
+  "$(dirname "$(pwd)")"; do
+  [ -n "${path}" ] || continue
+
+  directory="$(basename "${path}")"
+  version="${directory#acer-nitro-sense-linux-}"
+
+  if [ "${directory}" != "${version}" ] &&
+     printf '%s\n' "${version}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+    printf '%s\n' "${version}"
+    exit 0
+  fi
+done
+
+printf '0.0.0\n'
+    ''',
+    check: true,
+  ).stdout().strip(),
   default_options: ['c_std=c17', 'warning_level=2'])
 
 prefix = get_option('prefix')

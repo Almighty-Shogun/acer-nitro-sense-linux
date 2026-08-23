@@ -37,6 +37,7 @@ jobs:
 
                     {
                         echo "VERSION=${RELEASE_TAG}"
+                        echo "ANS_VERSION=${RELEASE_TAG}"
                         echo "PACKAGE_NAME=acer-nitro-sense-linux"
                         echo "SOURCE_ARCHIVE=build/meson-dist/acer-nitro-sense-linux-${RELEASE_TAG}.tar.gz"
                         echo "RUN_ASSET=acer-nitro-sense-linux-${RELEASE_TAG}.run"
@@ -233,6 +234,7 @@ jobs:
 
                     {
                         echo "VERSION=${RELEASE_TAG}"
+                        echo "ANS_VERSION=${RELEASE_TAG}"
                         echo "PACKAGE_NAME=acer-nitro-sense-linux"
                         echo "SOURCE_ARCHIVE=build/meson-dist/acer-nitro-sense-linux-${RELEASE_TAG}.tar.gz"
                     } >> "${GITHUB_ENV}"
